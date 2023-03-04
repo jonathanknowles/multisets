@@ -16,6 +16,7 @@ module Data.MultiSet
     , multiplicity
     , maximum
     , minimum
+    , invert
     , intersection
     , union
     , emptyN
@@ -32,7 +33,7 @@ import Prelude hiding
     ( gcd, maximum, minimum )
 
 import Data.Group
-    ( Group (..) )
+    ( Group )
 import Data.Monoid
     ( Sum (..) )
 import Data.Total.MonoidMap
@@ -41,6 +42,7 @@ import Numeric.Natural
     ( Natural )
 
 import qualified Data.Foldable as F
+import qualified Data.Group as Group
 import qualified Data.Total.MonoidMap as MonoidMap
 
 data MultiSet (t :: MultiSetType) a where
@@ -77,7 +79,7 @@ instance Ord a => Monoid (MultiSetZ a) where
     mempty = MultiSetZ mempty
 
 instance Ord a => Group (MultiSetZ a) where
-    invert (MultiSetZ s) = MultiSetZ (invert s)
+    invert (MultiSetZ s) = MultiSetZ (MonoidMap.invert s)
 
 emptyN :: MultiSetN a
 emptyN = MultiSetN MonoidMap.empty
@@ -97,13 +99,14 @@ toList = \case
     MultiSetZ s -> fmap getSum <$> MonoidMap.toList s
 
 toMultiSetZ :: MultiSetN a -> MultiSetZ a
-toMultiSetZ (MultiSetN s) = MultiSetZ $ MonoidMap.map (fmap fromIntegral) s
+toMultiSetZ (MultiSetN s) = MultiSetZ $
+    MonoidMap.map (fmap naturalToInteger) s
 
 toMultiSetN :: MultiSetZ a -> (MultiSetN a, MultiSetN a)
 toMultiSetN (MultiSetZ s) = (MultiSetN ps, MultiSetN ns)
   where
-    ps = MonoidMap.map (fmap  fromIntegral       ) (MonoidMap.filter (> 0) s)
-    ns = MonoidMap.map (fmap (fromIntegral . abs)) (MonoidMap.filter (< 0) s)
+    ps = MonoidMap.map (fmap integerPositivePartToNatural) s
+    ns = MonoidMap.map (fmap integerNegativePartToNatural) s
 
 cardinality :: MultiSet t a -> Multiplicity t
 cardinality = \case
@@ -125,6 +128,13 @@ minimum = \case
     MultiSetN s -> getSum $ F.minimum s
     MultiSetZ s -> getSum $ F.minimum s
 
+invert :: MultiSet t a -> MultiSetZ a
+invert = \case
+    MultiSetN s -> MultiSetZ
+        (MonoidMap.map (fmap (negate . naturalToInteger)) s)
+    MultiSetZ s -> MultiSetZ
+        (MonoidMap.map (fmap negate) s)
+
 intersection :: Ord a => MultiSet t a -> MultiSet t a -> MultiSet t a
 intersection (MultiSetN s1) (MultiSetN s2) =
     MultiSetN (MonoidMap.intersection min s1 s2)
@@ -136,3 +146,20 @@ union (MultiSetN s1) (MultiSetN s2) =
     MultiSetN (MonoidMap.union max s1 s2)
 union (MultiSetZ s1) (MultiSetZ s2) =
     MultiSetZ (MonoidMap.union max s1 s2)
+
+--------------------------------------------------------------------------------
+-- Utilities
+--------------------------------------------------------------------------------
+
+naturalToInteger :: Natural -> Integer
+naturalToInteger = fromIntegral
+
+integerNegativePartToNatural :: Integer -> Natural
+integerNegativePartToNatural n
+    | n < 0 = fromIntegral (abs n)
+    | otherwise = 0
+
+integerPositivePartToNatural :: Integer -> Natural
+integerPositivePartToNatural n
+    | n > 0 = fromIntegral n
+    | otherwise = 0
