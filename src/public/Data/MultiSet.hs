@@ -16,6 +16,7 @@ module Data.MultiSet
     , multiplicity
     , maximum
     , minimum
+    , invert
     , intersection
     , union
     , emptyN
@@ -32,7 +33,7 @@ import Prelude hiding
     ( gcd, maximum, minimum )
 
 import Data.Group
-    ( Group (..) )
+    ( Group )
 import Data.Monoid
     ( Sum (..) )
 import Data.Total.MonoidMap
@@ -41,6 +42,7 @@ import Numeric.Natural
     ( Natural )
 
 import qualified Data.Foldable as F
+import qualified Data.Group as Group
 import qualified Data.Total.MonoidMap as MonoidMap
 
 data MultiSet (t :: MultiSetType) a where
@@ -77,7 +79,7 @@ instance Ord a => Monoid (MultiSetZ a) where
     mempty = MultiSetZ mempty
 
 instance Ord a => Group (MultiSetZ a) where
-    invert (MultiSetZ s) = MultiSetZ (invert s)
+    invert (MultiSetZ s) = MultiSetZ (MonoidMap.invert s)
 
 emptyN :: MultiSetN a
 emptyN = MultiSetN MonoidMap.empty
@@ -124,6 +126,13 @@ minimum :: MultiSet t a -> Multiplicity t
 minimum = \case
     MultiSetN s -> getSum $ F.minimum s
     MultiSetZ s -> getSum $ F.minimum s
+
+invert :: MultiSet t a -> MultiSetZ a
+invert = \case
+    MultiSetN s -> MultiSetZ
+        (MonoidMap.map (fmap (negate . fromIntegral)) s)
+    MultiSetZ s -> MultiSetZ
+        (MonoidMap.map (fmap negate) s)
 
 intersection :: Ord a => MultiSet t a -> MultiSet t a -> MultiSet t a
 intersection (MultiSetN s1) (MultiSetN s2) =
