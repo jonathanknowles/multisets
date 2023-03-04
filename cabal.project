@@ -3,4 +3,4 @@ packages: multisets.cabal
 source-repository-package
     type: git
     location: https://github.com/jonathanknowles/total-monoidal-maps.git
-    tag: a903136e838db6e44bf4d428a5dd7ad2b93cba98
+    tag: 086675dc431aaade458b36f19f89f6835cc24303
