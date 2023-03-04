@@ -99,13 +99,14 @@ toList = \case
     MultiSetZ s -> fmap getSum <$> MonoidMap.toList s
 
 toMultiSetZ :: MultiSetN a -> MultiSetZ a
-toMultiSetZ (MultiSetN s) = MultiSetZ $ MonoidMap.map (fmap fromIntegral) s
+toMultiSetZ (MultiSetN s) = MultiSetZ $
+    MonoidMap.map (fmap naturalToInteger) s
 
 toMultiSetN :: MultiSetZ a -> (MultiSetN a, MultiSetN a)
 toMultiSetN (MultiSetZ s) = (MultiSetN ps, MultiSetN ns)
   where
-    ps = MonoidMap.map (fmap  fromIntegral       ) (MonoidMap.filter (> 0) s)
-    ns = MonoidMap.map (fmap (fromIntegral . abs)) (MonoidMap.filter (< 0) s)
+    ps = MonoidMap.map (fmap integerPositivePartToNatural) s
+    ns = MonoidMap.map (fmap integerNegativePartToNatural) s
 
 cardinality :: MultiSet t a -> Multiplicity t
 cardinality = \case
@@ -130,7 +131,7 @@ minimum = \case
 invert :: MultiSet t a -> MultiSetZ a
 invert = \case
     MultiSetN s -> MultiSetZ
-        (MonoidMap.map (fmap (negate . fromIntegral)) s)
+        (MonoidMap.map (fmap (negate . naturalToInteger)) s)
     MultiSetZ s -> MultiSetZ
         (MonoidMap.map (fmap negate) s)
 
@@ -145,3 +146,20 @@ union (MultiSetN s1) (MultiSetN s2) =
     MultiSetN (MonoidMap.union max s1 s2)
 union (MultiSetZ s1) (MultiSetZ s2) =
     MultiSetZ (MonoidMap.union max s1 s2)
+
+--------------------------------------------------------------------------------
+-- Utilities
+--------------------------------------------------------------------------------
+
+naturalToInteger :: Natural -> Integer
+naturalToInteger = fromIntegral
+
+integerNegativePartToNatural :: Integer -> Natural
+integerNegativePartToNatural n
+    | n < 0 = fromIntegral (abs n)
+    | otherwise = 0
+
+integerPositivePartToNatural :: Integer -> Natural
+integerPositivePartToNatural n
+    | n > 0 = fromIntegral n
+    | otherwise = 0
