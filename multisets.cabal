@@ -26,6 +26,8 @@ common dependency-hspec
     build-depends:hspec                         >= 2.10.9     && < 2.11
 common dependency-monoid-subclasses
     build-depends:monoid-subclasses             >= 1.2.1      && < 1.3
+common dependency-monoidmap
+    build-depends:monoidmap                     >= 0.0.0.0    && < 0.1
 common dependency-pretty-show
     build-depends:pretty-show                   >= 1.10       && < 1.11
 common dependency-QuickCheck
@@ -44,8 +46,6 @@ common dependency-tasty-hunit
     build-depends:tasty-hunit                   >= 0.10.0.3   && < 0.11
 common dependency-text
     build-depends:text                          >= 1.2.4.1    && < 2.1
-common dependency-total-monoidal-maps
-    build-depends:total-monoidal-maps           >= 0.0.0.0    && < 0.1
 
 common extensions
     default-extensions:
@@ -73,7 +73,7 @@ library
       , dependency-containers
       , dependency-groups
       , dependency-monoid-subclasses
-      , dependency-total-monoidal-maps
+      , dependency-monoidmap
       , extensions
     hs-source-dirs:
         src/public
