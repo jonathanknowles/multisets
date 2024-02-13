@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE StandaloneDeriving #-}
+{-# OPTIONS_GHC -Wno-unticked-promoted-constructors #-}
 
 -- |
 -- Copyright: © 2022–2023 Jonathan Knowles
@@ -36,14 +37,14 @@ import Data.Group
     ( Group )
 import Data.Monoid
     ( Sum (..) )
-import Data.Total.MonoidMap
+import Data.MonoidMap
     ( MonoidMap )
 import Numeric.Natural
     ( Natural )
 
 import qualified Data.Foldable as F
 import qualified Data.Group as Group
-import qualified Data.Total.MonoidMap as MonoidMap
+import qualified Data.MonoidMap as MonoidMap
 
 data MultiSet (t :: MultiSetType) a where
     MultiSetN :: MonoidMap a (Sum Natural) -> MultiSetN a
@@ -137,15 +138,15 @@ invert = \case
 
 intersection :: Ord a => MultiSet t a -> MultiSet t a -> MultiSet t a
 intersection (MultiSetN s1) (MultiSetN s2) =
-    MultiSetN (MonoidMap.intersection min s1 s2)
+    MultiSetN (MonoidMap.intersectionWith min s1 s2)
 intersection (MultiSetZ s1) (MultiSetZ s2) =
-    MultiSetZ (MonoidMap.intersection min s1 s2)
+    MultiSetZ (MonoidMap.intersectionWith min s1 s2)
 
 union :: Ord a => MultiSet t a -> MultiSet t a -> MultiSet t a
 union (MultiSetN s1) (MultiSetN s2) =
-    MultiSetN (MonoidMap.union max s1 s2)
+    MultiSetN (MonoidMap.unionWith max s1 s2)
 union (MultiSetZ s1) (MultiSetZ s2) =
-    MultiSetZ (MonoidMap.union max s1 s2)
+    MultiSetZ (MonoidMap.unionWith max s1 s2)
 
 --------------------------------------------------------------------------------
 -- Utilities
