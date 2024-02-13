@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE StandaloneDeriving #-}
+{-# OPTIONS_GHC -Wno-unticked-promoted-constructors #-}
 
 -- |
 -- Copyright: © 2022–2023 Jonathan Knowles
