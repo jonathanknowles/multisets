@@ -104,10 +104,10 @@ toMultiSetZ (MultiSetN s) = MultiSetZ $
     MonoidMap.map (fmap naturalToInteger) s
 
 toMultiSetN :: MultiSetZ a -> (MultiSetN a, MultiSetN a)
-toMultiSetN (MultiSetZ s) = (MultiSetN ps, MultiSetN ns)
+toMultiSetN (MultiSetZ s) = (MultiSetN ns, MultiSetN ps)
   where
-    ps = MonoidMap.map (fmap integerPositivePartToNatural) s
     ns = MonoidMap.map (fmap integerNegativePartToNatural) s
+    ps = MonoidMap.map (fmap integerPositivePartToNatural) s
 
 cardinality :: MultiSet t a -> Multiplicity t
 cardinality = \case
