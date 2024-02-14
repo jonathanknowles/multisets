@@ -99,15 +99,16 @@ toList = \case
     MultiSetN s -> fmap getSum <$> MonoidMap.toList s
     MultiSetZ s -> fmap getSum <$> MonoidMap.toList s
 
-toMultiSetZ :: MultiSetN a -> MultiSetZ a
-toMultiSetZ (MultiSetN s) = MultiSetZ $
-    MonoidMap.map (fmap naturalToInteger) s
+toMultiSetZ :: Ord a => (MultiSetN a, MultiSetN a) -> MultiSetZ a
+toMultiSetZ (MultiSetN ns, MultiSetN ps) = MultiSetZ $ (<>)
+    (MonoidMap.map (fmap (negate . naturalToInteger)) ns)
+    (MonoidMap.map (fmap (         naturalToInteger)) ps)
 
 toMultiSetN :: MultiSetZ a -> (MultiSetN a, MultiSetN a)
-toMultiSetN (MultiSetZ s) = (MultiSetN ps, MultiSetN ns)
+toMultiSetN (MultiSetZ s) = (MultiSetN ns, MultiSetN ps)
   where
-    ps = MonoidMap.map (fmap integerPositivePartToNatural) s
     ns = MonoidMap.map (fmap integerNegativePartToNatural) s
+    ps = MonoidMap.map (fmap integerPositivePartToNatural) s
 
 cardinality :: MultiSet t a -> Multiplicity t
 cardinality = \case
@@ -121,13 +122,13 @@ multiplicity a = \case
 
 maximum :: MultiSet t a -> Multiplicity t
 maximum = \case
-    MultiSetN s -> getSum $ F.maximum s
-    MultiSetZ s -> getSum $ F.maximum s
+    MultiSetN s -> if MonoidMap.null s then 0 else getSum $ F.maximum s
+    MultiSetZ s -> if MonoidMap.null s then 0 else getSum $ F.maximum s
 
 minimum :: MultiSet t a -> Multiplicity t
 minimum = \case
-    MultiSetN s -> getSum $ F.minimum s
-    MultiSetZ s -> getSum $ F.minimum s
+    MultiSetN s -> if MonoidMap.null s then 0 else getSum $ F.minimum s
+    MultiSetZ s -> if MonoidMap.null s then 0 else getSum $ F.minimum s
 
 invert :: MultiSet t a -> MultiSetZ a
 invert = \case
