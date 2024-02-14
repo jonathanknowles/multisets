@@ -122,13 +122,13 @@ multiplicity a = \case
 
 maximum :: MultiSet t a -> Multiplicity t
 maximum = \case
-    MultiSetN s -> getSum $ F.maximum s
-    MultiSetZ s -> getSum $ F.maximum s
+    MultiSetN s -> if MonoidMap.null s then 0 else getSum $ F.maximum s
+    MultiSetZ s -> if MonoidMap.null s then 0 else getSum $ F.maximum s
 
 minimum :: MultiSet t a -> Multiplicity t
 minimum = \case
-    MultiSetN s -> getSum $ F.minimum s
-    MultiSetZ s -> getSum $ F.minimum s
+    MultiSetN s -> if MonoidMap.null s then 0 else getSum $ F.minimum s
+    MultiSetZ s -> if MonoidMap.null s then 0 else getSum $ F.minimum s
 
 invert :: MultiSet t a -> MultiSetZ a
 invert = \case
