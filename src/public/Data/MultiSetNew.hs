@@ -1,3 +1,4 @@
+{-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE RankNTypes #-}
@@ -45,14 +46,19 @@ data MultiplicityS m where
     MultiplicityN :: MultiplicityS Natural
     MultiplicityZ :: MultiplicityS Integer
 
-class (Eq m, Num m) => Multiplicity m where
+class (Eq m, Num m) => Constraints m where
     multiplicityS :: MultiplicityS m
 
-instance Multiplicity Integer where
+instance Constraints Integer where
     multiplicityS = MultiplicityZ
 
-instance Multiplicity Natural where
+instance Constraints Natural where
     multiplicityS = MultiplicityN
+
+class Constraints m => Multiplicity m
+
+instance Multiplicity Integer
+instance Multiplicity Natural
 
 newtype MultiSet a m = UnsafeMultiSet {unwrap :: MonoidMap a (Sum m)}
     deriving stock Eq
@@ -63,18 +69,12 @@ type MultiSetZ a = MultiSet a Integer
 instance (Show a, Show m) => Show (MultiSet a m) where
     show = show . coerce @_ @(Map a m) . MonoidMap.toMap . unwrap
 
-withMultiplicity :: MultiplicityS m -> (Multiplicity m => r) -> r
-withMultiplicity m r = case m of
-    MultiplicityN -> r
-    MultiplicityZ -> r
-
 empty :: forall a m. (Ord a, Multiplicity m) => MultiSet a m
-empty = withMultiplicity (multiplicityS @m) (UnsafeMultiSet mempty)
+empty = UnsafeMultiSet mempty
 
 fromList :: forall a m. (Ord a, Multiplicity m) => [(a, m)] -> MultiSet a m
 fromList
-    = withMultiplicity (multiplicityS @m)
-    . UnsafeMultiSet
+    = UnsafeMultiSet
     . MonoidMap.fromList
     . coerce @_ @[(a, Sum m)]
 
@@ -99,14 +99,10 @@ splitSigned (UnsafeMultiSet s) =
     ps = MonoidMap.map (fmap integerPositivePartToNatural) s
 
 cardinality :: forall a m. Multiplicity m => MultiSet a m -> m
-cardinality
-    = withMultiplicity (multiplicityS @m)
-    $ getSum . F.fold . unwrap
+cardinality = getSum . F.fold . unwrap
 
 multiplicity :: forall a m. (Ord a, Multiplicity m) => a -> MultiSet a m -> m
-multiplicity
-    = withMultiplicity (multiplicityS @m)
-    $ \a -> getSum . MonoidMap.get a . unwrap
+multiplicity a = getSum . MonoidMap.get a . unwrap
 
 invert :: forall a m. Multiplicity m => MultiSet a m -> MultiSet a Integer
 invert (UnsafeMultiSet s) = case multiplicityS @m of
