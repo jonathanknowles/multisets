@@ -11,17 +11,21 @@
 --
 module Data.MultiSetNew
     ( MultiSet
+    , MultiSetN
+    , MultiSetZ
     , Multiplicity
-    , empty
-    , fromList
-    , toList
-    , mergeSigned
-    , splitSigned
     , cardinality
     , multiplicity
     , maximum
     , minimum
     , invert
+    , intersection
+    , union
+    , empty
+    , fromList
+    , toList
+    , toMultiSetN
+    , toMultiSetZ
     ) where
 
 import Prelude hiding
@@ -41,8 +45,28 @@ import Numeric.Natural
     ( Natural )
 
 import qualified Data.Foldable as F
-import qualified Data.Group as Group
 import qualified Data.MonoidMap as MonoidMap
+
+newtype MultiSet a m = MultiSet {unwrap :: MonoidMap a (Sum m)}
+    deriving stock Eq
+
+instance (Show a, Show m) => Show (MultiSet a m) where
+    show
+        = show
+        . coerce @_ @(Map a m)
+        . MonoidMap.toMap
+        . unwrap
+
+deriving newtype instance (Ord a, Multiplicity m) => Semigroup (MultiSet a m)
+deriving newtype instance (Ord a, Multiplicity m) => Monoid (MultiSet a m)
+
+deriving newtype instance Ord a => Group (MultiSetZ a)
+
+-- | Represents a multiset with 'Natural' (ℕ) multiplicity.
+type MultiSetN a = MultiSet a Natural
+
+-- | Represents a multiset with 'Integer' (ℤ) multiplicity.
+type MultiSetZ a = MultiSet a Integer
 
 data MultiplicityS m where
     MultiplicityN :: MultiplicityS Natural
@@ -62,43 +86,30 @@ class MultiplicityConstraints m => Multiplicity m
 instance Multiplicity Integer
 instance Multiplicity Natural
 
-newtype MultiSet a m = UnsafeMultiSet {unwrap :: MonoidMap a (Sum m)}
-    deriving stock Eq
-
-type MultiSetN a = MultiSet a Natural
-type MultiSetZ a = MultiSet a Integer
-
-instance (Show a, Show m) => Show (MultiSet a m) where
-    show = show . coerce @_ @(Map a m) . MonoidMap.toMap . unwrap
-
 empty :: forall a m. (Ord a, Multiplicity m) => MultiSet a m
-empty = UnsafeMultiSet mempty
+empty = MultiSet mempty
 
 fromList :: forall a m. (Ord a, Multiplicity m) => [(a, m)] -> MultiSet a m
 fromList
-    = UnsafeMultiSet
+    = MultiSet
     . MonoidMap.fromList
     . coerce @_ @[(a, Sum m)]
 
 toList :: forall a m. MultiSet a m -> [(a, m)]
 toList = coerce @_ @[(a, m)] . MonoidMap.toList . unwrap
 
-mergeSigned
-    :: Ord a
-    => MultiSet a Natural
-    -> MultiSet a Natural
-    -> MultiSet a Integer
-mergeSigned (UnsafeMultiSet ns) (UnsafeMultiSet ps) =
-    UnsafeMultiSet $ (<>)
-        (MonoidMap.map (fmap (negate . naturalToInteger)) ns)
-        (MonoidMap.map (fmap (         naturalToInteger)) ps)
-
-splitSigned :: MultiSet a Integer -> (MultiSet a Natural, MultiSet a Natural)
-splitSigned (UnsafeMultiSet s) =
-    (UnsafeMultiSet ns, UnsafeMultiSet ps)
+toMultiSetZ :: MultiSetZ a -> (MultiSetN a, MultiSetN a)
+toMultiSetZ (MultiSet s) =
+    (MultiSet ns, MultiSet ps)
   where
     ns = MonoidMap.map (fmap integerNegativePartToNatural) s
     ps = MonoidMap.map (fmap integerPositivePartToNatural) s
+
+toMultiSetN :: Ord a => (MultiSetN a, MultiSetN a) -> MultiSetZ a
+toMultiSetN (MultiSet ns, MultiSet ps) =
+    MultiSet $ (<>)
+        (MonoidMap.map (fmap (negate . naturalToInteger)) ns)
+        (MonoidMap.map (fmap (         naturalToInteger)) ps)
 
 cardinality :: forall a m. Multiplicity m => MultiSet a m -> m
 cardinality = getSum . F.fold . unwrap
@@ -107,21 +118,37 @@ multiplicity :: forall a m. (Ord a, Multiplicity m) => a -> MultiSet a m -> m
 multiplicity a = getSum . MonoidMap.get a . unwrap
 
 maximum :: Multiplicity m => MultiSet a m -> m
-maximum (UnsafeMultiSet s)
+maximum (MultiSet s)
     | MonoidMap.null s = 0
     | otherwise = getSum $ F.maximum s
 
 minimum :: Multiplicity m => MultiSet a m -> m
-minimum (UnsafeMultiSet s)
+minimum (MultiSet s)
     | MonoidMap.null s = 0
     | otherwise = getSum $ F.minimum s
 
-invert :: forall a m. Multiplicity m => MultiSet a m -> MultiSet a Integer
-invert (UnsafeMultiSet s) = case multiplicityS @m of
-    MultiplicityN -> UnsafeMultiSet
+invert :: forall a m. Multiplicity m => MultiSet a m -> MultiSetZ a
+invert (MultiSet s) = case multiplicityS @m of
+    MultiplicityN -> MultiSet
         (MonoidMap.map (fmap (negate . naturalToInteger)) s)
-    MultiplicityZ -> UnsafeMultiSet
+    MultiplicityZ -> MultiSet
         (MonoidMap.map (fmap negate) s)
+
+intersection
+    :: (Ord a, Multiplicity m)
+    => MultiSet a m
+    -> MultiSet a m
+    -> MultiSet a m
+intersection (MultiSet s1) (MultiSet s2) =
+    MultiSet (MonoidMap.intersectionWith min s1 s2)
+
+union
+    :: (Ord a, Multiplicity m)
+    => MultiSet a m
+    -> MultiSet a m
+    -> MultiSet a m
+union (MultiSet s1) (MultiSet s2) =
+    MultiSet (MonoidMap.unionWith max s1 s2)
 
 --------------------------------------------------------------------------------
 -- Utilities
