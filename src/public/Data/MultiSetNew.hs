@@ -19,6 +19,8 @@ module Data.MultiSetNew
     , splitSigned
     , cardinality
     , multiplicity
+    , maximum
+    , minimum
     , invert
     ) where
 
@@ -46,16 +48,16 @@ data MultiplicityS m where
     MultiplicityN :: MultiplicityS Natural
     MultiplicityZ :: MultiplicityS Integer
 
-class (Eq m, Num m) => Constraints m where
+class (Num m, Ord m) => MultiplicityConstraints m where
     multiplicityS :: MultiplicityS m
 
-instance Constraints Integer where
+instance MultiplicityConstraints Integer where
     multiplicityS = MultiplicityZ
 
-instance Constraints Natural where
+instance MultiplicityConstraints Natural where
     multiplicityS = MultiplicityN
 
-class Constraints m => Multiplicity m
+class MultiplicityConstraints m => Multiplicity m
 
 instance Multiplicity Integer
 instance Multiplicity Natural
@@ -103,6 +105,16 @@ cardinality = getSum . F.fold . unwrap
 
 multiplicity :: forall a m. (Ord a, Multiplicity m) => a -> MultiSet a m -> m
 multiplicity a = getSum . MonoidMap.get a . unwrap
+
+maximum :: Multiplicity m => MultiSet a m -> m
+maximum (UnsafeMultiSet s)
+    | MonoidMap.null s = 0
+    | otherwise = getSum $ F.maximum s
+
+minimum :: Multiplicity m => MultiSet a m -> m
+minimum (UnsafeMultiSet s)
+    | MonoidMap.null s = 0
+    | otherwise = getSum $ F.minimum s
 
 invert :: forall a m. Multiplicity m => MultiSet a m -> MultiSet a Integer
 invert (UnsafeMultiSet s) = case multiplicityS @m of
