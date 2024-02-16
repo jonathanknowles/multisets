@@ -100,8 +100,7 @@ fromListZ :: Ord a => [(a, Integer)] -> MultiSetZ a
 fromListZ kvs = MultiSet (MonoidMap.fromList (fmap Sum <$> kvs))
 
 toList :: MultiSet t a -> [(a, Multiplicity t)]
-toList = \case
-    MultiSet s -> fmap getSum <$> MonoidMap.toList s
+toList (MultiSet s) = fmap getSum <$> MonoidMap.toList s
 
 toMultiSetZ :: Ord a => (MultiSetN a, MultiSetN a) -> MultiSetZ a
 toMultiSetZ (MultiSet ns, MultiSet ps) = MultiSet $ (<>)
@@ -115,32 +114,27 @@ toMultiSetN (MultiSet s) = (MultiSet ns, MultiSet ps)
     ps = MonoidMap.map (fmap integerPositivePartToNatural) s
 
 cardinality :: Num (Multiplicity t) => MultiSet t a -> Multiplicity t
-cardinality = \case
-    MultiSet s -> getSum $ F.fold s
+cardinality (MultiSet s) = getSum $ F.fold s
 
 multiplicity
     :: (Num (Multiplicity t), Ord a) => a -> MultiSet t a -> Multiplicity t
-multiplicity a = \case
-    MultiSet s -> getSum $ MonoidMap.get a s
+multiplicity a (MultiSet s) = getSum $ MonoidMap.get a s
 
 maximum
     :: (Num (Multiplicity t), Ord (Multiplicity t))
     => MultiSet t a
     -> Multiplicity t
-maximum = \case
-    MultiSet s -> if MonoidMap.null s then 0 else getSum $ F.maximum s
+maximum (MultiSet s) = if MonoidMap.null s then 0 else getSum $ F.maximum s
 
 minimum
     :: (Num (Multiplicity t), Ord (Multiplicity t))
     => MultiSet t a
     -> Multiplicity t
-minimum = \case
-    MultiSet s -> if MonoidMap.null s then 0 else getSum $ F.minimum s
+minimum (MultiSet s) = if MonoidMap.null s then 0 else getSum $ F.minimum s
 
 invert :: Integral (Multiplicity t) => MultiSet t a -> MultiSetZ a
-invert = \case
-    MultiSet s -> MultiSet
-        (MonoidMap.map (fmap (negate . toInteger)) s)
+invert (MultiSet s) =
+    MultiSet (MonoidMap.map (fmap (negate . toInteger)) s)
 
 intersection
     :: (Eq (Multiplicity t), Num (Multiplicity t), Ord (Multiplicity t), Ord a)
