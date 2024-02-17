@@ -49,7 +49,7 @@ import qualified Data.MonoidMap as MonoidMap
 
 data MultiSet (t :: MultiSetType) a =
     MultiplicityConstraints (Multiplicity t) =>
-    MultiSet (MonoidMap a (Sum (Multiplicity t)))
+    MultiSet {unwrap :: MonoidMap a (Sum (Multiplicity t))}
 
 data MultiSetType
     -- | Indicates a multiset with 'Natural' (ℕ) multiplicity.
