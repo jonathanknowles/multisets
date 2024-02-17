@@ -1,7 +1,10 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeFamilyDependencies #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-unticked-promoted-constructors #-}
 
 -- |
@@ -10,14 +13,16 @@
 --
 module Data.MultiSet
     ( MultiSet
-    , MultiSetType (..)
-    , MultiSetN
-    , MultiSetZ
+    , MultiSetType (N, Z)
     , Multiplicity
-    , cardinality
-    , multiplicity
+    , IsMultiplicity
+    , empty
+    , fromList
     , maximum
     , minimum
+    {-, cardinality
+    , multiplicity
+
     , invert
     , intersection
     , union
@@ -25,7 +30,7 @@ module Data.MultiSet
     , emptyZ
     , fromListN
     , fromListZ
-    , toList
+    , toList-}
     , toMultiSetZ
     , toMultiSetN
     )
@@ -38,10 +43,10 @@ import Data.Coerce
     ( coerce )
 import Data.Group
     ( Group )
-import Data.Monoid
-    ( Sum (..) )
 import Data.MonoidMap
     ( MonoidMap )
+import Data.Monoid.Null
+    ( MonoidNull (null) )
 import Numeric.Natural
     ( Natural )
 
@@ -49,9 +54,36 @@ import qualified Data.Foldable as F
 import qualified Data.Group as Group
 import qualified Data.MonoidMap as MonoidMap
 
-data MultiSet (t :: MultiSetType) a =
-    MultiplicityConstraints (Multiplicity t) =>
+newtype MultiSet (t :: MultiSetType) a =
     MultiSet {unwrap :: MonoidMap a (Sum (Multiplicity t))}
+
+type MultiplicityConstraints m = (Eq m, Show m, Num m)
+
+class MultiplicityConstraints m => IsMultiplicity m
+
+deriving instance
+    (IsMultiplicity (Multiplicity t), Eq a) => Eq (MultiSet t a)
+deriving instance
+    (IsMultiplicity (Multiplicity t), Show a) => Show (MultiSet t a)
+deriving newtype instance
+    (IsMultiplicity (Multiplicity t), Ord a) => Semigroup (MultiSet t a)
+deriving newtype instance
+    (IsMultiplicity (Multiplicity t), Ord a) => Monoid (MultiSet t a)
+deriving newtype instance
+    (IsMultiplicity (Multiplicity t), Ord a) => MonoidNull (MultiSet t a)
+
+newtype Sum a = Sum {getSum :: a}
+    deriving (Functor, Eq, Ord, Show)
+
+instance (m ~ Multiplicity t, Num m) => Semigroup (Sum m) where
+    Sum x <> Sum y = Sum (x + y)
+
+instance (m ~ Multiplicity t, Num m) => Monoid (Sum m) where
+    mempty = Sum 0
+
+instance (m ~ Multiplicity t, Eq m, Num m) => MonoidNull (Sum m) where
+    null (Sum 0) = True
+    null _ = False
 
 data MultiSetType
     -- | Indicates a multiset with 'Natural' (ℕ) multiplicity.
@@ -66,26 +98,18 @@ type MultiSetN = MultiSet N
 type MultiSetZ = MultiSet Z
 
 -- | Maps the type of a multiset to the type of its multiplicity.
-type family Multiplicity (t :: MultiSetType) where
+type family Multiplicity (t :: MultiSetType) = m | m -> t where
     Multiplicity N = Natural
     Multiplicity Z = Integer
 
-type MultiplicityConstraints t = (Eq t, Integral t, Num t, Ord t, Show t)
+empty :: MultiSet t a
+empty = MultiSet MonoidMap.empty
 
-deriving instance Eq a => Eq (MultiSet t a)
-deriving instance Show a => Show (MultiSet t a)
+fromList :: (IsMultiplicity (Multiplicity t), Ord a) => [(a, Multiplicity t)] -> MultiSet t a
+fromList = MultiSet . MonoidMap.fromList . coerce
 
-instance Ord a => Semigroup (MultiSet t a) where
-    MultiSet s1 <> MultiSet s2 = MultiSet (s1 <> s2)
 
-instance Ord a => Monoid (MultiSetN a) where
-    mempty = MultiSet mempty
-instance Ord a => Monoid (MultiSetZ a) where
-    mempty = MultiSet mempty
-
-instance Ord a => Group (MultiSetZ a) where
-    invert (MultiSet s) = MultiSet (MonoidMap.invert s)
-
+{-
 emptyN :: MultiSetN a
 emptyN = MultiSet MonoidMap.empty
 
@@ -100,7 +124,7 @@ fromListZ = MultiSet . MonoidMap.fromList . coerce
 
 toList :: MultiSet t a -> [(a, Multiplicity t)]
 toList = coerce . MonoidMap.toList . unwrap
-
+-}
 toMultiSetZ :: Ord a => (MultiSetN a, MultiSetN a) -> MultiSetZ a
 toMultiSetZ (MultiSet ns, MultiSet ps) = MultiSet $ (<>)
     (MonoidMap.map (fmap (negate . naturalToInteger)) ns)
@@ -111,19 +135,19 @@ toMultiSetN (MultiSet s) = (MultiSet ns, MultiSet ps)
   where
     ns = MonoidMap.map (fmap integerNegativePartToNatural) s
     ps = MonoidMap.map (fmap integerPositivePartToNatural) s
-
+{-
 cardinality :: MultiSet t a -> Multiplicity t
 cardinality (MultiSet s) = getSum $ F.fold s
 
 multiplicity :: Ord a => a -> MultiSet t a -> Multiplicity t
 multiplicity a (MultiSet s) = getSum $ MonoidMap.get a s
-
-maximum :: MultiSet t a -> Multiplicity t
+-}
+maximum :: forall a m t. (m ~ Multiplicity t, Num m, Ord m) => MultiSet t a -> Multiplicity t
 maximum (MultiSet s) = if MonoidMap.null s then 0 else getSum $ F.maximum s
 
-minimum :: MultiSet t a -> Multiplicity t
+minimum :: forall a m t. (m ~ Multiplicity t, Num m, Ord m) => MultiSet t a -> Multiplicity t
 minimum (MultiSet s) = if MonoidMap.null s then 0 else getSum $ F.minimum s
-
+{-
 invert :: MultiSet t a -> MultiSetZ a
 invert (MultiSet s) =
     MultiSet (MonoidMap.map (fmap (negate . toInteger)) s)
@@ -139,7 +163,7 @@ union (MultiSet s1) (MultiSet s2) =
 --------------------------------------------------------------------------------
 -- Utilities
 --------------------------------------------------------------------------------
-
+-}
 naturalToInteger :: Natural -> Integer
 naturalToInteger = fromIntegral
 

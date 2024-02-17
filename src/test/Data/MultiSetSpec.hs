@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# OPTIONS_GHC -Wno-orphans#-}
 
 -- |
@@ -13,7 +14,7 @@ import Prelude
 import Data.Function
     ( (&) )
 import Data.MultiSet
-    ( MultiSetZ, fromListZ, toMultiSetN, toMultiSetZ )
+    ( MultiSet, MultiSetType (..), fromList, toMultiSetN, toMultiSetZ )
 import Test.Hspec
     ( Spec, describe, it )
 import Test.QuickCheck
@@ -28,7 +29,7 @@ spec = do
             prop_toMultiSetZ_toMultiSetN
                 & property
 
-prop_toMultiSetZ_toMultiSetN :: MultiSetZ Char -> Property
+prop_toMultiSetZ_toMultiSetN :: MultiSet Z Char -> Property
 prop_toMultiSetZ_toMultiSetN m =
     toMultiSetZ (toMultiSetN m) === m
         & cover 10
@@ -36,5 +37,5 @@ prop_toMultiSetZ_toMultiSetN m =
             "(MultiSet.minimum m < 0) && (MultiSet.maximum m > 0)"
         & checkCoverage
 
-instance (Arbitrary a, Ord a) => Arbitrary (MultiSetZ a) where
-    arbitrary = fromListZ <$> arbitrary
+instance (Arbitrary a, Ord a) => Arbitrary (MultiSet Z a) where
+    arbitrary = fromList <$> arbitrary

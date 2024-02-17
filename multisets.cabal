@@ -55,6 +55,8 @@ library
       , dependency-groups
       , dependency-monoidmap
       , extensions
+    build-depends:
+        monoid-subclasses
     hs-source-dirs:
         src/public
     exposed-modules:
