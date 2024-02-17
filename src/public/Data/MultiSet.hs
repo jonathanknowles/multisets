@@ -34,6 +34,8 @@ module Data.MultiSet
 import Prelude hiding
     ( gcd, maximum, minimum )
 
+import Data.Coerce
+    ( coerce )
 import Data.Group
     ( Group )
 import Data.Monoid
@@ -49,7 +51,7 @@ import qualified Data.MonoidMap as MonoidMap
 
 data MultiSet (t :: MultiSetType) a =
     MultiplicityConstraints (Multiplicity t) =>
-    MultiSet (MonoidMap a (Sum (Multiplicity t)))
+    MultiSet {unwrap :: MonoidMap a (Sum (Multiplicity t))}
 
 data MultiSetType
     -- | Indicates a multiset with 'Natural' (ℕ) multiplicity.
@@ -91,13 +93,13 @@ emptyZ :: MultiSetZ a
 emptyZ = MultiSet MonoidMap.empty
 
 fromListN :: Ord a => [(a, Natural)] -> MultiSetN a
-fromListN kvs = MultiSet (MonoidMap.fromList (fmap Sum <$> kvs))
+fromListN = MultiSet . MonoidMap.fromList . coerce
 
 fromListZ :: Ord a => [(a, Integer)] -> MultiSetZ a
-fromListZ kvs = MultiSet (MonoidMap.fromList (fmap Sum <$> kvs))
+fromListZ = MultiSet . MonoidMap.fromList . coerce
 
 toList :: MultiSet t a -> [(a, Multiplicity t)]
-toList (MultiSet s) = fmap getSum <$> MonoidMap.toList s
+toList = coerce . MonoidMap.toList . unwrap
 
 toMultiSetZ :: Ord a => (MultiSetN a, MultiSetN a) -> MultiSetZ a
 toMultiSetZ (MultiSet ns, MultiSet ps) = MultiSet $ (<>)
