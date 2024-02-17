@@ -99,7 +99,7 @@ fromListZ :: Ord a => [(a, Integer)] -> MultiSetZ a
 fromListZ = MultiSet . MonoidMap.fromList . coerce
 
 toList :: MultiSet t a -> [(a, Multiplicity t)]
-toList (MultiSet s) = fmap getSum <$> MonoidMap.toList s
+toList = coerce . MonoidMap.toList . unwrap
 
 toMultiSetZ :: Ord a => (MultiSetN a, MultiSetN a) -> MultiSetZ a
 toMultiSetZ (MultiSet ns, MultiSet ps) = MultiSet $ (<>)
