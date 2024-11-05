@@ -1,3 +1,6 @@
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE UndecidableInstances #-}
+
 module Data.Multiset.Signed where
 
 import Prelude hiding
@@ -12,14 +15,33 @@ import Data.Multiset.Combinators
 
 import qualified Data.MonoidMap as MonoidMap
 import qualified Data.Monoid
-    ( Sum )
+    ( Sum (Sum) )
 import Data.Multiset (Multiset)
 import qualified Data.Multiset as Multiset
 import Numeric.Natural (Natural)
 import Data.List (partition)
+import qualified GHC.IsList as List
 
 newtype SignedMultiset v = SignedMultiset
     (MonoidMap v (Data.Monoid.Sum Integer))
+
+instance Show v => Show (SignedMultiset v) where
+    show s = "fromListSum " <> show (toList s)
+
+instance Ord v => List.IsList (Sum (SignedMultiset v)) where
+    type Item (Sum (SignedMultiset v)) = (v, Sum Integer)
+    fromList = coerce (fromListWith (+))
+    toList = coerce toList
+
+instance Ord v => List.IsList (Union (SignedMultiset v)) where
+    type Item (Union (SignedMultiset v)) = (v, Union Integer)
+    fromList = coerce (fromListWith max)
+    toList = coerce toList
+
+instance Ord v => List.IsList (Intersection (SignedMultiset v)) where
+    type Item (Intersection (SignedMultiset v)) = (v, Intersection Integer)
+    fromList = coerce (fromListWith min)
+    toList = coerce toList
 
 instance Ord v => Semigroup (Sum (SignedMultiset v)) where
     (<>) = coerce sum
@@ -36,14 +58,30 @@ instance Ord v => Semigroup (Intersection (SignedMultiset v)) where
 instance Ord v => Monoid (Intersection (SignedMultiset v)) where
     mempty = coerce empty
 
+fromListSum :: Ord v => [(v, Integer)] -> SignedMultiset v
+fromListSum = fromListWith (+)
+
+fromListUnion :: Ord v => [(v, Integer)] -> SignedMultiset v
+fromListUnion = fromListWith max
+
+fromListIntersection :: Ord v => [(v, Integer)] -> SignedMultiset v
+fromListIntersection = fromListWith min
+
+fromListWith
+    :: Ord v
+    => (Integer -> Integer -> Integer)
+    -> [(v, Integer)]
+    -> SignedMultiset v
+fromListWith f
+    = SignedMultiset
+    . MonoidMap.fromListWith (coerce f)
+    . fmap (fmap Data.Monoid.Sum)
+
 empty :: SignedMultiset v
 empty = SignedMultiset MonoidMap.empty
 
 toList :: SignedMultiset v -> [(v, Integer)]
-toList = undefined
-
-fromUnsignedPair :: Ord v => (Multiset v, Multiset v) -> SignedMultiset v
-fromUnsignedPair = undefined
+toList (SignedMultiset s) = coerce (MonoidMap.toList s)
 
 toUnsignedPair :: Ord v => SignedMultiset v -> (Multiset v, Multiset v)
 toUnsignedPair m =
@@ -56,6 +94,33 @@ toUnsignedPair m =
     )
   where
     (ns, ps) = partition ((< 0) . snd) (toList m)
+
+fromUnsignedPairSum
+    :: Ord v => (Multiset v, Multiset v) -> SignedMultiset v
+fromUnsignedPairSum = fromUnsignedPairWith (+)
+
+fromUnsignedPairUnion
+    :: Ord v => (Multiset v, Multiset v) -> SignedMultiset v
+fromUnsignedPairUnion = fromUnsignedPairWith max
+
+fromUnsignedPairIntersection
+    :: Ord v => (Multiset v, Multiset v) -> SignedMultiset v
+fromUnsignedPairIntersection = fromUnsignedPairWith min
+
+fromUnsignedPairWith
+    :: forall v. Ord v
+    => (Integer -> Integer -> Integer)
+    -> (Multiset v, Multiset v)
+    -> SignedMultiset v
+fromUnsignedPairWith f (s1, s2) =
+    fromListWith f (ns <> ps)
+  where
+    ns :: [(v, Integer)]
+    ns = fmap (negate . fromIntegral @Natural @Integer) <$>
+        Multiset.toList s1
+    ps :: [(v, Integer)]
+    ps = fmap (fromIntegral @Natural @Integer) <$>
+        Multiset.toList s2
 
 difference
     :: Ord v

@@ -18,6 +18,9 @@ import qualified Data.Monoid
 
 newtype Multiset v = Multiset (MonoidMap v (Data.Monoid.Sum Natural))
 
+instance Show v => Show (Multiset v) where
+    show s = "fromListSum " <> show (toList s)
+
 instance Ord v => Semigroup (Sum (Multiset v)) where
     (<>) = coerce sum
 instance Ord v => Monoid (Sum (Multiset v)) where
@@ -45,7 +48,7 @@ fromListWith f
     . fmap (fmap Data.Monoid.Sum)
 
 toList :: Multiset v -> [(v, Natural)]
-toList = undefined
+toList (Multiset s) = coerce (MonoidMap.toList s)
 
 empty :: Multiset v
 empty = Multiset MonoidMap.empty
