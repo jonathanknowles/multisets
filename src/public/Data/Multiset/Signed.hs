@@ -20,28 +20,12 @@ import Data.Multiset (Multiset)
 import qualified Data.Multiset as Multiset
 import Numeric.Natural (Natural)
 import Data.List (partition)
-import qualified GHC.IsList as List
 
 newtype SignedMultiset v = SignedMultiset
     (MonoidMap v (Data.Monoid.Sum Integer))
 
 instance Show v => Show (SignedMultiset v) where
-    show s = "fromListSum " <> show (toList s)
-
-instance Ord v => List.IsList (Sum (SignedMultiset v)) where
-    type Item (Sum (SignedMultiset v)) = (v, Sum Integer)
-    fromList = coerce (fromListWith (+))
-    toList = coerce toList
-
-instance Ord v => List.IsList (Union (SignedMultiset v)) where
-    type Item (Union (SignedMultiset v)) = (v, Union Integer)
-    fromList = coerce (fromListWith max)
-    toList = coerce toList
-
-instance Ord v => List.IsList (Intersection (SignedMultiset v)) where
-    type Item (Intersection (SignedMultiset v)) = (v, Intersection Integer)
-    fromList = coerce (fromListWith min)
-    toList = coerce toList
+    show s = "fromListWith (+) " <> show (toList s)
 
 instance Ord v => Semigroup (Sum (SignedMultiset v)) where
     (<>) = coerce sum
@@ -57,15 +41,6 @@ instance Ord v => Semigroup (Intersection (SignedMultiset v)) where
     (<>) = coerce intersection
 instance Ord v => Monoid (Intersection (SignedMultiset v)) where
     mempty = coerce empty
-
-fromListSum :: Ord v => [(v, Integer)] -> SignedMultiset v
-fromListSum = fromListWith (+)
-
-fromListUnion :: Ord v => [(v, Integer)] -> SignedMultiset v
-fromListUnion = fromListWith max
-
-fromListIntersection :: Ord v => [(v, Integer)] -> SignedMultiset v
-fromListIntersection = fromListWith min
 
 fromListWith
     :: Ord v
@@ -85,27 +60,15 @@ toList (SignedMultiset s) = coerce (MonoidMap.toList s)
 
 toUnsignedPair :: Ord v => SignedMultiset v -> (Multiset v, Multiset v)
 toUnsignedPair m =
-    ( Multiset.fromListSum $
+    ( Multiset.fromListWith (+) $
         fmap (fmap (fromIntegral @Integer @Natural . abs))
         ns
-    , Multiset.fromListSum $
+    , Multiset.fromListWith (+) $
         fmap (fmap (fromIntegral @Integer @Natural))
         ps
     )
   where
     (ns, ps) = partition ((< 0) . snd) (toList m)
-
-fromUnsignedPairSum
-    :: Ord v => (Multiset v, Multiset v) -> SignedMultiset v
-fromUnsignedPairSum = fromUnsignedPairWith (+)
-
-fromUnsignedPairUnion
-    :: Ord v => (Multiset v, Multiset v) -> SignedMultiset v
-fromUnsignedPairUnion = fromUnsignedPairWith max
-
-fromUnsignedPairIntersection
-    :: Ord v => (Multiset v, Multiset v) -> SignedMultiset v
-fromUnsignedPairIntersection = fromUnsignedPairWith min
 
 fromUnsignedPairWith
     :: forall v. Ord v

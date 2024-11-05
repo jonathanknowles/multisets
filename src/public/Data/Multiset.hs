@@ -19,7 +19,7 @@ import qualified Data.Monoid
 newtype Multiset v = Multiset (MonoidMap v (Data.Monoid.Sum Natural))
 
 instance Show v => Show (Multiset v) where
-    show s = "fromListSum " <> show (toList s)
+    show s = "fromListWith (+) " <> show (toList s)
 
 instance Ord v => Semigroup (Sum (Multiset v)) where
     (<>) = coerce sum
@@ -31,12 +31,6 @@ instance Ord v => Semigroup (Union (Multiset v)) where
 instance Ord v => Monoid (Union (Multiset v)) where
     mempty = coerce empty
 
-fromListSum :: Ord v => [(v, Natural)] -> Multiset v
-fromListSum = fromListWith (+)
-
-fromListUnion :: Ord v => [(v, Natural)] -> Multiset v
-fromListUnion = fromListWith max
-
 fromListWith
     :: Ord v
     => (Natural -> Natural -> Natural)
@@ -45,7 +39,7 @@ fromListWith
 fromListWith f
     = Multiset
     . MonoidMap.fromListWith (coerce f)
-    . fmap (fmap Data.Monoid.Sum)
+    . coerce
 
 toList :: Multiset v -> [(v, Natural)]
 toList (Multiset s) = coerce (MonoidMap.toList s)
