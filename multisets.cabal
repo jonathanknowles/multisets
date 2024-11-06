@@ -32,9 +32,11 @@ common dependency-quickcheck-classes
 common extensions
     default-extensions:
         DerivingStrategies
+        DerivingVia
         FlexibleContexts
         FlexibleInstances
         GeneralizedNewtypeDeriving
+        ImportQualifiedPost
         LambdaCase
         MultiParamTypeClasses
         NoImplicitPrelude

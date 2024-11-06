@@ -1,5 +1,6 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -Wno-unticked-promoted-constructors #-}
@@ -7,7 +8,6 @@
 -- |
 -- Copyright: © 2022–2023 Jonathan Knowles
 -- License: Apache-2.0
---
 module Data.MultiSet
     ( MultiSet
     , MultiSetType (..)
@@ -29,35 +29,43 @@ module Data.MultiSet
     , toMultiSetZ
     , toMultiSetN
     )
-    where
+where
 
 import Prelude hiding
-    ( gcd, maximum, minimum )
+    ( gcd
+    , maximum
+    , minimum
+    )
 
 import Data.Coerce
-    ( coerce )
+    ( coerce
+    )
 import Data.Group
-    ( Group )
+    ( Group
+    )
 import Data.Monoid
-    ( Sum (..) )
+    ( Sum (..)
+    )
 import Data.MonoidMap
-    ( MonoidMap )
+    ( MonoidMap
+    )
 import Numeric.Natural
-    ( Natural )
+    ( Natural
+    )
 
-import qualified Data.Foldable as F
-import qualified Data.Group as Group
-import qualified Data.MonoidMap as MonoidMap
+import Data.Foldable qualified as F
+import Data.Group qualified as Group
+import Data.MonoidMap qualified as MonoidMap
 
-data MultiSet (t :: MultiSetType) a =
-    MultiplicityConstraints (Multiplicity t) =>
+data MultiSet (t :: MultiSetType) a
+    = MultiplicityConstraints (Multiplicity t) =>
     MultiSet {unwrap :: MonoidMap a (Sum (Multiplicity t))}
 
 data MultiSetType
-    -- | Indicates a multiset with 'Natural' (ℕ) multiplicity.
-    = N
-    -- | Indicates a multiset with 'Integer' (ℤ) multiplicity.
-    | Z
+    = -- | Indicates a multiset with 'Natural' (ℕ) multiplicity.
+      N
+    | -- | Indicates a multiset with 'Integer' (ℤ) multiplicity.
+      Z
 
 -- | Represents a multiset with 'Natural' (ℕ) multiplicity.
 type MultiSetN = MultiSet N
@@ -102,9 +110,11 @@ toList :: MultiSet t a -> [(a, Multiplicity t)]
 toList = coerce . MonoidMap.toList . unwrap
 
 toMultiSetZ :: Ord a => (MultiSetN a, MultiSetN a) -> MultiSetZ a
-toMultiSetZ (MultiSet ns, MultiSet ps) = MultiSet $ (<>)
-    (MonoidMap.map (fmap (negate . naturalToInteger)) ns)
-    (MonoidMap.map (fmap (         naturalToInteger)) ps)
+toMultiSetZ (MultiSet ns, MultiSet ps) =
+    MultiSet
+        $ (<>)
+            (MonoidMap.map (fmap (negate . naturalToInteger)) ns)
+            (MonoidMap.map (fmap (naturalToInteger)) ps)
 
 toMultiSetN :: MultiSetZ a -> (MultiSetN a, MultiSetN a)
 toMultiSetN (MultiSet s) = (MultiSet ns, MultiSet ps)
