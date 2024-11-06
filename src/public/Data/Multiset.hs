@@ -20,6 +20,10 @@ import Data.Multiset.Combinators
     , Sum (Sum)
     , Union (Union)
     )
+import Data.Set
+    ( Set
+    )
+import Data.Set qualified as Set
 import Numeric.Natural
     ( Natural
     )
@@ -28,6 +32,7 @@ import Prelude hiding
     )
 
 newtype Multiset a = Multiset (MonoidMap a (Data.Monoid.Sum Natural))
+    deriving (Eq)
 
 instance Show a => Show (Multiset a) where
     show s = "fromListWith (+) " <> show (toList s)
@@ -63,27 +68,61 @@ toList (Multiset s) = coerce (MonoidMap.toList s)
 empty :: Multiset a
 empty = Multiset MonoidMap.empty
 
+cardinality :: Multiset a -> Natural
+cardinality (Multiset s) = coerce (Foldable.fold s)
+
+member :: Ord a => a -> Multiset a -> Bool
+member a (Multiset s) = MonoidMap.nonNullKey a s
+
+multiplicity :: Ord a => a -> Multiset a -> Natural
+multiplicity a (Multiset s) = coerce (MonoidMap.get a s)
+
+support :: Multiset a -> Set a
+support (Multiset s) = MonoidMap.nonNullKeys s
+
+powerSet :: Multiset a -> Set (Multiset a)
+powerSet = undefined
+
+fromSet :: Set a -> Multiset a
+fromSet = undefined
+
+isSet :: Multiset a -> Bool
+isSet (Multiset s) = Foldable.all (== 1) s
+
+isSubsetOf :: Ord a => Multiset a -> Multiset a -> Bool
+isSubsetOf = undefined
+
+isProperSubsetOf :: Ord a => Multiset a -> Multiset a -> Bool
+isProperSubsetOf = undefined
+
+disjoint :: Ord a => Multiset a -> Multiset a -> Bool
+disjoint s1 s2 = Set.disjoint (support s1) (support s2)
+
 difference :: Ord a => Multiset a -> Multiset a -> Multiset a
-difference (Multiset m1) (Multiset m2) =
-    Multiset $ m1 `MonoidMap.monus` m2
+difference (Multiset s1) (Multiset s2) =
+    Multiset $ s1 `MonoidMap.monus` s2
+
+differenceMaybe :: Ord a => Multiset a -> Multiset a -> Maybe (Multiset a)
+differenceMaybe (Multiset s1) (Multiset s2) =
+    Multiset <$> s1 `MonoidMap.minusMaybe` s2
 
 sum :: Ord a => Multiset a -> Multiset a -> Multiset a
-sum (Multiset m1) (Multiset m2) =
-    Multiset $ MonoidMap.unionWith (+) m1 m2
+sum (Multiset s1) (Multiset s2) =
+    Multiset $ MonoidMap.unionWith (+) s1 s2
 
 sums :: Foldable f => Ord a => f (Multiset a) -> Multiset a
 sums = Foldable.foldl' sum empty
 
 union :: Ord a => Multiset a -> Multiset a -> Multiset a
-union (Multiset m1) (Multiset m2) =
-    Multiset $ MonoidMap.unionWith max m1 m2
+union (Multiset s1) (Multiset s2) =
+    Multiset $ MonoidMap.unionWith max s1 s2
 
 unions :: Foldable f => Ord a => f (Multiset a) -> Multiset a
 unions = Foldable.foldl' union empty
 
 intersection :: Ord a => Multiset a -> Multiset a -> Multiset a
-intersection (Multiset m1) (Multiset m2) =
-    Multiset $ MonoidMap.intersectionWith min m1 m2
+intersection (Multiset s1) (Multiset s2) =
+    Multiset $ MonoidMap.intersectionWith min s1 s2
 
 intersections :: Foldable1 f => Ord a => f (Multiset a) -> Multiset a
 intersections = Foldable1.foldl1' intersection
