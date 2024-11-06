@@ -76,10 +76,10 @@ toList (SignedMultiset s) = coerce (MonoidMap.toList s)
 
 toUnsignedPair :: Ord a => SignedMultiset a -> (Multiset a, Multiset a)
 toUnsignedPair m =
-    ( Multiset.fromListWith (+)
-        $ fmap (fmap integerNegativePartToNatural) ns
-    , Multiset.fromListWith (+)
-        $ fmap (fmap integerPositivePartToNatural) ps
+    ( Multiset.fromListWith (+) $
+        fmap (fmap integerNegativePartToNatural) ns
+    , Multiset.fromListWith (+) $
+        fmap (fmap integerPositivePartToNatural) ps
     )
   where
     (ns, ps) = partition ((< 0) . snd) (toList m)

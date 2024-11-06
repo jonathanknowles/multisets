@@ -5,9 +5,8 @@
 -- License: Apache-2.0
 module Data.MultiSetSpec
     ( spec
-    ) where
-
-import Prelude
+    )
+where
 
 import Data.Function
     ( (&)
@@ -18,6 +17,7 @@ import Data.MultiSet
     , toMultiSetN
     , toMultiSetZ
     )
+import Data.MultiSet qualified as MultiSet
 import Test.Hspec
     ( Spec
     , describe
@@ -31,15 +31,14 @@ import Test.QuickCheck
     , property
     , (===)
     )
-
-import Data.MultiSet qualified as MultiSet
+import Prelude
 
 spec :: Spec
 spec = do
     describe "Conversions" $ do
-        it "prop_toMultiSetZ_toMultiSetN"
-            $ prop_toMultiSetZ_toMultiSetN
-            & property
+        it "prop_toMultiSetZ_toMultiSetN" $
+            prop_toMultiSetZ_toMultiSetN
+                & property
 
 prop_toMultiSetZ_toMultiSetN :: MultiSetZ Char -> Property
 prop_toMultiSetZ_toMultiSetN m =
