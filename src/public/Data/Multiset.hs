@@ -16,49 +16,49 @@ import qualified Data.MonoidMap as MonoidMap
 import qualified Data.Monoid
     ( Sum (Sum) )
 
-newtype Multiset v = Multiset (MonoidMap v (Data.Monoid.Sum Natural))
+newtype Multiset a = Multiset (MonoidMap a (Data.Monoid.Sum Natural))
 
-instance Show v => Show (Multiset v) where
+instance Show a => Show (Multiset a) where
     show s = "fromListWith (+) " <> show (toList s)
 
-instance Ord v => Semigroup (Sum (Multiset v)) where
+instance Ord a => Semigroup (Sum (Multiset a)) where
     (<>) = coerce sum
-instance Ord v => Monoid (Sum (Multiset v)) where
+instance Ord a => Monoid (Sum (Multiset a)) where
     mempty = coerce empty
 
-instance Ord v => Semigroup (Union (Multiset v)) where
+instance Ord a => Semigroup (Union (Multiset a)) where
     (<>) = coerce union
-instance Ord v => Monoid (Union (Multiset v)) where
+instance Ord a => Monoid (Union (Multiset a)) where
     mempty = coerce empty
 
 fromListWith
-    :: Ord v
+    :: Ord a
     => (Natural -> Natural -> Natural)
-    -> [(v, Natural)]
-    -> Multiset v
+    -> [(a, Natural)]
+    -> Multiset a
 fromListWith f
     = Multiset
     . MonoidMap.fromListWith (coerce f)
     . coerce
 
-toList :: Multiset v -> [(v, Natural)]
+toList :: Multiset a -> [(a, Natural)]
 toList (Multiset s) = coerce (MonoidMap.toList s)
 
-empty :: Multiset v
+empty :: Multiset a
 empty = Multiset MonoidMap.empty
 
-difference :: Ord v => Multiset v -> Multiset v -> Multiset v
+difference :: Ord a => Multiset a -> Multiset a -> Multiset a
 difference (Multiset m1) (Multiset m2) =
     Multiset $ m1 `MonoidMap.monus` m2
 
-sum :: Ord v => Multiset v -> Multiset v -> Multiset v
+sum :: Ord a => Multiset a -> Multiset a -> Multiset a
 sum (Multiset m1) (Multiset m2) =
     Multiset $ MonoidMap.unionWith (+) m1 m2
 
-union :: Ord v => Multiset v -> Multiset v -> Multiset v
+union :: Ord a => Multiset a -> Multiset a -> Multiset a
 union (Multiset m1) (Multiset m2) =
     Multiset $ MonoidMap.unionWith max m1 m2
 
-intersection :: Ord v => Multiset v -> Multiset v -> Multiset v
+intersection :: Ord a => Multiset a -> Multiset a -> Multiset a
 intersection (Multiset m1) (Multiset m2) =
     Multiset $ MonoidMap.intersectionWith min m1 m2
