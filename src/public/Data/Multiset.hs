@@ -11,20 +11,11 @@ import Data.Foldable1
     )
 import Data.Foldable1 qualified as Foldable1
 import Data.List (nub, subsequences)
-import Data.Map.Merge.Strict qualified as Map
-import Data.Map.Strict (Map)
-import Data.Monoid qualified
-    ( Sum (Sum)
-    )
+import Data.Monoid (Sum (Sum))
 import Data.MonoidMap
     ( MonoidMap
     )
 import Data.MonoidMap qualified as MonoidMap
-import Data.Multiset.Combinators
-    ( Intersection (Intersection)
-    , Sum (Sum)
-    , Union (Union)
-    )
 import Data.Set
     ( Set
     )
@@ -37,7 +28,7 @@ import Prelude hiding
     )
 
 newtype Multiset a = Multiset (MonoidMap a (Data.Monoid.Sum Natural))
-    deriving (Eq)
+    deriving newtype (Eq)
 
 testA :: Multiset Char
 testA = fromListWith (+) [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
@@ -85,20 +76,21 @@ multiplicity a (Multiset s) = coerce (MonoidMap.get a s)
 support :: Multiset a -> Set a
 support (Multiset s) = MonoidMap.nonNullKeys s
 
-powerSet :: Multiset a -> Set (Multiset a)
-powerSet = undefined
-
 fromSet :: Set a -> Multiset a
 fromSet = undefined
 
 isSet :: Multiset a -> Bool
 isSet (Multiset s) = Foldable.all (== 1) s
 
-isSubmultisetOf :: Ord a => Multiset a -> Multiset a -> Bool
-isSubmultisetOf (Multiset s1) (Multiset s2) = s1 `MonoidMap.isSubmapOf` s2
+isSubsetOf :: Ord a => Multiset a -> Multiset a -> Bool
+isSubsetOf (Multiset s1) (Multiset s2) = s1 `MonoidMap.isSubmapOf` s2
 
 powerset :: Ord a => Multiset a -> [Multiset a]
 powerset = fmap fromUnaryList . nub . subsequences . toUnaryList
+
+powersetSize :: Ord a => Multiset a -> Natural
+powersetSize (Multiset s) =
+    coerce $ Foldable.foldl' (\x y -> x * (y + 1)) (Sum 1) s
 
 data ProperMultisubsetState a
     = Empty a

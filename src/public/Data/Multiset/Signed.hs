@@ -8,10 +8,12 @@ import Data.Coerce
 import Data.Foldable qualified as Foldable
     ( Foldable (foldl')
     )
+import Data.Foldable1 (Foldable1)
+import Data.Foldable1 qualified as Foldable1
 import Data.List
     ( partition
     )
-import Data.Map.Strict qualified as Map
+import Data.Monoid (Sum (Sum, getSum))
 import Data.Monoid qualified
     ( Sum (Sum, getSum)
     )
@@ -23,7 +25,6 @@ import Data.Multiset
     ( Multiset
     )
 import Data.Multiset qualified as Multiset
-import Data.Set (Set)
 import Numeric.Natural
     ( Natural
     )
@@ -151,22 +152,19 @@ intersection (SignedMultiset m1) (SignedMultiset m2) =
     SignedMultiset $ MonoidMap.intersectionWith min m1 m2
 
 intersections
-    :: Foldable f
-    => Ord a
-    => f (SignedMultiset a)
-    -> SignedMultiset a
-intersections = Foldable.foldl' intersection empty
+    :: Foldable1 f => Ord a => f (SignedMultiset a) -> SignedMultiset a
+intersections = Foldable1.foldl1' intersection
 
-isSubmultisetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isSubmultisetOf s1 s2 =
-    (n1 `Multiset.isSubmultisetOf` n2) && (p1 `Multiset.isSubmultisetOf` p2)
+isSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isSubsetOf s1 s2 =
+    (n1 `Multiset.isSubsetOf` n2) && (p1 `Multiset.isSubsetOf` p2)
   where
     (n1, p1) = toUnsignedPair s1
     (n2, p2) = toUnsignedPair s2
 
-isProperSubmultisetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isProperSubmultisetOf s1 s2 =
-    (s1 /= s2) && (s1 `isSubmultisetOf` s2)
+isProperSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isProperSubsetOf s1 s2 =
+    (s1 /= s2) && (s1 `isSubsetOf` s2)
 
 powerset :: Ord a => SignedMultiset a -> [SignedMultiset a]
 powerset as =
@@ -176,6 +174,11 @@ powerset as =
     ]
   where
     (ns, ps) = toUnsignedPair as
+
+powersetSize :: Ord a => SignedMultiset a -> Natural
+powersetSize (SignedMultiset s) =
+    getSum $
+        Foldable.foldl' (\x y -> x * (coerce integerMagnitude y + 1)) (Sum 1) s
 
 --------------------------------------------------------------------------------
 -- Utilities
