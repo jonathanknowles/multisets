@@ -63,6 +63,8 @@ library
     hs-source-dirs:
         src/public
     exposed-modules:
+        Data.Multimap.Seq
+        Data.Multimap.Set
         Data.Multiset
         Data.Multiset.Combinators
         Data.Multiset.Signed
