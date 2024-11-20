@@ -149,6 +149,7 @@ intersection
     -> SignedMultiset a
     -> SignedMultiset a
 intersection (SignedMultiset m1) (SignedMultiset m2) =
+    -- Is this correct? We probably want minimum here, which implies union
     SignedMultiset $ MonoidMap.intersectionWith min m1 m2
 
 intersections
