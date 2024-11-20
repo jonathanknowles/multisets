@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveFunctor #-}
+
 module Data.Multiset where
 
 import Data.Coerce
@@ -8,6 +10,9 @@ import Data.Foldable1
     ( Foldable1
     )
 import Data.Foldable1 qualified as Foldable1
+import Data.List (nub, subsequences)
+import Data.Map.Merge.Strict qualified as Map
+import Data.Map.Strict (Map)
 import Data.Monoid qualified
     ( Sum (Sum)
     )
@@ -34,23 +39,11 @@ import Prelude hiding
 newtype Multiset a = Multiset (MonoidMap a (Data.Monoid.Sum Natural))
     deriving (Eq)
 
+testA :: Multiset Char
+testA = fromListWith (+) [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
+
 instance Show a => Show (Multiset a) where
     show s = "fromListWith (+) " <> show (toList s)
-
-instance Ord a => Semigroup (Sum (Multiset a)) where
-    (<>) = coerce sum
-
-instance Ord a => Monoid (Sum (Multiset a)) where
-    mempty = coerce empty
-
-instance Ord a => Semigroup (Union (Multiset a)) where
-    (<>) = coerce union
-
-instance Ord a => Monoid (Union (Multiset a)) where
-    mempty = coerce empty
-
-instance Ord a => Semigroup (Intersection (Multiset a)) where
-    (<>) = coerce union
 
 fromListWith
     :: Ord a
@@ -65,8 +58,20 @@ fromListWith f =
 toList :: Multiset a -> [(a, Natural)]
 toList (Multiset s) = coerce (MonoidMap.toList s)
 
+toUnaryList :: Multiset a -> [a]
+toUnaryList = foldMap f . toList
+  where
+    f (_, 0) = []
+    f (a, n) = a : f (a, n - 1)
+
+fromUnaryList :: Ord a => [a] -> Multiset a
+fromUnaryList = sums . fmap singleton
+
 empty :: Multiset a
 empty = Multiset MonoidMap.empty
+
+singleton :: Ord a => a -> Multiset a
+singleton a = fromListWith (+) [(a, 1)]
 
 cardinality :: Multiset a -> Natural
 cardinality (Multiset s) = coerce (Foldable.fold s)
@@ -89,12 +94,40 @@ fromSet = undefined
 isSet :: Multiset a -> Bool
 isSet (Multiset s) = Foldable.all (== 1) s
 
-isSubsetOf :: Ord a => Multiset a -> Multiset a -> Bool
-isSubsetOf = undefined
+isSubmultisetOf :: Ord a => Multiset a -> Multiset a -> Bool
+isSubmultisetOf (Multiset s1) (Multiset s2) = s1 `MonoidMap.isSubmapOf` s2
 
-isProperSubsetOf :: Ord a => Multiset a -> Multiset a -> Bool
-isProperSubsetOf = undefined
+powerset :: Ord a => Multiset a -> [Multiset a]
+powerset = fmap fromUnaryList . nub . subsequences . toUnaryList
 
+data ProperMultisubsetState a
+    = Empty a
+    | HaveSeenLT a
+    | HaveSeenGT
+    deriving (Functor)
+
+{-
+instance Applicative ProperMultisubsetState where
+    pure _ = Empty
+    liftA2 _ HaveSeenGT _ = HaveSeenGT
+    liftA2 _ _ HaveSeenGT = HaveSeenGT
+    liftA2 _ HaveSeenLT _ = HaveSeenLT
+    liftA2 _ _ HaveSeenLT = HaveSeenLT
+    liftA2 _ _ _          = Empty
+-}
+{-
+isProperMultisubsetOf :: forall a. Ord a => Multiset a -> Multiset a -> ProperMultisubsetState (Map a ())
+isProperMultisubsetOf (Multiset s1) (Multiset s2) = foo
+  where
+    m1 = MonoidMap.toMap s1
+    m2 = MonoidMap.toMap s2
+    foo :: Maybe (Map a ())
+    foo = Map.mergeA
+        (Map.traverseMissing (\_ _ -> HaveSeenGT))
+        Map.dropMissing
+        (Map.zipWithMaybeAMatched (\k x y -> if x < y then Just HaveSeenLT else if x > y then Just ))
+        m1 m2
+-}
 disjoint :: Ord a => Multiset a -> Multiset a -> Bool
 disjoint s1 s2 = Set.disjoint (support s1) (support s2)
 
@@ -105,6 +138,15 @@ difference (Multiset s1) (Multiset s2) =
 differenceMaybe :: Ord a => Multiset a -> Multiset a -> Maybe (Multiset a)
 differenceMaybe (Multiset s1) (Multiset s2) =
     Multiset <$> s1 `MonoidMap.minusMaybe` s2
+
+-- consider having a single monoid (analogous to Sum Natural) where
+-- <> = sum
+-- lcm = union
+-- gcd = intersection
+-- <\> = difference
+-- </> = differenceMaybe
+--
+-- See: https://en.wikipedia.org/wiki/Multiset
 
 sum :: Ord a => Multiset a -> Multiset a -> Multiset a
 sum (Multiset s1) (Multiset s2) =

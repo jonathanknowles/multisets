@@ -63,7 +63,6 @@ library
     hs-source-dirs:
         src/public
     exposed-modules:
-        Data.MultiSet
         Data.Multiset
         Data.Multiset.Combinators
         Data.Multiset.Signed

@@ -11,8 +11,9 @@ import Data.Foldable qualified as Foldable
 import Data.List
     ( partition
     )
+import Data.Map.Strict qualified as Map
 import Data.Monoid qualified
-    ( Sum (Sum)
+    ( Sum (Sum, getSum)
     )
 import Data.MonoidMap
     ( MonoidMap
@@ -22,11 +23,7 @@ import Data.Multiset
     ( Multiset
     )
 import Data.Multiset qualified as Multiset
-import Data.Multiset.Combinators
-    ( Intersection (..)
-    , Sum (..)
-    , Union (..)
-    )
+import Data.Set (Set)
 import Numeric.Natural
     ( Natural
     )
@@ -36,27 +33,16 @@ import Prelude hiding
 
 newtype SignedMultiset a
     = SignedMultiset (MonoidMap a (Data.Monoid.Sum Integer))
+    deriving newtype (Eq)
 
 instance Show a => Show (SignedMultiset a) where
     show s = "fromListWith (+) " <> show (toList s)
 
-instance Ord a => Semigroup (Sum (SignedMultiset a)) where
-    (<>) = coerce sum
+testA :: SignedMultiset Char
+testA = fromListWith (+) [('a', -1), ('b', 1), ('c', -2), ('d', 2)]
 
-instance Ord a => Monoid (Sum (SignedMultiset a)) where
-    mempty = coerce empty
-
-instance Ord a => Semigroup (Union (SignedMultiset a)) where
-    (<>) = coerce union
-
-instance Ord a => Monoid (Union (SignedMultiset a)) where
-    mempty = coerce empty
-
-instance Ord a => Semigroup (Intersection (SignedMultiset a)) where
-    (<>) = coerce intersection
-
-instance Ord a => Monoid (Intersection (SignedMultiset a)) where
-    mempty = coerce empty
+testB :: SignedMultiset Char
+testB = fromListWith (+) [('a', -1), ('b', 1)]
 
 fromListWith
     :: Ord a
@@ -84,6 +70,26 @@ toUnsignedPair m =
   where
     (ns, ps) = partition ((< 0) . snd) (toList m)
 
+negativePart :: Ord a => SignedMultiset a -> Multiset a
+negativePart m =
+    Multiset.fromListWith (+) $
+        fmap integerNegativePartToNatural
+            <$> filter ((< 0) . snd) (toList m)
+
+positivePart :: Ord a => SignedMultiset a -> Multiset a
+positivePart m =
+    Multiset.fromListWith (+) $
+        fmap integerPositivePartToNatural
+            <$> filter ((> 0) . snd) (toList m)
+
+cardinality :: SignedMultiset a -> Integer
+cardinality (SignedMultiset s) =
+    Data.Monoid.getSum $ Foldable.foldl' (+) 0 s
+
+magnitude :: SignedMultiset a -> Natural
+magnitude (SignedMultiset s) =
+    Data.Monoid.getSum $ foldMap (coerce integerMagnitude) s
+
 fromUnsignedPairWith
     :: forall a
      . Ord a
@@ -97,22 +103,6 @@ fromUnsignedPairWith f (s1, s2) =
     ns = fmap naturalToNegativeInteger <$> Multiset.toList s1
     ps :: [(a, Integer)]
     ps = fmap naturalToPositiveInteger <$> Multiset.toList s2
-
-integerNegativePartToNatural :: Integer -> Natural
-integerNegativePartToNatural n
-    | n < 0 = fromIntegral (abs n)
-    | otherwise = 0
-
-integerPositivePartToNatural :: Integer -> Natural
-integerPositivePartToNatural n
-    | n > 0 = fromIntegral n
-    | otherwise = 0
-
-naturalToNegativeInteger :: Natural -> Integer
-naturalToNegativeInteger = negate . fromIntegral
-
-naturalToPositiveInteger :: Natural -> Integer
-naturalToPositiveInteger = fromIntegral
 
 difference
     :: Ord a
@@ -166,3 +156,51 @@ intersections
     => f (SignedMultiset a)
     -> SignedMultiset a
 intersections = Foldable.foldl' intersection empty
+
+isSubmultisetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isSubmultisetOf s1 s2 =
+    (n1 `Multiset.isSubmultisetOf` n2) && (p1 `Multiset.isSubmultisetOf` p2)
+  where
+    (n1, p1) = toUnsignedPair s1
+    (n2, p2) = toUnsignedPair s2
+
+isProperSubmultisetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isProperSubmultisetOf s1 s2 =
+    (s1 /= s2) && (s1 `isSubmultisetOf` s2)
+
+powerset :: Ord a => SignedMultiset a -> [SignedMultiset a]
+powerset as =
+    [ fromUnsignedPairWith (+) (n, p)
+    | n <- Multiset.powerset ns
+    , p <- Multiset.powerset ps
+    ]
+  where
+    (ns, ps) = toUnsignedPair as
+
+--------------------------------------------------------------------------------
+-- Utilities
+--------------------------------------------------------------------------------
+
+integerMagnitude :: Integer -> Natural
+integerMagnitude n = fromIntegral (abs n)
+
+integerToNaturalPair :: Integer -> (Natural, Natural)
+integerToNaturalPair n
+    | n < 0 = (fromIntegral (abs n), 0)
+    | otherwise = (0, fromIntegral n)
+
+integerNegativePartToNatural :: Integer -> Natural
+integerNegativePartToNatural n
+    | n < 0 = fromIntegral (abs n)
+    | otherwise = 0
+
+integerPositivePartToNatural :: Integer -> Natural
+integerPositivePartToNatural n
+    | n > 0 = fromIntegral n
+    | otherwise = 0
+
+naturalToNegativeInteger :: Natural -> Integer
+naturalToNegativeInteger = negate . fromIntegral
+
+naturalToPositiveInteger :: Natural -> Integer
+naturalToPositiveInteger = fromIntegral
