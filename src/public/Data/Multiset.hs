@@ -11,7 +11,7 @@ import Data.Foldable1
     )
 import Data.Foldable1 qualified as Foldable1
 import Data.List (nub, subsequences)
-import Data.Monoid (Sum (Sum))
+import Data.Monoid (Sum (Sum), All (All, getAll))
 import Data.MonoidMap
     ( MonoidMap
     )
@@ -26,12 +26,17 @@ import Numeric.Natural
 import Prelude hiding
     ( sum
     )
+import qualified Data.Map.Merge.Strict as Map
+import Control.Applicative (Const(Const, getConst))
 
 newtype Multiset a = Multiset (MonoidMap a (Data.Monoid.Sum Natural))
     deriving newtype (Eq)
 
 testA :: Multiset Char
 testA = fromListWith (+) [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
+
+testB :: Multiset Char
+testB = fromListWith (+) [('c', 2), ('d', 4)]
 
 instance Show a => Show (Multiset a) where
     show s = "fromListWith (+) " <> show (toList s)
@@ -83,7 +88,10 @@ isSet :: Multiset a -> Bool
 isSet (Multiset s) = Foldable.all (== 1) s
 
 isSubsetOf :: Ord a => Multiset a -> Multiset a -> Bool
-isSubsetOf (Multiset s1) (Multiset s2) = s1 `MonoidMap.isSubmapOf` s2
+isSubsetOf (Multiset s1) (Multiset s2) = MonoidMap.isSubmapOfBy (<=) s1 s2
+
+isProperSubsetOf :: Ord a => Multiset a -> Multiset a -> Bool
+isProperSubsetOf (Multiset s1) (Multiset s2) = MonoidMap.isSubmapOfBy (<=) s1 s2
 
 powerset :: Ord a => Multiset a -> [Multiset a]
 powerset = fmap fromUnaryList . nub . subsequences . toUnaryList
@@ -91,6 +99,12 @@ powerset = fmap fromUnaryList . nub . subsequences . toUnaryList
 powersetSize :: Ord a => Multiset a -> Natural
 powersetSize (Multiset s) =
     coerce $ Foldable.foldl' (\x y -> x * (y + 1)) (Sum 1) s
+
+data MapMergeState s m -- right most variable must be map - see mergeA
+    = InProgress s m
+    | Terminated s m
+    deriving Functor
+
 
 data ProperMultisubsetState a
     = Empty a
@@ -120,6 +134,7 @@ isProperMultisubsetOf (Multiset s1) (Multiset s2) = foo
         (Map.zipWithMaybeAMatched (\k x y -> if x < y then Just HaveSeenLT else if x > y then Just ))
         m1 m2
 -}
+
 disjoint :: Ord a => Multiset a -> Multiset a -> Bool
 disjoint s1 s2 = Set.disjoint (support s1) (support s2)
 
