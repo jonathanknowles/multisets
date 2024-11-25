@@ -209,6 +209,7 @@ compare s1 s2 = go False False (compareAll s1 s2)
 compareAll :: Ord a => SignedMultiset a -> SignedMultiset a -> [(a, Ordering)]
 compareAll s1 s2 = fmap (uncurry Prelude.compare) <$> align s1 s2
 
+-- Note this will terminate early if a GT is detected.
 isLessThan :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
 isLessThan s1 s2 = go False (compareAll s1 s2)
   where
