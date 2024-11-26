@@ -2,24 +2,20 @@
 
 module Data.Multiset.Signed where
 
-import Control.Applicative (Const (Const, getConst))
 import Data.Coerce
     ( coerce
     )
 import Data.Foldable qualified as Foldable
     ( Foldable (foldl')
-    , all
     )
 import Data.Foldable1 (Foldable1)
 import Data.Foldable1 qualified as Foldable1
+import Data.Function (on)
 import Data.List
     ( partition
     )
-import Data.Map.Merge.Strict qualified as Map
-import Data.Monoid (All (getAll), Sum (Sum, getSum))
-import Data.Monoid qualified
-    ( Sum (Sum, getSum)
-    )
+import Data.Map.Strict qualified as Map
+import Data.Monoid (Sum (Sum, getSum))
 import Data.MonoidMap
     ( MonoidMap
     )
@@ -28,8 +24,7 @@ import Data.Multiset
     ( Multiset
     )
 import Data.Multiset qualified as Multiset
-import Data.Semigroup (All (All))
-import Debug.Trace (trace)
+import Data.Set qualified as Set
 import Numeric.Natural
     ( Natural
     )
@@ -170,104 +165,136 @@ intersection (SignedMultiset m1) (SignedMultiset m2) =
     SignedMultiset $ MonoidMap.unionWith min m1 m2
 
 intersections
-    :: Foldable1 f => Ord a => f (SignedMultiset a) -> SignedMultiset a
+    :: Foldable1 f
+    => Ord a
+    => f (SignedMultiset a) -> SignedMultiset a
 intersections = Foldable1.foldl1' intersection
 
-testAlignA :: SignedMultiset Char
-testAlignA = fromListWith (+) [('a', -1), ('b', 0), ('c', 1)]
-
-testAlignB :: SignedMultiset Char
-testAlignB = fromListWith (+) [('b', -1), ('c', 0), ('d', 1)]
-
-align
-    :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
-    -> [(a, (Integer, Integer))]
-align s1 s2 = go (toList s1) (toList s2)
-  where
-    go [] [] = []
-    go ((k1, v1) : kvs1) [] = (k1, (v1, 0)) : go kvs1 []
-    go [] ((k2, v2) : kvs2) = (k2, (0, v2)) : go [] kvs2
-    go ((k1, v1) : kvs1) ((k2, v2) : kvs2)
-        | k1 < k2 = (k1, (v1, 0)) : go kvs1 ((k2, v2) : kvs2)
-        | k1 > k2 = (k2, (0, v2)) : go ((k1, v1) : kvs1) kvs2
-        | otherwise = (k1, (v1, v2)) : go kvs1 kvs2
-
--- Caution: this function will only shortcircuit if the sets are incomparable.
+-- Caution: this function will only short-circuit if the sets are incomparable.
+--
+{- ORMOLU_DISABLE -}
 compare :: Ord a => SignedMultiset a -> SignedMultiset a -> Maybe Ordering
 compare s1 s2 = go False False (compareAll s1 s2)
   where
-    go True True _ = Nothing
-    go True False [] = Just LT
-    go False True [] = Just GT
-    go False False [] = Just EQ
-    go _seenLT seenGT ((_, LT) : kcs) = go True seenGT kcs
-    go seenLT _seenGT ((_, GT) : kcs) = go seenLT True kcs
-    go seenLT seenGT ((_, EQ) : kcs) = go seenLT seenGT kcs
+    go    True    True              _ = Nothing
+    go    True   False             [] = Just LT
+    go   False    True             [] = Just GT
+    go   False   False             [] = Just EQ
+    go _seenLT  seenGT ((_, LT) : xs) = go True   seenGT xs
+    go  seenLT _seenGT ((_, GT) : xs) = go seenLT   True xs
+    go  seenLT  seenGT ((_, EQ) : xs) = go seenLT seenGT xs
+{- ORMOLU_ENABLE -}
 
 compareAll :: Ord a => SignedMultiset a -> SignedMultiset a -> [(a, Ordering)]
 compareAll s1 s2 = fmap (uncurry Prelude.compare) <$> align s1 s2
 
 -- Note this will terminate early if a GT is detected.
+{- ORMOLU_DISABLE -}
 isLessThan :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
 isLessThan s1 s2 = go False (compareAll s1 s2)
   where
-    go seenLT [] = seenLT
-    go seenLT ((_, EQ) : kcs) = go seenLT kcs
-    go _ ((_, LT) : kcs) = go True kcs
-    go _ ((_, GT) : _) = False
+    go seenLT             [] = seenLT
+    go _      ((_, LT) : xs) = go True   xs
+    go seenLT ((_, EQ) : xs) = go seenLT xs
+    go _      ((_, GT) :  _) = False
+{- ORMOLU_ENABLE -}
+
+-- Note this will terminate early if a GT is detected.
+{- ORMOLU_DISABLE -}
+isGreaterThan :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isGreaterThan s1 s2 = go False (compareAll s1 s2)
+  where
+    go seenGT             [] = seenGT
+    go _      ((_, LT) :  _) = False
+    go seenGT ((_, EQ) : xs) = go seenGT xs
+    go _      ((_, GT) : xs) = go True   xs
+{- ORMOLU_ENABLE -}
 
 isLessThanOrEqualTo :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
 isLessThanOrEqualTo s1 s2 = GT `notElem` (snd <$> compareAll s1 s2)
 
-isLessThanOrEqualToU :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isLessThanOrEqualToU (SignedMultiset s1) (SignedMultiset s2) =
-    coerce $
-        Foldable.foldl' (<>) (All True) $
-            MonoidMap.unionWith (\v1 v2 -> All (v1 <= v2)) s1 s2
+isGreaterThanOrEqualTo :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isGreaterThanOrEqualTo s1 s2 = LT `notElem` (snd <$> compareAll s1 s2)
 
 isSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
 isSubsetOf (SignedMultiset s1) (SignedMultiset s2) =
-    -- actually, can you do this with Map.isSubsetOf?
-    -- However, you might need this for properSubset.
-    -- And you'll probably need it for isLessThanOrEqualTo.
-    go True (MonoidMap.toList s1) (MonoidMap.toList s2)
-  where
-    go False _ _ = False
-    go _ [] _ = True
-    go _ (_ : _) [] = False
-    go _ ((k1, v1) : kvs1) ((k2, v2) : kvs2)
-        | k1 < k2 = False
-        | k1 > k2 = go True kvs1 ((k2, v2) : kvs2)
-        | otherwise = go (check v1 v2) kvs1 kvs2
-    check v1 v2
-        | v1 <= 0 && v2 <= 0 = v1 >= v2
-        | v1 >= 0 && v2 >= 0 = v1 <= v2
-        | otherwise = False
+    (Map.isSubmapOfBy isContainedBy `on` MonoidMap.toMap) s1 s2
 
-isSubsetOfW :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isSubsetOfW (SignedMultiset s1) (SignedMultiset s2) =
-    MonoidMap.isSubmapOfBy check s1 s2
-  where
-    check v1 v2
-        | v1 <= 0 && v2 <= 0 = v1 >= v2
-        | v1 >= 0 && v2 >= 0 = v1 <= v2
-        | otherwise = False
-
-isSubsetOfM :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isSubsetOfM s1 s2 =
-    (n1 `Multiset.isSubsetOf` n2) && (p1 `Multiset.isSubsetOf` p2)
-  where
-    (n1, p1) = toUnsignedPair s1
-    (n2, p2) = toUnsignedPair s2
+isSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isSupersetOf = flip isSubsetOf
 
 isProperSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isProperSubsetOf s1 s2 =
-    (s1 /= s2) && (s1 `isSubsetOf` s2)
+isProperSubsetOf (SignedMultiset s1) (SignedMultiset s2) =
+    (Map.isProperSubmapOfBy isContainedBy `on` MonoidMap.toMap) s1 s2
 
-powerset :: Ord a => SignedMultiset a -> [SignedMultiset a]
-powerset as =
+isProperSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isProperSupersetOf = flip isProperSubsetOf
+
+powersetSize :: Ord a => SignedMultiset a -> Natural
+powersetSize (SignedMultiset s) =
+    getSum $
+        Foldable.foldl'
+            (\x y -> x * (coerce integerMagnitude y + 1))
+            1
+            s
+
+--------------------------------------------------------------------------------
+-- Model functions
+--------------------------------------------------------------------------------
+
+modelIsLessThan
+    :: Ord a
+    => SignedMultiset a
+    -> SignedMultiset a
+    -> Bool
+modelIsLessThan s1 s2 =
+    (s1 /= s2) && (s1 `modelIsLessThanOrEqualTo` s2)
+
+modelIsGreaterThan
+    :: Ord a
+    => SignedMultiset a
+    -> SignedMultiset a
+    -> Bool
+modelIsGreaterThan s1 s2 =
+    (s1 /= s2) && (s1 `modelIsGreaterThanOrEqualTo` s2)
+
+modelIsLessThanOrEqualTo
+    :: Ord a
+    => SignedMultiset a
+    -> SignedMultiset a
+    -> Bool
+modelIsLessThanOrEqualTo (SignedMultiset s1) (SignedMultiset s2) =
+    all
+        (\k -> ((<=) `on` MonoidMap.get k) s1 s2)
+        ((Set.union `on` MonoidMap.nonNullKeys) s1 s2)
+
+modelIsGreaterThanOrEqualTo
+    :: Ord a
+    => SignedMultiset a
+    -> SignedMultiset a
+    -> Bool
+modelIsGreaterThanOrEqualTo (SignedMultiset s1) (SignedMultiset s2) =
+    all
+        (\k -> ((>=) `on` MonoidMap.get k) s1 s2)
+        ((Set.union `on` MonoidMap.nonNullKeys) s1 s2)
+
+modelIsSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+modelIsSubsetOf (SignedMultiset s1) (SignedMultiset s2) =
+    all
+        (\k -> (isContainedBy `on` MonoidMap.get k) s1 s2)
+        ((Set.union `on` MonoidMap.nonNullKeys) s1 s2)
+
+modelIsSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+modelIsSupersetOf = flip modelIsSubsetOf
+
+modelIsProperSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+modelIsProperSubsetOf s1 s2 = (s1 /= s2) && modelIsSubsetOf s1 s2
+
+modelIsProperSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+modelIsProperSupersetOf = flip modelIsProperSubsetOf
+
+modelPowerset :: Ord a => SignedMultiset a -> [SignedMultiset a]
+modelPowerset as =
     [ fromUnsignedPairWith (+) (n, p)
     | n <- Multiset.powerset ns
     , p <- Multiset.powerset ps
@@ -275,14 +302,32 @@ powerset as =
   where
     (ns, ps) = toUnsignedPair as
 
-powersetSize :: Ord a => SignedMultiset a -> Natural
-powersetSize (SignedMultiset s) =
-    getSum $
-        Foldable.foldl' (\x y -> x * (coerce integerMagnitude y + 1)) (Sum 1) s
-
 --------------------------------------------------------------------------------
 -- Utilities
 --------------------------------------------------------------------------------
+
+testAlignA :: SignedMultiset Char
+testAlignA = fromListWith (+) [('a', -1), ('b', 0), ('c', 1)]
+
+testAlignB :: SignedMultiset Char
+testAlignB = fromListWith (+) [('b', -1), ('c', 0), ('d', 1)]
+
+{- ORMOLU_DISABLE -}
+align
+    :: Ord a
+    => SignedMultiset a
+    -> SignedMultiset a
+    -> [(a, (Integer, Integer))]
+align = go `on` toList
+  where
+    go            []            [] = []
+    go ((a, p) : xs)            [] = (a, (p, 0)) : go xs []
+    go            [] ((b, q) : ys) = (b, (0, q)) : go [] ys
+    go ((a, p) : xs) ((b, q) : ys)
+        | a < b                    = (a, (p, 0)) : go           xs ((b, q) : ys)
+        | a > b                    = (b, (0, q)) : go ((a, p) : xs)          ys
+        | otherwise                = (a, (p, q)) : go           xs           ys
+{- ORMOLU_ENABLE -}
 
 integerMagnitude :: Integer -> Natural
 integerMagnitude n = fromIntegral (abs n)
@@ -307,3 +352,9 @@ naturalToNegativeInteger = negate . fromIntegral
 
 naturalToPositiveInteger :: Natural -> Integer
 naturalToPositiveInteger = fromIntegral
+
+isContainedBy :: (Ord a, Num a) => a -> a -> Bool
+isContainedBy v1 v2
+    | v1 <= 0 && v2 <= 0 = v1 >= v2
+    | v1 >= 0 && v2 >= 0 = v1 <= v2
+    | otherwise = False

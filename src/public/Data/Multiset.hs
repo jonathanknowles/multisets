@@ -10,8 +10,13 @@ import Data.Foldable1
     ( Foldable1
     )
 import Data.Foldable1 qualified as Foldable1
-import Data.List (nub, subsequences)
-import Data.Monoid (Sum (Sum), All (All, getAll))
+import Data.List
+    ( nub
+    , subsequences
+    )
+import Data.Monoid
+    ( Sum (Sum)
+    )
 import Data.MonoidMap
     ( MonoidMap
     )
@@ -26,8 +31,6 @@ import Numeric.Natural
 import Prelude hiding
     ( sum
     )
-import qualified Data.Map.Merge.Strict as Map
-import Control.Applicative (Const(Const, getConst))
 
 newtype Multiset a = Multiset (MonoidMap a (Data.Monoid.Sum Natural))
     deriving newtype (Eq)
@@ -99,41 +102,6 @@ powerset = fmap fromUnaryList . nub . subsequences . toUnaryList
 powersetSize :: Ord a => Multiset a -> Natural
 powersetSize (Multiset s) =
     coerce $ Foldable.foldl' (\x y -> x * (y + 1)) (Sum 1) s
-
-data MapMergeState s m -- right most variable must be map - see mergeA
-    = InProgress s m
-    | Terminated s m
-    deriving Functor
-
-
-data ProperMultisubsetState a
-    = Empty a
-    | HaveSeenLT a
-    | HaveSeenGT
-    deriving (Functor)
-
-{-
-instance Applicative ProperMultisubsetState where
-    pure _ = Empty
-    liftA2 _ HaveSeenGT _ = HaveSeenGT
-    liftA2 _ _ HaveSeenGT = HaveSeenGT
-    liftA2 _ HaveSeenLT _ = HaveSeenLT
-    liftA2 _ _ HaveSeenLT = HaveSeenLT
-    liftA2 _ _ _          = Empty
--}
-{-
-isProperMultisubsetOf :: forall a. Ord a => Multiset a -> Multiset a -> ProperMultisubsetState (Map a ())
-isProperMultisubsetOf (Multiset s1) (Multiset s2) = foo
-  where
-    m1 = MonoidMap.toMap s1
-    m2 = MonoidMap.toMap s2
-    foo :: Maybe (Map a ())
-    foo = Map.mergeA
-        (Map.traverseMissing (\_ _ -> HaveSeenGT))
-        Map.dropMissing
-        (Map.zipWithMaybeAMatched (\k x y -> if x < y then Just HaveSeenLT else if x > y then Just ))
-        m1 m2
--}
 
 disjoint :: Ord a => Multiset a -> Multiset a -> Bool
 disjoint s1 s2 = Set.disjoint (support s1) (support s2)
