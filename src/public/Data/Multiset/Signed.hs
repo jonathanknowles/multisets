@@ -1,4 +1,7 @@
 {-# LANGUAGE UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Use camelCase" #-}
 
 module Data.Multiset.Signed where
 
@@ -8,14 +11,23 @@ import Data.Coerce
 import Data.Foldable qualified as Foldable
     ( Foldable (foldl')
     )
-import Data.Foldable1 (Foldable1)
+import Data.Foldable1
+    ( Foldable1
+    )
 import Data.Foldable1 qualified as Foldable1
-import Data.Function (on)
+import Data.Function
+    ( on
+    )
 import Data.List
     ( partition
     )
+import Data.Map.Strict
+    ( Map
+    )
 import Data.Map.Strict qualified as Map
-import Data.Monoid (Sum (Sum, getSum))
+import Data.Monoid
+    ( Sum (Sum, getSum)
+    )
 import Data.MonoidMap
     ( MonoidMap
     )
@@ -24,6 +36,9 @@ import Data.Multiset
     ( Multiset
     )
 import Data.Multiset qualified as Multiset
+import Data.Set
+    ( Set
+    )
 import Data.Set qualified as Set
 import Numeric.Natural
     ( Natural
@@ -35,7 +50,7 @@ import Prelude hiding
 import Prelude qualified
 
 newtype SignedMultiset a
-    = SignedMultiset (MonoidMap a (Data.Monoid.Sum Integer))
+    = SignedMultiset (MonoidMap a (Sum Integer))
     deriving newtype (Eq)
 
 instance Show a => Show (SignedMultiset a) where
@@ -47,6 +62,9 @@ testA = fromListWith (+) [('a', -1), ('b', 1), ('c', 0), ('d', -2), ('e', 5)]
 testB :: SignedMultiset Char
 testB = fromListWith (+) [('a', -2), ('b', 1), ('c', 0), ('d', -2), ('e', 5)]
 
+empty :: SignedMultiset a
+empty = SignedMultiset MonoidMap.empty
+
 fromListWith
     :: Ord a
     => (Integer -> Integer -> Integer)
@@ -57,11 +75,23 @@ fromListWith f =
         . MonoidMap.fromListWith (coerce f)
         . fmap (fmap Data.Monoid.Sum)
 
-empty :: SignedMultiset a
-empty = SignedMultiset MonoidMap.empty
-
 toList :: SignedMultiset a -> [(a, Integer)]
 toList (SignedMultiset s) = coerce (MonoidMap.toList s)
+
+fromMap :: Map a Integer -> SignedMultiset a
+fromMap = SignedMultiset . MonoidMap.fromMap . coerce
+
+toMap :: SignedMultiset a -> Map a Integer
+toMap (SignedMultiset s) = coerce (MonoidMap.toMap s)
+
+fromSetPositive :: Set a -> SignedMultiset a
+fromSetPositive = fromSetWith (const 1)
+
+fromSetNegative :: Set a -> SignedMultiset a
+fromSetNegative = fromSetWith (const (-1))
+
+fromSetWith :: (a -> Integer) -> Set a -> SignedMultiset a
+fromSetWith f = SignedMultiset . MonoidMap.fromMap . Map.fromSet (coerce f)
 
 toUnsignedPair :: Ord a => SignedMultiset a -> (Multiset a, Multiset a)
 toUnsignedPair m =
@@ -217,18 +247,31 @@ isGreaterThanOrEqualTo :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
 isGreaterThanOrEqualTo s1 s2 = LT `notElem` (snd <$> compareAll s1 s2)
 
 isSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isSubsetOf (SignedMultiset s1) (SignedMultiset s2) =
-    (Map.isSubmapOfBy isContainedBy `on` MonoidMap.toMap) s1 s2
+isSubsetOf = Map.isSubmapOfBy isContainedBy `on` toMap
 
 isSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
 isSupersetOf = flip isSubsetOf
 
 isProperSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isProperSubsetOf (SignedMultiset s1) (SignedMultiset s2) =
-    (Map.isProperSubmapOfBy isContainedBy `on` MonoidMap.toMap) s1 s2
+isProperSubsetOf = Map.isProperSubmapOfBy isContainedBy `on` toMap
 
 isProperSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
 isProperSupersetOf = flip isProperSubsetOf
+
+-- Require lexicograhic order.
+{- ORMOLU_DISABLE -}
+powerset :: Ord a => SignedMultiset a -> [SignedMultiset a]
+powerset = fmap (fromListWith (+)) . go . toList
+  where
+    go            [] = [[]]
+    go ((a, p) : xs) = [(a, q) : ys | q <- shrinkInclusive p, ys <- go xs]
+
+    shrinkInclusive :: Integer -> [Integer]
+    shrinkInclusive a
+        | a < 0 = [0, -1 .. a]
+        | a > 0 = [0,  1 .. a]
+        | otherwise = [0]
+{- ORMOLU_ENABLE -}
 
 powersetSize :: Ord a => SignedMultiset a -> Natural
 powersetSize (SignedMultiset s) =
@@ -238,63 +281,73 @@ powersetSize (SignedMultiset s) =
             1
             s
 
+multiplicity :: Ord a => a -> SignedMultiset a -> Integer
+multiplicity a (SignedMultiset s) = coerce (MonoidMap.get a s)
+
+support :: SignedMultiset a -> Set a
+support = Map.keysSet . toMap
+
 --------------------------------------------------------------------------------
 -- Model functions
 --------------------------------------------------------------------------------
 
-modelIsLessThan
+model_isLessThan
     :: Ord a
     => SignedMultiset a
     -> SignedMultiset a
     -> Bool
-modelIsLessThan s1 s2 =
-    (s1 /= s2) && (s1 `modelIsLessThanOrEqualTo` s2)
+model_isLessThan s1 s2 =
+    (s1 /= s2) && (s1 `model_isLessThanOrEqualTo` s2)
 
-modelIsGreaterThan
+model_isGreaterThan
     :: Ord a
     => SignedMultiset a
     -> SignedMultiset a
     -> Bool
-modelIsGreaterThan s1 s2 =
-    (s1 /= s2) && (s1 `modelIsGreaterThanOrEqualTo` s2)
+model_isGreaterThan s1 s2 =
+    (s1 /= s2) && (s1 `model_isGreaterThanOrEqualTo` s2)
 
-modelIsLessThanOrEqualTo
+model_isLessThanOrEqualTo
     :: Ord a
     => SignedMultiset a
     -> SignedMultiset a
     -> Bool
-modelIsLessThanOrEqualTo (SignedMultiset s1) (SignedMultiset s2) =
+model_isLessThanOrEqualTo s1 s2 =
     all
-        (\k -> ((<=) `on` MonoidMap.get k) s1 s2)
-        ((Set.union `on` MonoidMap.nonNullKeys) s1 s2)
+        (\k -> ((<=) `on` multiplicity k) s1 s2)
+        ((Set.union `on` support) s1 s2)
 
-modelIsGreaterThanOrEqualTo
+model_isGreaterThanOrEqualTo
     :: Ord a
     => SignedMultiset a
     -> SignedMultiset a
     -> Bool
-modelIsGreaterThanOrEqualTo (SignedMultiset s1) (SignedMultiset s2) =
+model_isGreaterThanOrEqualTo s1 s2 =
     all
-        (\k -> ((>=) `on` MonoidMap.get k) s1 s2)
-        ((Set.union `on` MonoidMap.nonNullKeys) s1 s2)
+        (\k -> ((>=) `on` multiplicity k) s1 s2)
+        ((Set.union `on` support) s1 s2)
 
-modelIsSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-modelIsSubsetOf (SignedMultiset s1) (SignedMultiset s2) =
+model_isSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+model_isSubsetOf s1 s2 =
     all
-        (\k -> (isContainedBy `on` MonoidMap.get k) s1 s2)
-        ((Set.union `on` MonoidMap.nonNullKeys) s1 s2)
+        (\k -> (isContainedBy `on` multiplicity k) s1 s2)
+        ((Set.union `on` support) s1 s2)
 
-modelIsSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-modelIsSupersetOf = flip modelIsSubsetOf
+model_isSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+model_isSupersetOf = flip model_isSubsetOf
 
-modelIsProperSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-modelIsProperSubsetOf s1 s2 = (s1 /= s2) && modelIsSubsetOf s1 s2
+model_isProperSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+model_isProperSubsetOf s1 s2 = (s1 /= s2) && model_isSubsetOf s1 s2
 
-modelIsProperSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-modelIsProperSupersetOf = flip modelIsProperSubsetOf
+model_isProperSupersetOf
+    :: Ord a
+    => SignedMultiset a
+    -> SignedMultiset a
+    -> Bool
+model_isProperSupersetOf = flip model_isProperSubsetOf
 
-modelPowerset :: Ord a => SignedMultiset a -> [SignedMultiset a]
-modelPowerset as =
+model_powerset :: Ord a => SignedMultiset a -> [SignedMultiset a]
+model_powerset as =
     [ fromUnsignedPairWith (+) (n, p)
     | n <- Multiset.powerset ns
     , p <- Multiset.powerset ps

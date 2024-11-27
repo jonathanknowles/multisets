@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveFunctor #-}
-
 module Data.Multiset where
 
 import Data.Coerce
@@ -10,10 +8,13 @@ import Data.Foldable1
     ( Foldable1
     )
 import Data.Foldable1 qualified as Foldable1
-import Data.List
-    ( nub
-    , subsequences
+import Data.Function
+    ( on
     )
+import Data.Map.Strict
+    ( Map
+    )
+import Data.Map.Strict qualified as Map
 import Data.Monoid
     ( Sum (Sum)
     )
@@ -24,7 +25,6 @@ import Data.MonoidMap qualified as MonoidMap
 import Data.Set
     ( Set
     )
-import Data.Set qualified as Set
 import Numeric.Natural
     ( Natural
     )
@@ -32,7 +32,7 @@ import Prelude hiding
     ( sum
     )
 
-newtype Multiset a = Multiset (MonoidMap a (Data.Monoid.Sum Natural))
+newtype Multiset a = Multiset (MonoidMap a (Sum Natural))
     deriving newtype (Eq)
 
 testA :: Multiset Char
@@ -66,6 +66,12 @@ toUnaryList = foldMap f . toList
 fromUnaryList :: Ord a => [a] -> Multiset a
 fromUnaryList = sums . fmap singleton
 
+fromMap :: Map a Natural -> Multiset a
+fromMap = Multiset . MonoidMap.fromMap . coerce
+
+toMap :: Multiset a -> Map a Natural
+toMap (Multiset s) = coerce (MonoidMap.toMap s)
+
 empty :: Multiset a
 empty = Multiset MonoidMap.empty
 
@@ -85,26 +91,42 @@ support :: Multiset a -> Set a
 support (Multiset s) = MonoidMap.nonNullKeys s
 
 fromSet :: Set a -> Multiset a
-fromSet = undefined
+fromSet = fromSetWith (const 1)
+
+fromSetWith :: (a -> Natural) -> Set a -> Multiset a
+fromSetWith f = Multiset . MonoidMap.fromMap . Map.fromSet (coerce f)
 
 isSet :: Multiset a -> Bool
 isSet (Multiset s) = Foldable.all (== 1) s
 
 isSubsetOf :: Ord a => Multiset a -> Multiset a -> Bool
-isSubsetOf (Multiset s1) (Multiset s2) = MonoidMap.isSubmapOfBy (<=) s1 s2
+isSubsetOf = Map.isSubmapOfBy (<=) `on` toMap
 
 isProperSubsetOf :: Ord a => Multiset a -> Multiset a -> Bool
-isProperSubsetOf (Multiset s1) (Multiset s2) = MonoidMap.isSubmapOfBy (<=) s1 s2
+isProperSubsetOf = Map.isProperSubmapOfBy (<=) `on` toMap
 
+isSupersetOf :: Ord a => Multiset a -> Multiset a -> Bool
+isSupersetOf = flip isSubsetOf
+
+isProperSupersetOf :: Ord a => Multiset a -> Multiset a -> Bool
+isProperSupersetOf = flip isProperSubsetOf
+
+-- Require lexicograhic order.
 powerset :: Ord a => Multiset a -> [Multiset a]
-powerset = fmap fromUnaryList . nub . subsequences . toUnaryList
+powerset = fmap (fromListWith (+)) . go . toList
+  where
+    go [] = [[]]
+    go ((a, p) : xs) = [(a, q) : ys | q <- shrinkInclusive p, ys <- go xs]
+
+    shrinkInclusive :: Natural -> [Natural]
+    shrinkInclusive a = [0 .. a]
 
 powersetSize :: Ord a => Multiset a -> Natural
 powersetSize (Multiset s) =
     coerce $ Foldable.foldl' (\x y -> x * (y + 1)) (Sum 1) s
 
 disjoint :: Ord a => Multiset a -> Multiset a -> Bool
-disjoint s1 s2 = Set.disjoint (support s1) (support s2)
+disjoint (Multiset s1) (Multiset s2) = MonoidMap.disjoint s1 s2
 
 difference :: Ord a => Multiset a -> Multiset a -> Multiset a
 difference (Multiset s1) (Multiset s2) =
