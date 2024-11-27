@@ -229,7 +229,7 @@ isLessThan s1 s2 = go False (compareAll s1 s2)
     go _      ((_, GT) :  _) = False
 {- ORMOLU_ENABLE -}
 
--- Note this will terminate early if a GT is detected.
+-- Note this will terminate early if a LT is detected.
 {- ORMOLU_DISABLE -}
 isGreaterThan :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
 isGreaterThan s1 s2 = go False (compareAll s1 s2)
@@ -249,11 +249,11 @@ isGreaterThanOrEqualTo s1 s2 = LT `notElem` (snd <$> compareAll s1 s2)
 isSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
 isSubsetOf = Map.isSubmapOfBy isContainedBy `on` toMap
 
-isSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isSupersetOf = flip isSubsetOf
-
 isProperSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
 isProperSubsetOf = Map.isProperSubmapOfBy isContainedBy `on` toMap
+
+isSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isSupersetOf = flip isSubsetOf
 
 isProperSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
 isProperSupersetOf = flip isProperSubsetOf
