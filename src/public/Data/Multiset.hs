@@ -31,9 +31,13 @@ import Numeric.Natural
 import Prelude hiding
     ( sum
     )
+import qualified Data.Set as Set
 
 newtype Multiset a = Multiset (MonoidMap a (Sum Natural))
-    deriving newtype (Eq)
+    deriving newtype Eq
+
+instance Ord a => Ord (Multiset a) where
+    compare = Prelude.compare `on` toMap
 
 testA :: Multiset Char
 testA = fromListWith (+) [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
@@ -96,6 +100,24 @@ fromSet = fromSetWith (const 1)
 fromSetWith :: (a -> Natural) -> Set a -> Multiset a
 fromSetWith f = Multiset . MonoidMap.fromMap . Map.fromSet (coerce f)
 
+-- Caution: this function will only short-circuit if the sets are incomparable.
+--
+{- ORMOLU_DISABLE -}
+compare :: Ord a => Multiset a -> Multiset a -> Maybe Ordering
+compare s1 s2 = go False False (compareAll s1 s2)
+  where
+    go    True    True              _ = Nothing
+    go    True   False             [] = Just LT
+    go   False    True             [] = Just GT
+    go   False   False             [] = Just EQ
+    go _seenLT  seenGT ((_, LT) : xs) = go True   seenGT xs
+    go  seenLT _seenGT ((_, GT) : xs) = go seenLT   True xs
+    go  seenLT  seenGT ((_, EQ) : xs) = go seenLT seenGT xs
+{- ORMOLU_ENABLE -}
+
+compareAll :: Ord a => Multiset a -> Multiset a -> [(a, Ordering)]
+compareAll s1 s2 = fmap (uncurry Prelude.compare) <$> align s1 s2
+
 isSet :: Multiset a -> Bool
 isSet (Multiset s) = Foldable.all (== 1) s
 
@@ -111,15 +133,21 @@ isSupersetOf = flip isSubsetOf
 isProperSupersetOf :: Ord a => Multiset a -> Multiset a -> Bool
 isProperSupersetOf = flip isProperSubsetOf
 
--- Require lexicograhic order.
-powerset :: Ord a => Multiset a -> [Multiset a]
-powerset = fmap (fromListWith (+)) . go . toList
+-- The set of all subsets.
+powerset :: Ord a => Multiset a -> Set (Multiset a)
+powerset = Set.fromList . powersetElements
+
+-- Generates all subsets in lexicograhic order.
+{- ORMOLU_DISABLE -}
+powersetElements :: Ord a => Multiset a -> [Multiset a]
+powersetElements = fmap (fromListWith (+)) . go . toList
   where
-    go [] = [[]]
+    go            [] = [[]]
     go ((a, p) : xs) = [(a, q) : ys | q <- shrinkInclusive p, ys <- go xs]
 
     shrinkInclusive :: Natural -> [Natural]
     shrinkInclusive a = [0 .. a]
+{- ORMOLU_ENABLE -}
 
 powersetSize :: Ord a => Multiset a -> Natural
 powersetSize (Multiset s) =
@@ -165,3 +193,24 @@ intersection (Multiset s1) (Multiset s2) =
 
 intersections :: Foldable1 f => Ord a => f (Multiset a) -> Multiset a
 intersections = Foldable1.foldl1' intersection
+
+--------------------------------------------------------------------------------
+-- Utilities
+--------------------------------------------------------------------------------
+
+{- ORMOLU_DISABLE -}
+align
+    :: Ord a
+    => Multiset a
+    -> Multiset a
+    -> [(a, (Natural, Natural))]
+align = go `on` toList
+  where
+    go            []            [] = []
+    go ((a, p) : xs)            [] = (a, (p, 0)) : go xs []
+    go            [] ((b, q) : ys) = (b, (0, q)) : go [] ys
+    go ((a, p) : xs) ((b, q) : ys)
+        | a < b                    = (a, (p, 0)) : go           xs ((b, q) : ys)
+        | a > b                    = (b, (0, q)) : go ((a, p) : xs)          ys
+        | otherwise                = (a, (p, q)) : go           xs           ys
+{- ORMOLU_ENABLE -}

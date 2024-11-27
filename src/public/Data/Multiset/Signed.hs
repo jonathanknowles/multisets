@@ -10,6 +10,7 @@ import Data.Coerce
     )
 import Data.Foldable qualified as Foldable
     ( Foldable (foldl')
+    , all
     )
 import Data.Foldable1
     ( Foldable1
@@ -53,6 +54,9 @@ newtype SignedMultiset a
     = SignedMultiset (MonoidMap a (Sum Integer))
     deriving newtype (Eq)
 
+instance Ord a => Ord (SignedMultiset a) where
+    compare = Prelude.compare `on` toMap
+
 instance Show a => Show (SignedMultiset a) where
     show s = "fromListWith (+) " <> show (toList s)
 
@@ -60,7 +64,7 @@ testA :: SignedMultiset Char
 testA = fromListWith (+) [('a', -1), ('b', 1), ('c', 0), ('d', -2), ('e', 5)]
 
 testB :: SignedMultiset Char
-testB = fromListWith (+) [('a', -2), ('b', 1), ('c', 0), ('d', -2), ('e', 5)]
+testB = fromListWith (+) [('a', -2), ('b', 2)]
 
 empty :: SignedMultiset a
 empty = SignedMultiset MonoidMap.empty
@@ -200,6 +204,12 @@ intersections
     => f (SignedMultiset a) -> SignedMultiset a
 intersections = Foldable1.foldl1' intersection
 
+isSetPositive :: SignedMultiset a -> Bool
+isSetPositive (SignedMultiset s) = Foldable.all (== 1) s
+
+isSetNegative :: SignedMultiset a -> Bool
+isSetNegative (SignedMultiset s) = Foldable.all (== (-1)) s
+
 -- Caution: this function will only short-circuit if the sets are incomparable.
 --
 {- ORMOLU_DISABLE -}
@@ -218,7 +228,7 @@ compare s1 s2 = go False False (compareAll s1 s2)
 compareAll :: Ord a => SignedMultiset a -> SignedMultiset a -> [(a, Ordering)]
 compareAll s1 s2 = fmap (uncurry Prelude.compare) <$> align s1 s2
 
--- Note this will terminate early if a GT is detected.
+-- Note this will terminate early if (and only if) a GT is detected.
 {- ORMOLU_DISABLE -}
 isLessThan :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
 isLessThan s1 s2 = go False (compareAll s1 s2)
@@ -229,7 +239,7 @@ isLessThan s1 s2 = go False (compareAll s1 s2)
     go _      ((_, GT) :  _) = False
 {- ORMOLU_ENABLE -}
 
--- Note this will terminate early if a LT is detected.
+-- Note this will terminate early if (and only if) a LT is detected.
 {- ORMOLU_DISABLE -}
 isGreaterThan :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
 isGreaterThan s1 s2 = go False (compareAll s1 s2)
@@ -258,18 +268,22 @@ isSupersetOf = flip isSubsetOf
 isProperSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
 isProperSupersetOf = flip isProperSubsetOf
 
--- Require lexicograhic order.
+-- The set of all subsets.
+powerset :: Ord a => SignedMultiset a -> Set (SignedMultiset a)
+powerset = Set.fromList . powersetElements
+
+-- Generates all subsets in lexicograhic order.
 {- ORMOLU_DISABLE -}
-powerset :: Ord a => SignedMultiset a -> [SignedMultiset a]
-powerset = fmap (fromListWith (+)) . go . toList
+powersetElements :: Ord a => SignedMultiset a -> [SignedMultiset a]
+powersetElements = fmap (fromListWith (+)) . go . toList
   where
     go            [] = [[]]
     go ((a, p) : xs) = [(a, q) : ys | q <- shrinkInclusive p, ys <- go xs]
 
     shrinkInclusive :: Integer -> [Integer]
     shrinkInclusive a
-        | a < 0 = [0, -1 .. a]
-        | a > 0 = [0,  1 .. a]
+        | a < 0 = [a .. 0]
+        | a > 0 = [0 .. a]
         | otherwise = [0]
 {- ORMOLU_ENABLE -}
 
@@ -346,11 +360,11 @@ model_isProperSupersetOf
     -> Bool
 model_isProperSupersetOf = flip model_isProperSubsetOf
 
-model_powerset :: Ord a => SignedMultiset a -> [SignedMultiset a]
-model_powerset as =
+model_powersetElements :: Ord a => SignedMultiset a -> [SignedMultiset a]
+model_powersetElements as =
     [ fromUnsignedPairWith (+) (n, p)
-    | n <- Multiset.powerset ns
-    , p <- Multiset.powerset ps
+    | n <- Multiset.powersetElements ns
+    , p <- Multiset.powersetElements ps
     ]
   where
     (ns, ps) = toUnsignedPair as
