@@ -6,9 +6,19 @@
 module Data.Bag.Signed
     ( SignedBag
     , toUnsignedPair
+    , support
+    , supportNegative
+    , supportPositive
+    , supportSigned
     )
 where
 
+import Data.Bag qualified as Bag
+import Data.Bag.Internal
+    ( Bag (Bag)
+    , Count (Count, getCount)
+    , SignedBag (SignedBag)
+    )
 import Data.Coerce
     ( coerce
     )
@@ -30,19 +40,14 @@ import Data.Map.Strict
     ( Map
     )
 import Data.Map.Strict qualified as Map
-import Data.Monoid
-    ( Sum (Sum, getSum)
-    )
 import Data.MonoidMap qualified as MonoidMap
-import Data.Bag qualified as Bag
-import Data.Bag.Internal
-    ( Bag (Bag)
-    , SignedBag (SignedBag)
-    )
 import Data.Set
     ( Set
     )
 import Data.Set qualified as Set
+import Data.Set.Signed
+    ( SignedSet
+    )
 import Numeric.Natural
     ( Natural
     )
@@ -69,7 +74,8 @@ fromListWith
 fromListWith f =
     SignedBag
         . MonoidMap.fromListWith (coerce f)
-        . fmap (fmap Data.Monoid.Sum)
+        -- use coerce
+        . fmap (fmap Count)
 
 toList :: SignedBag a -> [(a, Integer)]
 toList (SignedBag s) = coerce (MonoidMap.toList s)
@@ -100,7 +106,7 @@ toUnsignedPair m =
     (ns, ps) = partition ((< 0) . snd) (toList m)
 
 invert :: SignedBag a -> SignedBag a
-invert (SignedBag s) = SignedBag (MonoidMap.invert s)
+invert (SignedBag s) = undefined -- SignedBag (MonoidMap.invert s)
 
 negativePart :: Ord a => SignedBag a -> Bag a
 negativePart m =
@@ -114,18 +120,18 @@ positivePart m =
         fmap integerPositivePartToNatural
             <$> filter ((> 0) . snd) (toList m)
 
--- cardinalitySum
+-- cardinalityCount
 -- cardinalityAbsolute
 -- cardinalityPositive
 -- cardinalityNegative
 
 cardinality :: SignedBag a -> Integer
 cardinality (SignedBag s) =
-    Data.Monoid.getSum $ Foldable.foldl' (+) 0 s
+    getCount $ Foldable.foldl' (+) 0 s
 
 magnitude :: SignedBag a -> Natural
 magnitude (SignedBag s) =
-    Data.Monoid.getSum $ foldMap (coerce integerMagnitude) s
+    getCount $ foldMap (coerce integerMagnitude) s
 
 fromUnsignedNegative :: Bag a -> SignedBag a
 fromUnsignedNegative = undefined
@@ -150,7 +156,7 @@ difference
     -> SignedBag a
     -> SignedBag a
 difference (SignedBag m1) (SignedBag m2) =
-    SignedBag $ m1 `MonoidMap.minus` m2
+    undefined -- SignedBag $ m1 `MonoidMap.minus` m2
 
 symmetricDifference
     :: Ord a
@@ -316,7 +322,7 @@ symmetricPowersetElements = fmap (fromListWith (+)) . go . toList
 
 symmetricPowersetSize :: Ord a => SignedBag a -> Natural
 symmetricPowersetSize (SignedBag s) =
-    getSum $
+    getCount $
         Foldable.foldl'
             (\x y -> x * (coerce integerMagnitude y + 1))
             1
@@ -327,6 +333,9 @@ multiplicity a (SignedBag s) = coerce (MonoidMap.get a s)
 
 support :: SignedBag a -> Set a
 support = Map.keysSet . toMap
+
+supportSigned :: SignedBag a -> SignedSet a
+supportSigned = undefined
 
 supportPositive :: SignedBag a -> Set a
 supportPositive = undefined

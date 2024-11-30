@@ -24,12 +24,10 @@ import Data.Map.Strict
     ( Map
     )
 import Data.Map.Strict qualified as Map
-import Data.Monoid
-    ( Sum (Sum)
-    )
 import Data.MonoidMap qualified as MonoidMap
 import Data.Bag.Internal
     ( Bag (Bag)
+    , Count (Count)
     , SignedBag (SignedBag)
     )
 import Data.Set
@@ -155,18 +153,18 @@ powersetElements = fmap (fromListWith (+)) . go . toList
 
 powersetSize :: Ord a => Bag a -> Natural
 powersetSize (Bag s) =
-    coerce $ Foldable.foldl' (\x y -> x * (y + 1)) (Sum 1) s
+    coerce $ Foldable.foldl' (\x y -> x * (y + 1)) (Count 1) s
 
 disjoint :: Ord a => Bag a -> Bag a -> Bool
-disjoint (Bag s1) (Bag s2) = MonoidMap.disjoint s1 s2
+disjoint = undefined -- (Bag s1) (Bag s2) = MonoidMap.disjoint s1 s2
 
 difference :: Ord a => Bag a -> Bag a -> Bag a
 difference (Bag s1) (Bag s2) =
-    Bag $ s1 `MonoidMap.monus` s2
+    undefined -- Bag $ s1 `MonoidMap.monus` s2
 
 differenceMaybe :: Ord a => Bag a -> Bag a -> Maybe (Bag a)
 differenceMaybe (Bag s1) (Bag s2) =
-    Bag <$> s1 `MonoidMap.minusMaybe` s2
+    undefined -- Bag <$> s1 `MonoidMap.minusMaybe` s2
 
 differenceSigned :: Ord a => Bag a -> Bag a -> SignedBag a
 differenceSigned (Bag s1) (Bag s2) =
@@ -181,7 +179,7 @@ symmetricDifference
 symmetricDifference (Bag s1) (Bag s2) =
     Bag $ MonoidMap.unionWith (coerce naturalDistance) s1 s2
 
--- consider having a single monoid (analogous to Sum Natural) where
+-- consider having a single monoid (analogous to Count Natural) where
 -- <> = sum
 -- lcm = union
 -- gcd = intersection
