@@ -1,7 +1,7 @@
 {-# LANGUAGE UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-
 {-# HLINT ignore "Use camelCase" #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
 module Data.Multiset.Signed where
 
@@ -29,14 +29,12 @@ import Data.Map.Strict qualified as Map
 import Data.Monoid
     ( Sum (Sum, getSum)
     )
-import Data.MonoidMap
-    ( MonoidMap
-    )
 import Data.MonoidMap qualified as MonoidMap
-import Data.Multiset
-    ( Multiset
-    )
 import Data.Multiset qualified as Multiset
+import Data.Multiset.Internal
+    ( Multiset
+    , SignedMultiset (SignedMultiset)
+    )
 import Data.Set
     ( Set
     )
@@ -49,10 +47,6 @@ import Prelude hiding
     , sum
     )
 import Prelude qualified
-
-newtype SignedMultiset a
-    = SignedMultiset (MonoidMap a (Sum Integer))
-    deriving newtype (Eq)
 
 instance Ord a => Ord (SignedMultiset a) where
     compare = Prelude.compare `on` toMap
@@ -228,10 +222,13 @@ compare s1 s2 = go False False (compareAll s1 s2)
 compareAll :: Ord a => SignedMultiset a -> SignedMultiset a -> [(a, Ordering)]
 compareAll s1 s2 = fmap (uncurry Prelude.compare) <$> align s1 s2
 
+isSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isSubsetOf s1 s2 = GT `notElem` (snd <$> compareAll s1 s2)
+
 -- Note this will terminate early if (and only if) a GT is detected.
 {- ORMOLU_DISABLE -}
-isLessThan :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isLessThan s1 s2 = go False (compareAll s1 s2)
+isProperSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isProperSubsetOf s1 s2 = go False (compareAll s1 s2)
   where
     go seenLT             [] = seenLT
     go _      ((_, LT) : xs) = go True   xs
@@ -239,10 +236,13 @@ isLessThan s1 s2 = go False (compareAll s1 s2)
     go _      ((_, GT) :  _) = False
 {- ORMOLU_ENABLE -}
 
+isSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isSupersetOf s1 s2 = LT `notElem` (snd <$> compareAll s1 s2)
+
 -- Note this will terminate early if (and only if) a LT is detected.
 {- ORMOLU_DISABLE -}
-isGreaterThan :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isGreaterThan s1 s2 = go False (compareAll s1 s2)
+isProperSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isProperSupersetOf s1 s2 = go False (compareAll s1 s2)
   where
     go seenGT             [] = seenGT
     go _      ((_, LT) :  _) = False
@@ -250,32 +250,28 @@ isGreaterThan s1 s2 = go False (compareAll s1 s2)
     go _      ((_, GT) : xs) = go True   xs
 {- ORMOLU_ENABLE -}
 
-isLessThanOrEqualTo :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isLessThanOrEqualTo s1 s2 = GT `notElem` (snd <$> compareAll s1 s2)
+isSymmetricSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isSymmetricSubsetOf = Map.isSubmapOfBy isSmallerThan `on` toMap
 
-isGreaterThanOrEqualTo :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isGreaterThanOrEqualTo s1 s2 = LT `notElem` (snd <$> compareAll s1 s2)
+isProperSymmetricSubsetOf
+    :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isProperSymmetricSubsetOf = Map.isProperSubmapOfBy isSmallerThan `on` toMap
 
-isSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isSubsetOf = Map.isSubmapOfBy isContainedBy `on` toMap
+isSymmetricSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isSymmetricSupersetOf = flip isSymmetricSubsetOf
 
-isProperSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isProperSubsetOf = Map.isProperSubmapOfBy isContainedBy `on` toMap
+isProperSymmetricSupersetOf
+    :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isProperSymmetricSupersetOf = flip isProperSymmetricSubsetOf
 
-isSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isSupersetOf = flip isSubsetOf
+-- The set of all symmetric subsets.
+symmetricPowerset :: Ord a => SignedMultiset a -> Set (SignedMultiset a)
+symmetricPowerset = Set.fromList . symmetricPowersetElements
 
-isProperSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-isProperSupersetOf = flip isProperSubsetOf
-
--- The set of all subsets.
-powerset :: Ord a => SignedMultiset a -> Set (SignedMultiset a)
-powerset = Set.fromList . powersetElements
-
--- Generates all subsets in lexicograhic order.
+-- Generates all symmetric subsets in lexicograhic order.
 {- ORMOLU_DISABLE -}
-powersetElements :: Ord a => SignedMultiset a -> [SignedMultiset a]
-powersetElements = fmap (fromListWith (+)) . go . toList
+symmetricPowersetElements :: Ord a => SignedMultiset a -> [SignedMultiset a]
+symmetricPowersetElements = fmap (fromListWith (+)) . go . toList
   where
     go            [] = [[]]
     go ((a, p) : xs) = [(a, q) : ys | q <- shrinkInclusive p, ys <- go xs]
@@ -287,8 +283,8 @@ powersetElements = fmap (fromListWith (+)) . go . toList
         | otherwise = [0]
 {- ORMOLU_ENABLE -}
 
-powersetSize :: Ord a => SignedMultiset a -> Natural
-powersetSize (SignedMultiset s) =
+symmetricPowersetSize :: Ord a => SignedMultiset a -> Natural
+symmetricPowersetSize (SignedMultiset s) =
     getSum $
         Foldable.foldl'
             (\x y -> x * (coerce integerMagnitude y + 1))
@@ -305,63 +301,76 @@ support = Map.keysSet . toMap
 -- Model functions
 --------------------------------------------------------------------------------
 
-model_isLessThan
+model_isSubsetOf
     :: Ord a
     => SignedMultiset a
     -> SignedMultiset a
     -> Bool
-model_isLessThan s1 s2 =
-    (s1 /= s2) && (s1 `model_isLessThanOrEqualTo` s2)
-
-model_isGreaterThan
-    :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
-    -> Bool
-model_isGreaterThan s1 s2 =
-    (s1 /= s2) && (s1 `model_isGreaterThanOrEqualTo` s2)
-
-model_isLessThanOrEqualTo
-    :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
-    -> Bool
-model_isLessThanOrEqualTo s1 s2 =
+model_isSubsetOf s1 s2 =
     all
         (\k -> ((<=) `on` multiplicity k) s1 s2)
         ((Set.union `on` support) s1 s2)
 
-model_isGreaterThanOrEqualTo
+model_isSupersetOf
     :: Ord a
     => SignedMultiset a
     -> SignedMultiset a
     -> Bool
-model_isGreaterThanOrEqualTo s1 s2 =
+model_isSupersetOf s1 s2 =
     all
         (\k -> ((>=) `on` multiplicity k) s1 s2)
         ((Set.union `on` support) s1 s2)
 
-model_isSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-model_isSubsetOf s1 s2 =
-    all
-        (\k -> (isContainedBy `on` multiplicity k) s1 s2)
-        ((Set.union `on` support) s1 s2)
-
-model_isSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-model_isSupersetOf = flip model_isSubsetOf
-
-model_isProperSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
-model_isProperSubsetOf s1 s2 = (s1 /= s2) && model_isSubsetOf s1 s2
+model_isProperSubsetOf
+    :: Ord a
+    => SignedMultiset a
+    -> SignedMultiset a
+    -> Bool
+model_isProperSubsetOf s1 s2 =
+    (s1 /= s2) && (s1 `model_isSubsetOf` s2)
 
 model_isProperSupersetOf
     :: Ord a
     => SignedMultiset a
     -> SignedMultiset a
     -> Bool
-model_isProperSupersetOf = flip model_isProperSubsetOf
+model_isProperSupersetOf s1 s2 =
+    (s1 /= s2) && (s1 `model_isSupersetOf` s2)
 
-model_powersetElements :: Ord a => SignedMultiset a -> [SignedMultiset a]
-model_powersetElements as =
+model_isSymmetricSubsetOf
+    :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+model_isSymmetricSubsetOf s1 s2 =
+    all
+        (\k -> (isSmallerThan `on` multiplicity k) s1 s2)
+        ((Set.union `on` support) s1 s2)
+
+model_isSymmetricSupersetOf
+    :: Ord a
+    => SignedMultiset a
+    -> SignedMultiset a
+    -> Bool
+model_isSymmetricSupersetOf = flip model_isSymmetricSubsetOf
+
+model_isProperSymmetricSubsetOf
+    :: Ord a
+    => SignedMultiset a
+    -> SignedMultiset a
+    -> Bool
+model_isProperSymmetricSubsetOf s1 s2 =
+    (s1 /= s2) && model_isSymmetricSubsetOf s1 s2
+
+model_isProperSymmetricSupersetOf
+    :: Ord a
+    => SignedMultiset a
+    -> SignedMultiset a
+    -> Bool
+model_isProperSymmetricSupersetOf = flip model_isProperSymmetricSubsetOf
+
+model_symmetricPowersetElements
+    :: Ord a
+    => SignedMultiset a
+    -> [SignedMultiset a]
+model_symmetricPowersetElements as =
     [ fromUnsignedPairWith (+) (n, p)
     | n <- Multiset.powersetElements ns
     , p <- Multiset.powersetElements ps
@@ -420,8 +429,8 @@ naturalToNegativeInteger = negate . fromIntegral
 naturalToPositiveInteger :: Natural -> Integer
 naturalToPositiveInteger = fromIntegral
 
-isContainedBy :: (Ord a, Num a) => a -> a -> Bool
-isContainedBy v1 v2
+isSmallerThan :: (Ord a, Num a) => a -> a -> Bool
+isSmallerThan v1 v2
     | v1 <= 0 && v2 <= 0 = v1 >= v2
     | v1 >= 0 && v2 >= 0 = v1 <= v2
     | otherwise = False

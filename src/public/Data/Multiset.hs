@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-orphans #-}
 module Data.Multiset where
 
 import Data.Coerce
@@ -18,10 +19,9 @@ import Data.Map.Strict qualified as Map
 import Data.Monoid
     ( Sum (Sum)
     )
-import Data.MonoidMap
-    ( MonoidMap
-    )
 import Data.MonoidMap qualified as MonoidMap
+import Data.Multiset.Internal
+    ( Multiset (Multiset) )
 import Data.Set
     ( Set
     )
@@ -32,9 +32,6 @@ import Prelude hiding
     ( sum
     )
 import qualified Data.Set as Set
-
-newtype Multiset a = Multiset (MonoidMap a (Sum Natural))
-    deriving newtype Eq
 
 instance Ord a => Ord (Multiset a) where
     compare = Prelude.compare `on` toMap

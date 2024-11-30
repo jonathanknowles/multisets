@@ -67,6 +67,7 @@ library
         Data.Multimap.Set
         Data.Multiset
         Data.Multiset.Combinators
+        Data.Multiset.Internal
         Data.Multiset.Signed
     default-language:
         Haskell2010
