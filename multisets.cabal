@@ -63,6 +63,16 @@ library
     hs-source-dirs:
         src/public
     exposed-modules:
+        --Data.Bag
+        --Data.Bag.Signed
+        --Data.Set.Signed
+        -- other package
+        --Data.BagMap
+        --Data.BagMap.Signed
+        --Data.ListMap
+        --Data.SetMap
+        --Data.SeqMap
+
         Data.Multimap.Seq
         Data.Multimap.Set
         Data.Multiset

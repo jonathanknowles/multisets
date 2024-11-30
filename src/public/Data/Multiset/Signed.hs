@@ -117,7 +117,7 @@ positivePart m =
             <$> filter ((> 0) . snd) (toList m)
 
 -- cardinalitySum
--- cardinalityAbs
+-- cardinalityAbsolute
 -- cardinalityPositive
 -- cardinalityNegative
 
@@ -329,6 +329,12 @@ multiplicity a (SignedMultiset s) = coerce (MonoidMap.get a s)
 
 support :: SignedMultiset a -> Set a
 support = Map.keysSet . toMap
+
+supportPositive :: SignedMultiset a -> Set a
+supportPositive = undefined
+
+supportNegative :: SignedMultiset a -> Set a
+supportNegative = undefined
 
 --------------------------------------------------------------------------------
 -- Model functions
