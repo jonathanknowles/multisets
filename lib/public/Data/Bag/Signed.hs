@@ -52,12 +52,6 @@ import Prelude hiding
     )
 import Prelude qualified
 
-instance Ord a => Ord (SignedBag a) where
-    compare = Prelude.compare `on` toMap
-
-instance Show a => Show (SignedBag a) where
-    show s = "SignedBag.fromListWith (+) " <> show (toList s)
-
 testA :: SignedBag Char
 testA = fromListWith (+) [('a', -1), ('b', 1), ('c', 0), ('d', -2), ('e', 5)]
 

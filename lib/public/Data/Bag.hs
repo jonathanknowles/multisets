@@ -43,12 +43,6 @@ import Prelude hiding
     ( sum
     )
 
-instance Ord a => Ord (Bag a) where
-    compare = Prelude.compare `on` toMap
-
-instance Show a => Show (Bag a) where
-    show s = "Bag.fromListWith (+) " <> show (toList s)
-
 testA :: Bag Char
 testA = fromListWith (+) [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
 
