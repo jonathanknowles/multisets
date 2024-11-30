@@ -61,18 +61,8 @@ library
       , dependency-monoidmap
       , extensions
     hs-source-dirs:
-        src/public
+        lib/public
     exposed-modules:
-        --Data.Bag
-        --Data.Bag.Signed
-        --Data.Set.Signed
-        -- other package
-        --Data.BagMap
-        --Data.BagMap.Signed
-        --Data.ListMap
-        --Data.SetMap
-        --Data.SeqMap
-
         Data.Multimap.Seq
         Data.Multimap.Set
         Data.Multiset
@@ -95,7 +85,7 @@ test-suite test
     main-is:
         Spec.hs
     hs-source-dirs:
-        src/test
+        exe/test
     other-modules:
         SpecHook
         Test.QuickCheck.Classes.Hspec
@@ -118,7 +108,7 @@ benchmark benchmark
     type:
         exitcode-stdio-1.0
     hs-source-dirs:
-        src/benchmark
+        exe/benchmark
     main-is:
         Main.hs
     build-depends:
