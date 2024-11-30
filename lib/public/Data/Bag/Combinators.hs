@@ -1,4 +1,4 @@
-module Data.Multiset.Combinators where
+module Data.Bag.Combinators where
 
 newtype Sum m = Sum
     { getSum :: m

@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Data.Multiset
-    ( Multiset
+module Data.Bag
+    ( Bag
     , fromListWith
     , toList
     , invert
@@ -28,9 +28,9 @@ import Data.Monoid
     ( Sum (Sum)
     )
 import Data.MonoidMap qualified as MonoidMap
-import Data.Multiset.Internal
-    ( Multiset (Multiset)
-    , SignedMultiset (SignedMultiset)
+import Data.Bag.Internal
+    ( Bag (Bag)
+    , SignedBag (SignedBag)
     )
 import Data.Set
     ( Set
@@ -43,77 +43,77 @@ import Prelude hiding
     ( sum
     )
 
-instance Ord a => Ord (Multiset a) where
+instance Ord a => Ord (Bag a) where
     compare = Prelude.compare `on` toMap
 
-instance Show a => Show (Multiset a) where
-    show s = "Multiset.fromListWith (+) " <> show (toList s)
+instance Show a => Show (Bag a) where
+    show s = "Bag.fromListWith (+) " <> show (toList s)
 
-testA :: Multiset Char
+testA :: Bag Char
 testA = fromListWith (+) [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
 
-testB :: Multiset Char
+testB :: Bag Char
 testB = fromListWith (+) [('c', 2), ('d', 4)]
 
 fromListWith
     :: Ord a
     => (Natural -> Natural -> Natural)
     -> [(a, Natural)]
-    -> Multiset a
+    -> Bag a
 fromListWith f =
-    Multiset
+    Bag
         . MonoidMap.fromListWith (coerce f)
         . coerce
 
-toList :: Multiset a -> [(a, Natural)]
-toList (Multiset s) = coerce (MonoidMap.toList s)
+toList :: Bag a -> [(a, Natural)]
+toList (Bag s) = coerce (MonoidMap.toList s)
 
-toUnaryList :: Multiset a -> [a]
+toUnaryList :: Bag a -> [a]
 toUnaryList = foldMap f . toList
   where
     f (_, 0) = []
     f (a, n) = a : f (a, n - 1)
 
-fromUnaryList :: Ord a => [a] -> Multiset a
+fromUnaryList :: Ord a => [a] -> Bag a
 fromUnaryList = sums . fmap singleton
 
-fromMap :: Map a Natural -> Multiset a
-fromMap = Multiset . MonoidMap.fromMap . coerce
+fromMap :: Map a Natural -> Bag a
+fromMap = Bag . MonoidMap.fromMap . coerce
 
-toMap :: Multiset a -> Map a Natural
-toMap (Multiset s) = coerce (MonoidMap.toMap s)
+toMap :: Bag a -> Map a Natural
+toMap (Bag s) = coerce (MonoidMap.toMap s)
 
-empty :: Multiset a
-empty = Multiset MonoidMap.empty
+empty :: Bag a
+empty = Bag MonoidMap.empty
 
-singleton :: Ord a => a -> Multiset a
+singleton :: Ord a => a -> Bag a
 singleton a = fromListWith (+) [(a, 1)]
 
-cardinality :: Multiset a -> Natural
-cardinality (Multiset s) = coerce (Foldable.fold s)
+cardinality :: Bag a -> Natural
+cardinality (Bag s) = coerce (Foldable.fold s)
 
-member :: Ord a => a -> Multiset a -> Bool
-member a (Multiset s) = MonoidMap.nonNullKey a s
+member :: Ord a => a -> Bag a -> Bool
+member a (Bag s) = MonoidMap.nonNullKey a s
 
-multiplicity :: Ord a => a -> Multiset a -> Natural
-multiplicity a (Multiset s) = coerce (MonoidMap.get a s)
+multiplicity :: Ord a => a -> Bag a -> Natural
+multiplicity a (Bag s) = coerce (MonoidMap.get a s)
 
-support :: Multiset a -> Set a
-support (Multiset s) = MonoidMap.nonNullKeys s
+support :: Bag a -> Set a
+support (Bag s) = MonoidMap.nonNullKeys s
 
-invert :: Multiset a -> SignedMultiset a
+invert :: Bag a -> SignedBag a
 invert = undefined
 
-fromSet :: Set a -> Multiset a
+fromSet :: Set a -> Bag a
 fromSet = fromSetWith (const 1)
 
-fromSetWith :: (a -> Natural) -> Set a -> Multiset a
-fromSetWith f = Multiset . MonoidMap.fromMap . Map.fromSet (coerce f)
+fromSetWith :: (a -> Natural) -> Set a -> Bag a
+fromSetWith f = Bag . MonoidMap.fromMap . Map.fromSet (coerce f)
 
 -- Caution: this function will only short-circuit if the sets are incomparable.
 --
 {- ORMOLU_DISABLE -}
-compare :: Ord a => Multiset a -> Multiset a -> Maybe Ordering
+compare :: Ord a => Bag a -> Bag a -> Maybe Ordering
 compare s1 s2 = go False False (compareAll s1 s2)
   where
     go    True    True              _ = Nothing
@@ -125,31 +125,31 @@ compare s1 s2 = go False False (compareAll s1 s2)
     go  seenLT  seenGT ((_, EQ) : xs) = go seenLT seenGT xs
 {- ORMOLU_ENABLE -}
 
-compareAll :: Ord a => Multiset a -> Multiset a -> [(a, Ordering)]
+compareAll :: Ord a => Bag a -> Bag a -> [(a, Ordering)]
 compareAll s1 s2 = fmap (uncurry Prelude.compare) <$> align s1 s2
 
-isSet :: Multiset a -> Bool
-isSet (Multiset s) = Foldable.all (== 1) s
+isSet :: Bag a -> Bool
+isSet (Bag s) = Foldable.all (== 1) s
 
-isSubsetOf :: Ord a => Multiset a -> Multiset a -> Bool
+isSubsetOf :: Ord a => Bag a -> Bag a -> Bool
 isSubsetOf = Map.isSubmapOfBy (<=) `on` toMap
 
-isProperSubsetOf :: Ord a => Multiset a -> Multiset a -> Bool
+isProperSubsetOf :: Ord a => Bag a -> Bag a -> Bool
 isProperSubsetOf = Map.isProperSubmapOfBy (<=) `on` toMap
 
-isSupersetOf :: Ord a => Multiset a -> Multiset a -> Bool
+isSupersetOf :: Ord a => Bag a -> Bag a -> Bool
 isSupersetOf = flip isSubsetOf
 
-isProperSupersetOf :: Ord a => Multiset a -> Multiset a -> Bool
+isProperSupersetOf :: Ord a => Bag a -> Bag a -> Bool
 isProperSupersetOf = flip isProperSubsetOf
 
 -- The set of all subsets.
-powerset :: Ord a => Multiset a -> Set (Multiset a)
+powerset :: Ord a => Bag a -> Set (Bag a)
 powerset = Set.fromList . powersetElements
 
 -- Generates all subsets in lexicograhic order.
 {- ORMOLU_DISABLE -}
-powersetElements :: Ord a => Multiset a -> [Multiset a]
+powersetElements :: Ord a => Bag a -> [Bag a]
 powersetElements = fmap (fromListWith (+)) . go . toList
   where
     go            [] = [[]]
@@ -159,33 +159,33 @@ powersetElements = fmap (fromListWith (+)) . go . toList
     shrinkInclusive a = [0 .. a]
 {- ORMOLU_ENABLE -}
 
-powersetSize :: Ord a => Multiset a -> Natural
-powersetSize (Multiset s) =
+powersetSize :: Ord a => Bag a -> Natural
+powersetSize (Bag s) =
     coerce $ Foldable.foldl' (\x y -> x * (y + 1)) (Sum 1) s
 
-disjoint :: Ord a => Multiset a -> Multiset a -> Bool
-disjoint (Multiset s1) (Multiset s2) = MonoidMap.disjoint s1 s2
+disjoint :: Ord a => Bag a -> Bag a -> Bool
+disjoint (Bag s1) (Bag s2) = MonoidMap.disjoint s1 s2
 
-difference :: Ord a => Multiset a -> Multiset a -> Multiset a
-difference (Multiset s1) (Multiset s2) =
-    Multiset $ s1 `MonoidMap.monus` s2
+difference :: Ord a => Bag a -> Bag a -> Bag a
+difference (Bag s1) (Bag s2) =
+    Bag $ s1 `MonoidMap.monus` s2
 
-differenceMaybe :: Ord a => Multiset a -> Multiset a -> Maybe (Multiset a)
-differenceMaybe (Multiset s1) (Multiset s2) =
-    Multiset <$> s1 `MonoidMap.minusMaybe` s2
+differenceMaybe :: Ord a => Bag a -> Bag a -> Maybe (Bag a)
+differenceMaybe (Bag s1) (Bag s2) =
+    Bag <$> s1 `MonoidMap.minusMaybe` s2
 
-differenceSigned :: Ord a => Multiset a -> Multiset a -> SignedMultiset a
-differenceSigned (Multiset s1) (Multiset s2) =
-    SignedMultiset $
+differenceSigned :: Ord a => Bag a -> Bag a -> SignedBag a
+differenceSigned (Bag s1) (Bag s2) =
+    SignedBag $
         MonoidMap.unionWith ((-) `on` coerce naturalToPositiveInteger) s1 s2
 
 symmetricDifference
     :: Ord a
-    => Multiset a
-    -> Multiset a
-    -> Multiset a
-symmetricDifference (Multiset s1) (Multiset s2) =
-    Multiset $ MonoidMap.unionWith (coerce naturalDistance) s1 s2
+    => Bag a
+    -> Bag a
+    -> Bag a
+symmetricDifference (Bag s1) (Bag s2) =
+    Bag $ MonoidMap.unionWith (coerce naturalDistance) s1 s2
 
 -- consider having a single monoid (analogous to Sum Natural) where
 -- <> = sum
@@ -194,27 +194,27 @@ symmetricDifference (Multiset s1) (Multiset s2) =
 -- <\> = difference
 -- </> = differenceMaybe
 --
--- See: https://en.wikipedia.org/wiki/Multiset
+-- See: https://en.wikipedia.org/wiki/Bag
 
-sum :: Ord a => Multiset a -> Multiset a -> Multiset a
-sum (Multiset s1) (Multiset s2) =
-    Multiset $ MonoidMap.unionWith (+) s1 s2
+sum :: Ord a => Bag a -> Bag a -> Bag a
+sum (Bag s1) (Bag s2) =
+    Bag $ MonoidMap.unionWith (+) s1 s2
 
-sums :: Foldable f => Ord a => f (Multiset a) -> Multiset a
+sums :: Foldable f => Ord a => f (Bag a) -> Bag a
 sums = Foldable.foldl' sum empty
 
-union :: Ord a => Multiset a -> Multiset a -> Multiset a
-union (Multiset s1) (Multiset s2) =
-    Multiset $ MonoidMap.unionWith max s1 s2
+union :: Ord a => Bag a -> Bag a -> Bag a
+union (Bag s1) (Bag s2) =
+    Bag $ MonoidMap.unionWith max s1 s2
 
-unions :: Foldable f => Ord a => f (Multiset a) -> Multiset a
+unions :: Foldable f => Ord a => f (Bag a) -> Bag a
 unions = Foldable.foldl' union empty
 
-intersection :: Ord a => Multiset a -> Multiset a -> Multiset a
-intersection (Multiset s1) (Multiset s2) =
-    Multiset $ MonoidMap.intersectionWith min s1 s2
+intersection :: Ord a => Bag a -> Bag a -> Bag a
+intersection (Bag s1) (Bag s2) =
+    Bag $ MonoidMap.intersectionWith min s1 s2
 
-intersections :: Foldable1 f => Ord a => f (Multiset a) -> Multiset a
+intersections :: Foldable1 f => Ord a => f (Bag a) -> Bag a
 intersections = Foldable1.foldl1' intersection
 
 --------------------------------------------------------------------------------
@@ -224,8 +224,8 @@ intersections = Foldable1.foldl1' intersection
 {- ORMOLU_DISABLE -}
 align
     :: Ord a
-    => Multiset a
-    -> Multiset a
+    => Bag a
+    -> Bag a
     -> [(a, (Natural, Natural))]
 align = go `on` toList
   where

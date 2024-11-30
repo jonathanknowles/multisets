@@ -1,4 +1,4 @@
-module Data.Multiset.Internal where
+module Data.Bag.Internal where
 
 import Data.Monoid
     ( Sum
@@ -11,8 +11,8 @@ import Numeric.Natural
     )
 import Prelude
 
-newtype Multiset a = Multiset (MonoidMap a (Sum Natural))
+newtype Bag a = Bag (MonoidMap a (Sum Natural))
     deriving newtype (Eq)
 
-newtype SignedMultiset a = SignedMultiset (MonoidMap a (Sum Integer))
+newtype SignedBag a = SignedBag (MonoidMap a (Sum Integer))
     deriving newtype (Eq)

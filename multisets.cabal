@@ -63,9 +63,9 @@ library
     hs-source-dirs:
         lib/public
     exposed-modules:
-        Data.Multiset
-        Data.Multiset.Combinators
-        Data.Multiset.Signed
+        Data.Bag
+        Data.Bag.Combinators
+        Data.Bag.Signed
     default-language:
         Haskell2010
     build-depends:
@@ -81,7 +81,7 @@ library internal
     hs-source-dirs:
         lib/internal
     exposed-modules:
-        Data.Multiset.Internal
+        Data.Bag.Internal
     default-language:
         Haskell2010
 

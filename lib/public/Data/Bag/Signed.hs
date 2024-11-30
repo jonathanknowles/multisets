@@ -3,8 +3,8 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
-module Data.Multiset.Signed
-    ( SignedMultiset
+module Data.Bag.Signed
+    ( SignedBag
     , toUnsignedPair
     )
 where
@@ -34,10 +34,10 @@ import Data.Monoid
     ( Sum (Sum, getSum)
     )
 import Data.MonoidMap qualified as MonoidMap
-import Data.Multiset qualified as Multiset
-import Data.Multiset.Internal
-    ( Multiset (Multiset)
-    , SignedMultiset (SignedMultiset)
+import Data.Bag qualified as Bag
+import Data.Bag.Internal
+    ( Bag (Bag)
+    , SignedBag (SignedBag)
     )
 import Data.Set
     ( Set
@@ -52,71 +52,71 @@ import Prelude hiding
     )
 import Prelude qualified
 
-instance Ord a => Ord (SignedMultiset a) where
+instance Ord a => Ord (SignedBag a) where
     compare = Prelude.compare `on` toMap
 
-instance Show a => Show (SignedMultiset a) where
-    show s = "SignedMultiset.fromListWith (+) " <> show (toList s)
+instance Show a => Show (SignedBag a) where
+    show s = "SignedBag.fromListWith (+) " <> show (toList s)
 
-testA :: SignedMultiset Char
+testA :: SignedBag Char
 testA = fromListWith (+) [('a', -1), ('b', 1), ('c', 0), ('d', -2), ('e', 5)]
 
-testB :: SignedMultiset Char
+testB :: SignedBag Char
 testB = fromListWith (+) [('a', -2), ('b', 2)]
 
-empty :: SignedMultiset a
-empty = SignedMultiset MonoidMap.empty
+empty :: SignedBag a
+empty = SignedBag MonoidMap.empty
 
 fromListWith
     :: Ord a
     => (Integer -> Integer -> Integer)
     -> [(a, Integer)]
-    -> SignedMultiset a
+    -> SignedBag a
 fromListWith f =
-    SignedMultiset
+    SignedBag
         . MonoidMap.fromListWith (coerce f)
         . fmap (fmap Data.Monoid.Sum)
 
-toList :: SignedMultiset a -> [(a, Integer)]
-toList (SignedMultiset s) = coerce (MonoidMap.toList s)
+toList :: SignedBag a -> [(a, Integer)]
+toList (SignedBag s) = coerce (MonoidMap.toList s)
 
-fromMap :: Map a Integer -> SignedMultiset a
-fromMap = SignedMultiset . MonoidMap.fromMap . coerce
+fromMap :: Map a Integer -> SignedBag a
+fromMap = SignedBag . MonoidMap.fromMap . coerce
 
-toMap :: SignedMultiset a -> Map a Integer
-toMap (SignedMultiset s) = coerce (MonoidMap.toMap s)
+toMap :: SignedBag a -> Map a Integer
+toMap (SignedBag s) = coerce (MonoidMap.toMap s)
 
-fromSetPositive :: Set a -> SignedMultiset a
+fromSetPositive :: Set a -> SignedBag a
 fromSetPositive = fromSetWith (const 1)
 
-fromSetNegative :: Set a -> SignedMultiset a
+fromSetNegative :: Set a -> SignedBag a
 fromSetNegative = fromSetWith (const (-1))
 
-fromSetWith :: (a -> Integer) -> Set a -> SignedMultiset a
-fromSetWith f = SignedMultiset . MonoidMap.fromMap . Map.fromSet (coerce f)
+fromSetWith :: (a -> Integer) -> Set a -> SignedBag a
+fromSetWith f = SignedBag . MonoidMap.fromMap . Map.fromSet (coerce f)
 
-toUnsignedPair :: Ord a => SignedMultiset a -> (Multiset a, Multiset a)
+toUnsignedPair :: Ord a => SignedBag a -> (Bag a, Bag a)
 toUnsignedPair m =
-    ( Multiset.fromListWith (+) $
+    ( Bag.fromListWith (+) $
         fmap (fmap integerNegativePartToNatural) ns
-    , Multiset.fromListWith (+) $
+    , Bag.fromListWith (+) $
         fmap (fmap integerPositivePartToNatural) ps
     )
   where
     (ns, ps) = partition ((< 0) . snd) (toList m)
 
-invert :: SignedMultiset a -> SignedMultiset a
-invert (SignedMultiset s) = SignedMultiset (MonoidMap.invert s)
+invert :: SignedBag a -> SignedBag a
+invert (SignedBag s) = SignedBag (MonoidMap.invert s)
 
-negativePart :: Ord a => SignedMultiset a -> Multiset a
+negativePart :: Ord a => SignedBag a -> Bag a
 negativePart m =
-    Multiset.fromListWith (+) $
+    Bag.fromListWith (+) $
         fmap integerNegativePartToNatural
             <$> filter ((< 0) . snd) (toList m)
 
-positivePart :: Ord a => SignedMultiset a -> Multiset a
+positivePart :: Ord a => SignedBag a -> Bag a
 positivePart m =
-    Multiset.fromListWith (+) $
+    Bag.fromListWith (+) $
         fmap integerPositivePartToNatural
             <$> filter ((> 0) . snd) (toList m)
 
@@ -125,126 +125,126 @@ positivePart m =
 -- cardinalityPositive
 -- cardinalityNegative
 
-cardinality :: SignedMultiset a -> Integer
-cardinality (SignedMultiset s) =
+cardinality :: SignedBag a -> Integer
+cardinality (SignedBag s) =
     Data.Monoid.getSum $ Foldable.foldl' (+) 0 s
 
-magnitude :: SignedMultiset a -> Natural
-magnitude (SignedMultiset s) =
+magnitude :: SignedBag a -> Natural
+magnitude (SignedBag s) =
     Data.Monoid.getSum $ foldMap (coerce integerMagnitude) s
 
-fromUnsignedNegative :: Multiset a -> SignedMultiset a
+fromUnsignedNegative :: Bag a -> SignedBag a
 fromUnsignedNegative = undefined
 
-fromUnsignedPositive :: Multiset a -> SignedMultiset a
+fromUnsignedPositive :: Bag a -> SignedBag a
 fromUnsignedPositive = undefined
 
 fromUnsignedPairWith
     :: Ord a
     => (Integer -> Integer -> Integer)
-    -> (Multiset a, Multiset a)
-    -> SignedMultiset a
+    -> (Bag a, Bag a)
+    -> SignedBag a
 fromUnsignedPairWith f (s1, s2) =
     fromListWith f (ns <> ps)
   where
-    ns = fmap naturalToNegativeInteger <$> Multiset.toList s1
-    ps = fmap naturalToPositiveInteger <$> Multiset.toList s2
+    ns = fmap naturalToNegativeInteger <$> Bag.toList s1
+    ps = fmap naturalToPositiveInteger <$> Bag.toList s2
 
 difference
     :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
-    -> SignedMultiset a
-difference (SignedMultiset m1) (SignedMultiset m2) =
-    SignedMultiset $ m1 `MonoidMap.minus` m2
+    => SignedBag a
+    -> SignedBag a
+    -> SignedBag a
+difference (SignedBag m1) (SignedBag m2) =
+    SignedBag $ m1 `MonoidMap.minus` m2
 
 symmetricDifference
     :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
-    -> SignedMultiset a
+    => SignedBag a
+    -> SignedBag a
+    -> SignedBag a
 symmetricDifference = undefined
 
 symmetricDifferenceUnsigned
     :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
-    -> Multiset a
-symmetricDifferenceUnsigned (SignedMultiset s1) (SignedMultiset s2) =
-    Multiset $ MonoidMap.unionWith (coerce integerDistance) s1 s2
+    => SignedBag a
+    -> SignedBag a
+    -> Bag a
+symmetricDifferenceUnsigned (SignedBag s1) (SignedBag s2) =
+    Bag $ MonoidMap.unionWith (coerce integerDistance) s1 s2
 
 sum
     :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
-    -> SignedMultiset a
-sum (SignedMultiset m1) (SignedMultiset m2) =
-    SignedMultiset $ MonoidMap.unionWith (+) m1 m2
+    => SignedBag a
+    -> SignedBag a
+    -> SignedBag a
+sum (SignedBag m1) (SignedBag m2) =
+    SignedBag $ MonoidMap.unionWith (+) m1 m2
 
 sums
     :: Foldable f
     => Ord a
-    => f (SignedMultiset a)
-    -> SignedMultiset a
+    => f (SignedBag a)
+    -> SignedBag a
 sums = Foldable.foldl' sum empty
 
 union
     :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
-    -> SignedMultiset a
-union (SignedMultiset m1) (SignedMultiset m2) =
-    SignedMultiset $ MonoidMap.unionWith max m1 m2
+    => SignedBag a
+    -> SignedBag a
+    -> SignedBag a
+union (SignedBag m1) (SignedBag m2) =
+    SignedBag $ MonoidMap.unionWith max m1 m2
 
 unions
     :: Foldable f
     => Ord a
-    => f (SignedMultiset a)
-    -> SignedMultiset a
+    => f (SignedBag a)
+    -> SignedBag a
 unions = Foldable.foldl' union empty
 
 intersection
     :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
-    -> SignedMultiset a
-intersection (SignedMultiset m1) (SignedMultiset m2) =
-    SignedMultiset $ MonoidMap.unionWith min m1 m2
+    => SignedBag a
+    -> SignedBag a
+    -> SignedBag a
+intersection (SignedBag m1) (SignedBag m2) =
+    SignedBag $ MonoidMap.unionWith min m1 m2
 
 intersections
     :: Foldable1 f
     => Ord a
-    => f (SignedMultiset a) -> SignedMultiset a
+    => f (SignedBag a) -> SignedBag a
 intersections = Foldable1.foldl1' intersection
 
-isPositive :: SignedMultiset a -> Bool
+isPositive :: SignedBag a -> Bool
 isPositive = undefined
 
-isNegative :: SignedMultiset a -> Bool
+isNegative :: SignedBag a -> Bool
 isNegative = undefined
 
-maybePositive :: SignedMultiset a -> Maybe (Multiset a)
+maybePositive :: SignedBag a -> Maybe (Bag a)
 maybePositive = undefined
 
-maybeNegative :: SignedMultiset a -> Maybe (Multiset a)
+maybeNegative :: SignedBag a -> Maybe (Bag a)
 maybeNegative = undefined
 
-isPositiveSet :: SignedMultiset a -> Bool
-isPositiveSet (SignedMultiset s) = Foldable.all (== 1) s
+isPositiveSet :: SignedBag a -> Bool
+isPositiveSet (SignedBag s) = Foldable.all (== 1) s
 
-isNegativeSet :: SignedMultiset a -> Bool
-isNegativeSet (SignedMultiset s) = Foldable.all (== (-1)) s
+isNegativeSet :: SignedBag a -> Bool
+isNegativeSet (SignedBag s) = Foldable.all (== (-1)) s
 
-maybePositiveSet :: SignedMultiset a -> Maybe (Set a)
+maybePositiveSet :: SignedBag a -> Maybe (Set a)
 maybePositiveSet = undefined
 
-maybeNegativeSet :: SignedMultiset a -> Maybe (Set a)
+maybeNegativeSet :: SignedBag a -> Maybe (Set a)
 maybeNegativeSet = undefined
 
 -- Caution: this function will only short-circuit if the sets are incomparable.
 --
 {- ORMOLU_DISABLE -}
-compare :: Ord a => SignedMultiset a -> SignedMultiset a -> Maybe Ordering
+compare :: Ord a => SignedBag a -> SignedBag a -> Maybe Ordering
 compare s1 s2 = go False False (compareAll s1 s2)
   where
     go    True    True              _ = Nothing
@@ -256,15 +256,15 @@ compare s1 s2 = go False False (compareAll s1 s2)
     go  seenLT  seenGT ((_, EQ) : xs) = go seenLT seenGT xs
 {- ORMOLU_ENABLE -}
 
-compareAll :: Ord a => SignedMultiset a -> SignedMultiset a -> [(a, Ordering)]
+compareAll :: Ord a => SignedBag a -> SignedBag a -> [(a, Ordering)]
 compareAll s1 s2 = fmap (uncurry Prelude.compare) <$> align s1 s2
 
-isSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isSubsetOf :: Ord a => SignedBag a -> SignedBag a -> Bool
 isSubsetOf s1 s2 = GT `notElem` (snd <$> compareAll s1 s2)
 
 -- Note this will terminate early if (and only if) a GT is detected.
 {- ORMOLU_DISABLE -}
-isProperSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isProperSubsetOf :: Ord a => SignedBag a -> SignedBag a -> Bool
 isProperSubsetOf s1 s2 = go False (compareAll s1 s2)
   where
     go seenLT             [] = seenLT
@@ -273,12 +273,12 @@ isProperSubsetOf s1 s2 = go False (compareAll s1 s2)
     go _      ((_, GT) :  _) = False
 {- ORMOLU_ENABLE -}
 
-isSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isSupersetOf :: Ord a => SignedBag a -> SignedBag a -> Bool
 isSupersetOf s1 s2 = LT `notElem` (snd <$> compareAll s1 s2)
 
 -- Note this will terminate early if (and only if) a LT is detected.
 {- ORMOLU_DISABLE -}
-isProperSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isProperSupersetOf :: Ord a => SignedBag a -> SignedBag a -> Bool
 isProperSupersetOf s1 s2 = go False (compareAll s1 s2)
   where
     go seenGT             [] = seenGT
@@ -287,27 +287,27 @@ isProperSupersetOf s1 s2 = go False (compareAll s1 s2)
     go _      ((_, GT) : xs) = go True   xs
 {- ORMOLU_ENABLE -}
 
-isSymmetricSubsetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isSymmetricSubsetOf :: Ord a => SignedBag a -> SignedBag a -> Bool
 isSymmetricSubsetOf = Map.isSubmapOfBy isSmallerThan `on` toMap
 
 isProperSymmetricSubsetOf
-    :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+    :: Ord a => SignedBag a -> SignedBag a -> Bool
 isProperSymmetricSubsetOf = Map.isProperSubmapOfBy isSmallerThan `on` toMap
 
-isSymmetricSupersetOf :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+isSymmetricSupersetOf :: Ord a => SignedBag a -> SignedBag a -> Bool
 isSymmetricSupersetOf = flip isSymmetricSubsetOf
 
 isProperSymmetricSupersetOf
-    :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+    :: Ord a => SignedBag a -> SignedBag a -> Bool
 isProperSymmetricSupersetOf = flip isProperSymmetricSubsetOf
 
 -- The set of all symmetric subsets.
-symmetricPowerset :: Ord a => SignedMultiset a -> Set (SignedMultiset a)
+symmetricPowerset :: Ord a => SignedBag a -> Set (SignedBag a)
 symmetricPowerset = Set.fromList . symmetricPowersetElements
 
 -- Generates all symmetric subsets in lexicograhic order.
 {- ORMOLU_DISABLE -}
-symmetricPowersetElements :: Ord a => SignedMultiset a -> [SignedMultiset a]
+symmetricPowersetElements :: Ord a => SignedBag a -> [SignedBag a]
 symmetricPowersetElements = fmap (fromListWith (+)) . go . toList
   where
     go            [] = [[]]
@@ -320,24 +320,24 @@ symmetricPowersetElements = fmap (fromListWith (+)) . go . toList
         | otherwise = [0]
 {- ORMOLU_ENABLE -}
 
-symmetricPowersetSize :: Ord a => SignedMultiset a -> Natural
-symmetricPowersetSize (SignedMultiset s) =
+symmetricPowersetSize :: Ord a => SignedBag a -> Natural
+symmetricPowersetSize (SignedBag s) =
     getSum $
         Foldable.foldl'
             (\x y -> x * (coerce integerMagnitude y + 1))
             1
             s
 
-multiplicity :: Ord a => a -> SignedMultiset a -> Integer
-multiplicity a (SignedMultiset s) = coerce (MonoidMap.get a s)
+multiplicity :: Ord a => a -> SignedBag a -> Integer
+multiplicity a (SignedBag s) = coerce (MonoidMap.get a s)
 
-support :: SignedMultiset a -> Set a
+support :: SignedBag a -> Set a
 support = Map.keysSet . toMap
 
-supportPositive :: SignedMultiset a -> Set a
+supportPositive :: SignedBag a -> Set a
 supportPositive = undefined
 
-supportNegative :: SignedMultiset a -> Set a
+supportNegative :: SignedBag a -> Set a
 supportNegative = undefined
 
 --------------------------------------------------------------------------------
@@ -346,8 +346,8 @@ supportNegative = undefined
 
 model_isSubsetOf
     :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
+    => SignedBag a
+    -> SignedBag a
     -> Bool
 model_isSubsetOf s1 s2 =
     all
@@ -356,8 +356,8 @@ model_isSubsetOf s1 s2 =
 
 model_isSupersetOf
     :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
+    => SignedBag a
+    -> SignedBag a
     -> Bool
 model_isSupersetOf s1 s2 =
     all
@@ -366,22 +366,22 @@ model_isSupersetOf s1 s2 =
 
 model_isProperSubsetOf
     :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
+    => SignedBag a
+    -> SignedBag a
     -> Bool
 model_isProperSubsetOf s1 s2 =
     (s1 /= s2) && (s1 `model_isSubsetOf` s2)
 
 model_isProperSupersetOf
     :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
+    => SignedBag a
+    -> SignedBag a
     -> Bool
 model_isProperSupersetOf s1 s2 =
     (s1 /= s2) && (s1 `model_isSupersetOf` s2)
 
 model_isSymmetricSubsetOf
-    :: Ord a => SignedMultiset a -> SignedMultiset a -> Bool
+    :: Ord a => SignedBag a -> SignedBag a -> Bool
 model_isSymmetricSubsetOf s1 s2 =
     all
         (\k -> (isSmallerThan `on` multiplicity k) s1 s2)
@@ -389,34 +389,34 @@ model_isSymmetricSubsetOf s1 s2 =
 
 model_isSymmetricSupersetOf
     :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
+    => SignedBag a
+    -> SignedBag a
     -> Bool
 model_isSymmetricSupersetOf = flip model_isSymmetricSubsetOf
 
 model_isProperSymmetricSubsetOf
     :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
+    => SignedBag a
+    -> SignedBag a
     -> Bool
 model_isProperSymmetricSubsetOf s1 s2 =
     (s1 /= s2) && model_isSymmetricSubsetOf s1 s2
 
 model_isProperSymmetricSupersetOf
     :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
+    => SignedBag a
+    -> SignedBag a
     -> Bool
 model_isProperSymmetricSupersetOf = flip model_isProperSymmetricSubsetOf
 
 model_symmetricPowersetElements
     :: Ord a
-    => SignedMultiset a
-    -> [SignedMultiset a]
+    => SignedBag a
+    -> [SignedBag a]
 model_symmetricPowersetElements as =
     [ fromUnsignedPairWith (+) (n, p)
-    | n <- Multiset.powersetElements ns
-    , p <- Multiset.powersetElements ps
+    | n <- Bag.powersetElements ns
+    , p <- Bag.powersetElements ps
     ]
   where
     (ns, ps) = toUnsignedPair as
@@ -425,17 +425,17 @@ model_symmetricPowersetElements as =
 -- Utilities
 --------------------------------------------------------------------------------
 
-testAlignA :: SignedMultiset Char
+testAlignA :: SignedBag Char
 testAlignA = fromListWith (+) [('a', -1), ('b', 0), ('c', 1)]
 
-testAlignB :: SignedMultiset Char
+testAlignB :: SignedBag Char
 testAlignB = fromListWith (+) [('b', -1), ('c', 0), ('d', 1)]
 
 {- ORMOLU_DISABLE -}
 align
     :: Ord a
-    => SignedMultiset a
-    -> SignedMultiset a
+    => SignedBag a
+    -> SignedBag a
     -> [(a, (Integer, Integer))]
 align = go `on` toList
   where
