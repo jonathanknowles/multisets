@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
+
 module Data.Multiset where
 
 import Data.Coerce
@@ -21,29 +22,31 @@ import Data.Monoid
     )
 import Data.MonoidMap qualified as MonoidMap
 import Data.Multiset.Internal
-    ( Multiset (Multiset) )
+    ( Multiset (Multiset)
+    , SignedMultiset (SignedMultiset)
+    )
 import Data.Set
     ( Set
     )
+import Data.Set qualified as Set
 import Numeric.Natural
     ( Natural
     )
 import Prelude hiding
     ( sum
     )
-import qualified Data.Set as Set
 
 instance Ord a => Ord (Multiset a) where
     compare = Prelude.compare `on` toMap
+
+instance Show a => Show (Multiset a) where
+    show s = "Multiset.fromListWith (+) " <> show (toList s)
 
 testA :: Multiset Char
 testA = fromListWith (+) [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
 
 testB :: Multiset Char
 testB = fromListWith (+) [('c', 2), ('d', 4)]
-
-instance Show a => Show (Multiset a) where
-    show s = "fromListWith (+) " <> show (toList s)
 
 fromListWith
     :: Ord a
@@ -90,6 +93,9 @@ multiplicity a (Multiset s) = coerce (MonoidMap.get a s)
 
 support :: Multiset a -> Set a
 support (Multiset s) = MonoidMap.nonNullKeys s
+
+invert :: Multiset a -> SignedMultiset a
+invert = undefined
 
 fromSet :: Set a -> Multiset a
 fromSet = fromSetWith (const 1)
@@ -161,6 +167,19 @@ differenceMaybe :: Ord a => Multiset a -> Multiset a -> Maybe (Multiset a)
 differenceMaybe (Multiset s1) (Multiset s2) =
     Multiset <$> s1 `MonoidMap.minusMaybe` s2
 
+differenceSigned :: Ord a => Multiset a -> Multiset a -> SignedMultiset a
+differenceSigned (Multiset s1) (Multiset s2) =
+    SignedMultiset $
+        MonoidMap.unionWith ((-) `on` coerce naturalToPositiveInteger) s1 s2
+
+symmetricDifference
+    :: Ord a
+    => Multiset a
+    -> Multiset a
+    -> Multiset a
+symmetricDifference (Multiset s1) (Multiset s2) =
+    Multiset $ MonoidMap.unionWith (coerce naturalDistance) s1 s2
+
 -- consider having a single monoid (analogous to Sum Natural) where
 -- <> = sum
 -- lcm = union
@@ -211,3 +230,13 @@ align = go `on` toList
         | a > b                    = (b, (0, q)) : go ((a, p) : xs)          ys
         | otherwise                = (a, (p, q)) : go           xs           ys
 {- ORMOLU_ENABLE -}
+
+{- ORMOLU_DISABLE -}
+naturalDistance :: Natural -> Natural -> Natural
+naturalDistance a b
+    | a > b     = a - b
+    | otherwise = b - a
+{- ORMOLU_ENABLE -}
+
+naturalToPositiveInteger :: Natural -> Integer
+naturalToPositiveInteger = fromIntegral

@@ -32,7 +32,7 @@ import Data.Monoid
 import Data.MonoidMap qualified as MonoidMap
 import Data.Multiset qualified as Multiset
 import Data.Multiset.Internal
-    ( Multiset
+    ( Multiset (Multiset)
     , SignedMultiset (SignedMultiset)
     )
 import Data.Set
@@ -52,7 +52,7 @@ instance Ord a => Ord (SignedMultiset a) where
     compare = Prelude.compare `on` toMap
 
 instance Show a => Show (SignedMultiset a) where
-    show s = "fromListWith (+) " <> show (toList s)
+    show s = "SignedMultiset.fromListWith (+) " <> show (toList s)
 
 testA :: SignedMultiset Char
 testA = fromListWith (+) [('a', -1), ('b', 1), ('c', 0), ('d', -2), ('e', 5)]
@@ -154,6 +154,14 @@ difference
 difference (SignedMultiset m1) (SignedMultiset m2) =
     SignedMultiset $ m1 `MonoidMap.minus` m2
 
+symmetricDifference
+    :: Ord a
+    => SignedMultiset a
+    -> SignedMultiset a
+    -> Multiset a
+symmetricDifference (SignedMultiset s1) (SignedMultiset s2) =
+    Multiset $ MonoidMap.unionWith (coerce integerDistance) s1 s2
+
 sum
     :: Ord a
     => SignedMultiset a
@@ -198,11 +206,29 @@ intersections
     => f (SignedMultiset a) -> SignedMultiset a
 intersections = Foldable1.foldl1' intersection
 
-isSetPositive :: SignedMultiset a -> Bool
-isSetPositive (SignedMultiset s) = Foldable.all (== 1) s
+isPositive :: SignedMultiset a -> Bool
+isPositive = undefined
 
-isSetNegative :: SignedMultiset a -> Bool
-isSetNegative (SignedMultiset s) = Foldable.all (== (-1)) s
+isNegative :: SignedMultiset a -> Bool
+isNegative = undefined
+
+maybePositive :: SignedMultiset a -> Maybe (Multiset a)
+maybePositive = undefined
+
+maybeNegative :: SignedMultiset a -> Maybe (Multiset a)
+maybeNegative = undefined
+
+isPositiveSet :: SignedMultiset a -> Bool
+isPositiveSet (SignedMultiset s) = Foldable.all (== 1) s
+
+isNegativeSet :: SignedMultiset a -> Bool
+isNegativeSet (SignedMultiset s) = Foldable.all (== (-1)) s
+
+maybePositiveSet :: SignedMultiset a -> Maybe (Set a)
+maybePositiveSet = undefined
+
+maybeNegativeSet :: SignedMultiset a -> Maybe (Set a)
+maybeNegativeSet = undefined
 
 -- Caution: this function will only short-circuit if the sets are incomparable.
 --
@@ -403,6 +429,13 @@ align = go `on` toList
         | a < b                    = (a, (p, 0)) : go           xs ((b, q) : ys)
         | a > b                    = (b, (0, q)) : go ((a, p) : xs)          ys
         | otherwise                = (a, (p, q)) : go           xs           ys
+{- ORMOLU_ENABLE -}
+
+{- ORMOLU_DISABLE -}
+integerDistance :: Integer -> Integer -> Natural
+integerDistance a b
+    | a > b     = fromIntegral (a - b)
+    | otherwise = fromIntegral (b - a)
 {- ORMOLU_ENABLE -}
 
 integerMagnitude :: Integer -> Natural
