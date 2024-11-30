@@ -158,8 +158,15 @@ symmetricDifference
     :: Ord a
     => SignedMultiset a
     -> SignedMultiset a
+    -> SignedMultiset a
+symmetricDifference = undefined
+
+symmetricDifferenceUnsigned
+    :: Ord a
+    => SignedMultiset a
+    -> SignedMultiset a
     -> Multiset a
-symmetricDifference (SignedMultiset s1) (SignedMultiset s2) =
+symmetricDifferenceUnsigned (SignedMultiset s1) (SignedMultiset s2) =
     Multiset $ MonoidMap.unionWith (coerce integerDistance) s1 s2
 
 sum
