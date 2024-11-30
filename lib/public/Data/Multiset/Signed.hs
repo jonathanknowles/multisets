@@ -3,7 +3,11 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
-module Data.Multiset.Signed where
+module Data.Multiset.Signed
+    ( SignedMultiset
+    , toUnsignedPair
+    )
+where
 
 import Data.Coerce
     ( coerce

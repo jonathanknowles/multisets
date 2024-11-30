@@ -1,6 +1,13 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Data.Multiset where
+module Data.Multiset
+    ( Multiset
+    , fromListWith
+    , toList
+    , invert
+    , powersetElements
+    )
+where
 
 import Data.Coerce
     ( coerce
