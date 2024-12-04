@@ -38,15 +38,15 @@ instance Semigroup (Count Integer) where
 
 {- ORMOLU_DISABLE -}
 instance Semigroup (Count Sign) where
-    Count SignNegative <> Count SignNegative = Count SignNegative
-    Count SignNegative <> Count SignZero     = Count SignNegative
-    Count SignNegative <> Count SignPositive = Count SignZero
-    Count SignZero     <> Count SignNegative = Count SignNegative
-    Count SignZero     <> Count SignZero     = Count SignZero
-    Count SignZero     <> Count SignPositive = Count SignPositive
-    Count SignPositive <> Count SignNegative = Count SignZero
-    Count SignPositive <> Count SignZero     = Count SignPositive
-    Count SignPositive <> Count SignPositive = Count SignPositive
+    Count Negative <> Count Negative = Count Negative
+    Count Negative <> Count Zero     = Count Negative
+    Count Negative <> Count Positive = Count Zero
+    Count Zero     <> Count Negative = Count Negative
+    Count Zero     <> Count Zero     = Count Zero
+    Count Zero     <> Count Positive = Count Positive
+    Count Positive <> Count Negative = Count Zero
+    Count Positive <> Count Zero     = Count Positive
+    Count Positive <> Count Positive = Count Positive
 {- ORMOLU_ENABLE -}
 
 instance Monoid (Count Natural) where
@@ -56,7 +56,7 @@ instance Monoid (Count Integer) where
     mempty = 0
 
 instance Monoid (Count Sign) where
-    mempty = Count SignZero
+    mempty = Count Zero
 
 instance MonoidNull (Count Natural) where
     null (Count 0) = True
@@ -67,7 +67,7 @@ instance MonoidNull (Count Integer) where
     null _ = False
 
 instance MonoidNull (Count Sign) where
-    null (Count SignZero) = True
+    null (Count Zero) = True
     null _ = False
 
 newtype Bag a = Bag (MonoidMap a (Count Natural))

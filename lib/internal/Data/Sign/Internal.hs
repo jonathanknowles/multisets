@@ -4,7 +4,7 @@ module Data.Sign.Internal
 import Prelude
 
 data Sign
-    = SignNegative
-    | SignZero
-    | SignPositive
+    = Negative
+    | Zero
+    | Positive
     deriving stock (Bounded, Enum, Eq, Ord, Show)
