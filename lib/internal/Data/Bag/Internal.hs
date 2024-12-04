@@ -16,6 +16,7 @@ import Data.MonoidMap
     ( MonoidMap
     )
 import Data.MonoidMap qualified as MonoidMap
+import Data.Sign.Internal (Sign (..))
 import Numeric.Natural
     ( Natural
     )
@@ -24,11 +25,10 @@ import Prelude hiding
     , null
     )
 import Prelude qualified
-import Data.Sign.Internal (Sign (..))
 
 newtype Count a = Count {getCount :: a}
     deriving stock (Bounded, Eq, Ord)
-    deriving newtype Num
+    deriving newtype (Num)
 
 instance Semigroup (Count Natural) where
     a <> b = a + b
