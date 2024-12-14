@@ -197,11 +197,11 @@ union (SignedBag m1) (SignedBag m2) =
     SignedBag $ MonoidMap.unionWith max m1 m2
 
 unions
-    :: Foldable f
+    :: Foldable1 f
     => Ord a
     => f (SignedBag a)
     -> SignedBag a
-unions = Foldable.foldl' union empty
+unions = Foldable1.foldl1' union
 
 intersection
     :: Ord a
