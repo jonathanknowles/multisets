@@ -32,6 +32,8 @@ common dependency-QuickCheck
     build-depends:QuickCheck                    >= 2.14.2     && < 2.15
 common dependency-quickcheck-classes
     build-depends:quickcheck-classes            >= 0.6.5.0    && < 0.7
+common dependency-quickcheck-groups
+    build-depends:quickcheck-groups             >= 0.0.1.0    && < 0.1
 
 common extensions
     default-extensions:
@@ -99,6 +101,7 @@ test-suite test
       , dependency-pretty-show
       , dependency-QuickCheck
       , dependency-quickcheck-classes
+      , dependency-quickcheck-groups
       , extensions
     ghc-options:
         -threaded -with-rtsopts=-N
@@ -107,6 +110,7 @@ test-suite test
     hs-source-dirs:
         exe/test
     other-modules:
+        Data.SignSpec
         SpecHook
         Test.QuickCheck.Classes.Hspec
         Test.Hspec.Unit

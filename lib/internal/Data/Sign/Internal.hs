@@ -21,15 +21,50 @@ import Data.Monoid.Cancellative
     )
 import Prelude
 
+newtype Sum a = Sum a
+    deriving newtype (Bounded, Enum, Eq, Ord)
+    deriving stock (Read, Show)
+
+newtype Product a = Product a
+    deriving newtype (Bounded, Enum, Eq, Ord)
+    deriving stock (Read, Show)
+
+--------------------------------------------------------------------------------
+-- 2-element signs
+--------------------------------------------------------------------------------
+
+data StrictSign
+    = StrictNegative
+    | StrictPositive
+    deriving stock (Bounded, Enum, Eq, Ord, Read, Show)
+
+instance Semigroup (Product StrictSign) where
+    (<>) = coerce multiply
+
+instance Monoid (Product StrictSign) where
+    mempty = coerce StrictPositive
+
+instance Group (Product StrictSign) where
+    invert = id
+
+instance Cyclic (Product StrictSign) where
+    generator = coerce StrictNegative
+
+multiply :: StrictSign -> StrictSign -> StrictSign
+multiply StrictNegative StrictNegative = StrictPositive
+multiply StrictNegative StrictPositive = StrictNegative
+multiply StrictPositive StrictNegative = StrictNegative
+multiply StrictPositive StrictPositive = StrictPositive
+
+--------------------------------------------------------------------------------
+-- 3-element signs
+--------------------------------------------------------------------------------
+
 data Sign
     = Negative
     | Zero
     | Positive
     deriving stock (Bounded, Enum, Eq, Ord, Read, Show)
-
-newtype Sum a = Sum a
-    deriving newtype (Bounded, Enum, Eq, Ord)
-    deriving stock (Read, Show)
 
 instance Semigroup (Sum Sign) where
     (<>) = coerce add
@@ -56,14 +91,6 @@ add Zero     Positive = Positive
 add Positive Negative = Zero
 add Positive Zero     = Positive
 add Positive Positive = Negative
-{- ORMOLU_ENABLE -}
-
-{- ORMOLU_DISABLE -}
-multiply :: Sign -> Sign -> Sign
-multiply = \case
-    Negative -> invert
-    Zero     -> const Zero
-    Positive -> id
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
