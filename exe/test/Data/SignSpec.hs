@@ -3,14 +3,11 @@
 
 module Data.SignSpec where
 
-import Data.Semigroup
+import Data.Sign
     ( Max (Max)
     , Min (Min)
-    )
-import Data.Sign
-    ( Product (Product)
+    , Product (Product)
     , Sign
-    , StrictSign
     , Sum (Sum)
     )
 import Test.Hspec
@@ -46,11 +43,11 @@ import Prelude
 spec :: Spec
 spec = do
     describe "Class laws" $ do
-        testLawsMany @(Max Sign)
+        testLawsMany @(Min Sign)
             [ semigroupLaws
             , monoidLaws
             ]
-        testLawsMany @(Min Sign)
+        testLawsMany @(Max Sign)
             [ semigroupLaws
             , monoidLaws
             ]
@@ -59,42 +56,19 @@ spec = do
             , monoidLaws
             , groupLaws
             ]
-        testLawsMany @(Min StrictSign)
+        testLawsMany @(Product Sign)
             [ semigroupLaws
             , monoidLaws
             ]
-        testLawsMany @(Max StrictSign)
-            [ semigroupLaws
-            , monoidLaws
-            ]
-        testLawsMany @(Product StrictSign)
-            [ semigroupLaws
-            , monoidLaws
-            ]
-        testLawsMany @(Product StrictSign) $
-            disableCoverageCheck
-                [ groupLaws
-                ]
 
 instance Arbitrary Sign where
     arbitrary = arbitraryBoundedEnum
     shrink = shrinkBoundedEnum
 
-instance Arbitrary StrictSign where
-    arbitrary = arbitraryBoundedEnum
-    shrink = shrinkBoundedEnum
-
 deriving newtype instance Arbitrary (Min Sign)
-
 deriving newtype instance Arbitrary (Max Sign)
-
 deriving newtype instance Arbitrary (Sum Sign)
-
-deriving newtype instance Arbitrary (Min StrictSign)
-
-deriving newtype instance Arbitrary (Max StrictSign)
-
-deriving newtype instance Arbitrary (Product StrictSign)
+deriving newtype instance Arbitrary (Product Sign)
 
 --------------------------------------------------------------------------------
 -- Coverage checks

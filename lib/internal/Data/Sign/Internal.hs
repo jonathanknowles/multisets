@@ -1,64 +1,28 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
 {-# HLINT ignore "Use camelCase" #-}
-module Data.Sign.Internal where
+module Data.Sign.Internal
+    ( Sign (..)
+    , Min (..)
+    , Max (..)
+    , Sum (..)
+    , Product (..)
+    )
+where
 
 import Data.Coerce
     ( coerce
     )
-import Data.Function
-    ( on
-    )
 import Data.Group
-    ( Cyclic (generator)
+    ( Abelian
+    , Cyclic (generator)
     , Group
     )
 import Data.Group qualified as Group
     ( Group (..)
     )
-import Data.Monoid.Cancellative
-    ( Commutative
-    )
+import Data.Semigroup (Max (..), Min (..))
 import Prelude
-
-newtype Sum a = Sum a
-    deriving newtype (Bounded, Enum, Eq, Ord)
-    deriving stock (Read, Show)
-
-newtype Product a = Product a
-    deriving newtype (Bounded, Enum, Eq, Ord)
-    deriving stock (Read, Show)
-
---------------------------------------------------------------------------------
--- 2-element signs
---------------------------------------------------------------------------------
-
-data StrictSign
-    = StrictNegative
-    | StrictPositive
-    deriving stock (Bounded, Enum, Eq, Ord, Read, Show)
-
-instance Semigroup (Product StrictSign) where
-    (<>) = coerce multiply
-
-instance Monoid (Product StrictSign) where
-    mempty = coerce StrictPositive
-
-instance Group (Product StrictSign) where
-    invert = id
-
-instance Cyclic (Product StrictSign) where
-    generator = coerce StrictNegative
-
-multiply :: StrictSign -> StrictSign -> StrictSign
-multiply StrictNegative StrictNegative = StrictPositive
-multiply StrictNegative StrictPositive = StrictNegative
-multiply StrictPositive StrictNegative = StrictNegative
-multiply StrictPositive StrictPositive = StrictPositive
-
---------------------------------------------------------------------------------
--- 3-element signs
---------------------------------------------------------------------------------
 
 data Sign
     = Negative
@@ -66,10 +30,16 @@ data Sign
     | Positive
     deriving stock (Bounded, Enum, Eq, Ord, Read, Show)
 
+--------------------------------------------------------------------------------
+-- Sum
+--------------------------------------------------------------------------------
+
+newtype Sum a = Sum {getSum :: a}
+    deriving newtype (Bounded, Enum, Eq, Ord)
+    deriving stock (Read, Show)
+
 instance Semigroup (Sum Sign) where
     (<>) = coerce add
-
-instance Commutative (Sum Sign)
 
 instance Monoid (Sum Sign) where
     mempty = coerce Zero
@@ -77,28 +47,53 @@ instance Monoid (Sum Sign) where
 instance Group (Sum Sign) where
     invert = coerce invert
 
+instance Abelian (Sum Sign)
+
 instance Cyclic (Sum Sign) where
     generator = coerce Positive
 
+--------------------------------------------------------------------------------
+-- Product
+--------------------------------------------------------------------------------
+
+newtype Product a = Product {getProduct :: a}
+    deriving newtype (Bounded, Enum, Eq, Ord)
+    deriving stock (Read, Show)
+
+instance Semigroup (Product Sign) where
+    (<>) = coerce multiply
+
+instance Monoid (Product Sign) where
+    mempty = coerce Positive
+
+--------------------------------------------------------------------------------
+-- Functions
+--------------------------------------------------------------------------------
+
+{- ORMOLU_DISABLE -}
+invert :: Sign -> Sign
+invert Zero     = Zero
+invert Negative = Positive
+invert Positive = Negative
+{- ORMOLU_ENABLE -}
+
 {- ORMOLU_DISABLE -}
 add :: Sign -> Sign -> Sign
-add Negative Negative = Positive
-add Negative Zero     = Negative
+add Zero     x        = x
+add x        Zero     = x
 add Negative Positive = Zero
-add Zero     Negative = Negative
-add Zero     Zero     = Zero
-add Zero     Positive = Positive
 add Positive Negative = Zero
-add Positive Zero     = Positive
+add Negative Negative = Positive
 add Positive Positive = Negative
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
-invert :: Sign -> Sign
-invert = \case
-    Negative -> Positive
-    Zero     -> Zero
-    Positive -> Negative
+multiply :: Sign -> Sign -> Sign
+multiply Zero     _        = Zero
+multiply _        Zero     = Zero
+multiply Positive x        = x
+multiply x        Positive = x
+multiply Negative Negative = Positive
 {- ORMOLU_ENABLE -}
 
 --------------------------------------------------------------------------------
@@ -109,20 +104,23 @@ invert = \case
 model_add :: Sign -> Sign -> Sign
 model_add s1 s2
     = integralToSign @Int
-    $ subtract 1
-    $ (`mod` 3)
-    $ (+ 1)
-    $ ((+) `on` signToIntegral) s1 s2
+    $ (`moduloInclusiveRange` (-1, 1))
+    $ signToIntegral s1 + signToIntegral s2
 {- ORMOLU_ENABLE -}
 
+{- ORMOLU_DISABLE -}
 model_multiply :: Sign -> Sign -> Sign
-model_multiply s1 s2 =
-    integralToSign @Int $
-        ((*) `on` signToIntegral) s1 s2
+model_multiply s1 s2
+    = integralToSign @Int
+    $ signToIntegral s1 * signToIntegral s2
+{- ORMOLU_ENABLE -}
 
 --------------------------------------------------------------------------------
 -- Utilities
 --------------------------------------------------------------------------------
+
+moduloInclusiveRange :: Integral i => i -> (i, i) -> i
+moduloInclusiveRange i (lo, hi) = ((i - lo) `mod` (hi - lo + 1)) + lo
 
 {- ORMOLU_DISABLE -}
 signToIntegral :: Integral i => Sign -> i

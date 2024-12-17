@@ -1,6 +1,7 @@
 module Data.Sign
     ( Sign (..)
-    , StrictSign (..)
+    , Min (..)
+    , Max (..)
     , Sum (..)
     , Product (..)
     )
@@ -8,7 +9,8 @@ module Data.Sign
 
 import Data.Sign.Internal
     ( Sign (..)
-    , StrictSign (..)
+    , Min (..)
+    , Max (..)
     , Sum (..)
     , Product (..)
     )
