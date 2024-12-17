@@ -10,6 +10,7 @@ module Data.Bag.Signed
     , supportNegative
     , supportPositive
     , supportSigned
+    , testA
     )
 where
 
@@ -46,7 +47,7 @@ import Data.Set
     )
 import Data.Set qualified as Set
 import Data.Set.Signed
-    ( SignedSet
+    ( SignedSet (..)
     )
 import Numeric.Natural
     ( Natural
@@ -56,6 +57,8 @@ import Prelude hiding
     , sum
     )
 import Prelude qualified
+import qualified Data.Semigroup as Semigroup
+import qualified Data.Sign as Sign
 
 testA :: SignedBag Char
 testA = fromListWith (+) [('a', -1), ('b', 1), ('c', 0), ('d', -2), ('e', 5)]
@@ -332,10 +335,12 @@ multiplicity :: Ord a => a -> SignedBag a -> Integer
 multiplicity a (SignedBag s) = coerce (MonoidMap.get a s)
 
 support :: SignedBag a -> Set a
-support = Map.keysSet . toMap
+support (SignedBag b) = MonoidMap.nonNullKeys b
 
 supportSigned :: SignedBag a -> SignedSet a
-supportSigned = undefined
+supportSigned (SignedBag b) = SignedSet (MonoidMap.map f b)
+  where
+    f (Count n) = Sign.Sum (Sign.integralToSign n)
 
 supportPositive :: SignedBag a -> Set a
 supportPositive = undefined

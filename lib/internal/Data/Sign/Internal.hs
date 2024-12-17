@@ -7,6 +7,7 @@ module Data.Sign.Internal
     , Max (..)
     , Sum (..)
     , Product (..)
+    , integralToSign
     )
 where
 
@@ -21,8 +22,17 @@ import Data.Group
 import Data.Group qualified as Group
     ( Group (..)
     )
-import Data.Semigroup (Max (..), Min (..))
-import Prelude
+import Data.Monoid.Null
+    ( MonoidNull
+    )
+import Data.Monoid.Null qualified as MonoidNull
+import Data.Semigroup
+    ( Max (..)
+    , Min (..)
+    )
+import Prelude hiding
+    ( null
+    )
 
 data Sign
     = Negative
@@ -43,6 +53,9 @@ instance Semigroup (Sum Sign) where
 
 instance Monoid (Sum Sign) where
     mempty = coerce Zero
+
+instance MonoidNull (Sum Sign) where
+    null = coerce null
 
 instance Group (Sum Sign) where
     invert = coerce invert
@@ -69,6 +82,12 @@ instance Monoid (Product Sign) where
 --------------------------------------------------------------------------------
 -- Functions
 --------------------------------------------------------------------------------
+
+{- ORMOLU_DISABLE -}
+null :: Sign -> Bool
+null Zero = True
+null _    = False
+{- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
 invert :: Sign -> Sign

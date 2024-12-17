@@ -4,6 +4,7 @@ module Data.Sign
     , Max (..)
     , Sum (..)
     , Product (..)
+    , integralToSign
     )
     where
 
@@ -13,4 +14,5 @@ import Data.Sign.Internal
     , Max (..)
     , Sum (..)
     , Product (..)
+    , integralToSign
     )
