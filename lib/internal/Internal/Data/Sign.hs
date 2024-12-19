@@ -23,6 +23,10 @@ import Data.Monoid.Null
     ( MonoidNull
     )
 import Data.Monoid.Null qualified as MonoidNull
+import Data.Semiring
+    ( Ring (..)
+    , Semiring (..)
+    )
 import Internal.Data.Monoid
     ( Product (..)
     , Sum (..)
@@ -37,6 +41,15 @@ data Sign
     | Zero
     | Positive
     deriving stock (Bounded, Enum, Eq, Ord, Read, Show)
+
+instance Semiring Sign where
+    zero = Zero
+    one = Positive
+    plus = add
+    times = multiply
+
+instance Ring Sign where
+    negate = invert
 
 --------------------------------------------------------------------------------
 -- Sum

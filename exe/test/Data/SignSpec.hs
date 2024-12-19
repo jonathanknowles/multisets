@@ -6,6 +6,12 @@ module Data.SignSpec where
 import Data.Sign
     ( Sign
     )
+import Internal.Data.Monoid
+    ( Max (..)
+    , Min (..)
+    , Product (..)
+    , Sum (..)
+    )
 import Test.Hspec
     ( Spec
     , describe
@@ -22,7 +28,7 @@ import Test.QuickCheck
 import Test.QuickCheck.Classes
     ( Laws (Laws)
     , monoidLaws
-    , semigroupLaws
+    , semigroupLaws, semiringLaws, ringLaws
     )
 import Test.QuickCheck.Classes.Group
     ( groupLaws
@@ -37,33 +43,39 @@ import Test.QuickCheck.Property
 import Prelude
 
 spec :: Spec
-spec = return () {-
-    describe "Class laws" $ do
-        testLawsMany @(Min Sign)
-            [ semigroupLaws
-            , monoidLaws
-            ]
-        testLawsMany @(Max Sign)
-            [ semigroupLaws
-            , monoidLaws
-            ]
-        testLawsMany @(Sum Sign)
-            [ semigroupLaws
-            , monoidLaws
-            , groupLaws
-            ]
-        testLawsMany @(Product Sign)
-            [ semigroupLaws
-            , monoidLaws
-            ]
+spec = describe "Class laws" $ do
+    testLawsMany @Sign
+        [ semiringLaws
+        , ringLaws
+        ]
+    testLawsMany @(Min Sign)
+        [ semigroupLaws
+        , monoidLaws
+        ]
+    testLawsMany @(Max Sign)
+        [ semigroupLaws
+        , monoidLaws
+        ]
+    testLawsMany @(Sum Sign)
+        [ semigroupLaws
+        , monoidLaws
+        , groupLaws
+        ]
+    testLawsMany @(Product Sign)
+        [ semigroupLaws
+        , monoidLaws
+        ]
 
 instance Arbitrary Sign where
     arbitrary = arbitraryBoundedEnum
     shrink = shrinkBoundedEnum
 
 deriving newtype instance Arbitrary (Min Sign)
+
 deriving newtype instance Arbitrary (Max Sign)
+
 deriving newtype instance Arbitrary (Sum Sign)
+
 deriving newtype instance Arbitrary (Product Sign)
 
 --------------------------------------------------------------------------------
@@ -84,4 +96,3 @@ instance HasCoverageCheck Property where
 instance (Functor f, HasCoverageCheck p) => HasCoverageCheck (f p) where
     disableCoverageCheck =
         fmap disableCoverageCheck
--}

@@ -16,6 +16,8 @@ extra-doc-files:
 
 common dependency-base
     build-depends:base                          >= 4.14.3.0   && < 4.21
+common dependency-commutative-semigroups
+    build-depends:commutative-semigroups        >= 0.2        && < 0.3
 common dependency-containers
     build-depends:containers                    >= 0.6.5.1    && < 0.8
 common dependency-groups
@@ -34,6 +36,8 @@ common dependency-quickcheck-classes
     build-depends:quickcheck-classes            >= 0.6.5.0    && < 0.7
 common dependency-quickcheck-groups
     build-depends:quickcheck-groups             >= 0.0.1.0    && < 0.1
+common dependency-semirings
+    build-depends:semirings                     >= 0.7        && < 0.8
 
 common extensions
     default-extensions:
@@ -84,6 +88,7 @@ library internal
       , dependency-groups
       , dependency-monoid-subclasses
       , dependency-monoidmap
+      , dependency-semirings
       , extensions
     hs-source-dirs:
         lib/internal
@@ -124,6 +129,7 @@ test-suite test
         hspec-discover:hspec-discover ==2.*
     build-depends:
       , multisets
+      , multisets:internal
 
 benchmark benchmark
     import:
