@@ -15,7 +15,7 @@ extra-doc-files:
     README.md
 
 common dependency-base
-    build-depends:base                          >= 4.14.3.0   && < 4.20
+    build-depends:base                          >= 4.14.3.0   && < 4.21
 common dependency-containers
     build-depends:containers                    >= 0.6.5.1    && < 0.8
 common dependency-groups
@@ -90,7 +90,8 @@ library internal
     exposed-modules:
         Data.Bag.Combinators
         Data.Bag.Internal
-        Data.Sign.Internal
+        Internal.Data.Monoid
+        Internal.Data.Sign
     default-language:
         Haskell2010
 

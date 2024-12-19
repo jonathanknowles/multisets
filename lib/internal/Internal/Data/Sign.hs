@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
 {-# HLINT ignore "Use camelCase" #-}
-module Data.Sign.Internal
+module Internal.Data.Sign
     ( Sign (..)
     , Min (..)
     , Max (..)
@@ -26,9 +26,11 @@ import Data.Monoid.Null
     ( MonoidNull
     )
 import Data.Monoid.Null qualified as MonoidNull
-import Data.Semigroup
-    ( Max (..)
+import Internal.Data.Monoid
+    ( Sum (..)
+    , Product (..)
     , Min (..)
+    , Max (..)
     )
 import Prelude hiding
     ( null
@@ -43,10 +45,6 @@ data Sign
 --------------------------------------------------------------------------------
 -- Sum
 --------------------------------------------------------------------------------
-
-newtype Sum a = Sum {getSum :: a}
-    deriving newtype (Bounded, Enum, Eq, Ord)
-    deriving stock (Read, Show)
 
 instance Semigroup (Sum Sign) where
     (<>) = coerce add
@@ -68,10 +66,6 @@ instance Cyclic (Sum Sign) where
 --------------------------------------------------------------------------------
 -- Product
 --------------------------------------------------------------------------------
-
-newtype Product a = Product {getProduct :: a}
-    deriving newtype (Bounded, Enum, Eq, Ord)
-    deriving stock (Read, Show)
 
 instance Semigroup (Product Sign) where
     (<>) = coerce multiply
@@ -118,6 +112,12 @@ multiply Negative Negative = Positive
 --------------------------------------------------------------------------------
 -- Model
 --------------------------------------------------------------------------------
+
+model_null :: Sign -> Bool
+model_null s = signToIntegral @Int s == 0
+
+model_invert :: Sign -> Sign
+model_invert s = integralToSign @Int $ negate $ signToIntegral s
 
 {- ORMOLU_DISABLE -}
 model_add :: Sign -> Sign -> Sign

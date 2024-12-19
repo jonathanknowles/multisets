@@ -16,7 +16,9 @@ import Data.MonoidMap
     ( MonoidMap
     )
 import Data.MonoidMap qualified as MonoidMap
-import Data.Sign.Internal (Sign (..))
+import Internal.Data.Sign
+    ( Sign (..)
+    )
 import Numeric.Natural
     ( Natural
     )
@@ -36,27 +38,11 @@ instance Semigroup (Count Natural) where
 instance Semigroup (Count Integer) where
     a <> b = a + b
 
-{- ORMOLU_DISABLE -}
-instance Semigroup (Count Sign) where
-    Count Negative <> Count Negative = Count Negative
-    Count Negative <> Count Zero     = Count Negative
-    Count Negative <> Count Positive = Count Zero
-    Count Zero     <> Count Negative = Count Negative
-    Count Zero     <> Count Zero     = Count Zero
-    Count Zero     <> Count Positive = Count Positive
-    Count Positive <> Count Negative = Count Zero
-    Count Positive <> Count Zero     = Count Positive
-    Count Positive <> Count Positive = Count Positive
-{- ORMOLU_ENABLE -}
-
 instance Monoid (Count Natural) where
     mempty = 0
 
 instance Monoid (Count Integer) where
     mempty = 0
-
-instance Monoid (Count Sign) where
-    mempty = Count Zero
 
 instance MonoidNull (Count Natural) where
     null (Count 0) = True
@@ -64,10 +50,6 @@ instance MonoidNull (Count Natural) where
 
 instance MonoidNull (Count Integer) where
     null (Count 0) = True
-    null _ = False
-
-instance MonoidNull (Count Sign) where
-    null (Count Zero) = True
     null _ = False
 
 newtype Bag a = Bag (MonoidMap a (Count Natural))

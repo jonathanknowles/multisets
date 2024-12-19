@@ -8,7 +8,7 @@ module Data.Sign
     )
     where
 
-import Data.Sign.Internal
+import Internal.Data.Sign
     ( Sign (..)
     , Min (..)
     , Max (..)
