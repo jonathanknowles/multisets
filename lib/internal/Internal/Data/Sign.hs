@@ -1,13 +1,10 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
 {-# HLINT ignore "Use camelCase" #-}
+
 module Internal.Data.Sign
     ( Sign (..)
-    , Min (..)
-    , Max (..)
-    , Sum (..)
-    , Product (..)
-    , integralToSign
+    , fromIntegral
     )
 where
 
@@ -27,13 +24,12 @@ import Data.Monoid.Null
     )
 import Data.Monoid.Null qualified as MonoidNull
 import Internal.Data.Monoid
-    ( Sum (..)
-    , Product (..)
-    , Min (..)
-    , Max (..)
+    ( Product (..)
+    , Sum (..)
     )
 import Prelude hiding
-    ( null
+    ( fromIntegral
+    , null
     )
 
 data Sign
@@ -78,6 +74,14 @@ instance Monoid (Product Sign) where
 --------------------------------------------------------------------------------
 
 {- ORMOLU_DISABLE -}
+fromIntegral :: Integral i => i -> Sign
+fromIntegral i
+    | i < 0     = Negative
+    | i > 0     = Positive
+    | otherwise = Zero
+{- ORMOLU_ENABLE -}
+
+{- ORMOLU_DISABLE -}
 null :: Sign -> Bool
 null Zero = True
 null _    = False
@@ -107,52 +111,4 @@ multiply _        Zero     = Zero
 multiply Positive x        = x
 multiply x        Positive = x
 multiply Negative Negative = Positive
-{- ORMOLU_ENABLE -}
-
---------------------------------------------------------------------------------
--- Model
---------------------------------------------------------------------------------
-
-model_null :: Sign -> Bool
-model_null s = signToIntegral @Int s == 0
-
-model_invert :: Sign -> Sign
-model_invert s = integralToSign @Int $ negate $ signToIntegral s
-
-{- ORMOLU_DISABLE -}
-model_add :: Sign -> Sign -> Sign
-model_add s1 s2
-    = integralToSign @Int
-    $ (`moduloInclusiveRange` (-1, 1))
-    $ signToIntegral s1 + signToIntegral s2
-{- ORMOLU_ENABLE -}
-
-{- ORMOLU_DISABLE -}
-model_multiply :: Sign -> Sign -> Sign
-model_multiply s1 s2
-    = integralToSign @Int
-    $ signToIntegral s1 * signToIntegral s2
-{- ORMOLU_ENABLE -}
-
---------------------------------------------------------------------------------
--- Utilities
---------------------------------------------------------------------------------
-
-moduloInclusiveRange :: Integral i => i -> (i, i) -> i
-moduloInclusiveRange i (lo, hi) = ((i - lo) `mod` (hi - lo + 1)) + lo
-
-{- ORMOLU_DISABLE -}
-signToIntegral :: Integral i => Sign -> i
-signToIntegral = \case
-    Negative -> -1
-    Zero     ->  0
-    Positive ->  1
-{- ORMOLU_ENABLE -}
-
-{- ORMOLU_DISABLE -}
-integralToSign :: Integral i => i -> Sign
-integralToSign i
-    | i < 0     = Negative
-    | i > 0     = Positive
-    | otherwise = Zero
 {- ORMOLU_ENABLE -}

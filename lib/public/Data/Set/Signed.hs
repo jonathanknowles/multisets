@@ -9,9 +9,11 @@ import Data.MonoidMap
     ( MonoidMap
     )
 import Data.MonoidMap qualified as MonoidMap
-import Data.Sign
+import Internal.Data.Monoid
+    ( Sum (..)
+    )
+import Internal.Data.Sign
     ( Sign (..)
-    , Sum (..)
     )
 import Prelude
 

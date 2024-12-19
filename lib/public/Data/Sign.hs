@@ -1,18 +1,10 @@
 module Data.Sign
     ( Sign (..)
-    , Min (..)
-    , Max (..)
-    , Sum (..)
-    , Product (..)
-    , integralToSign
+    , fromIntegral
     )
     where
 
 import Internal.Data.Sign
     ( Sign (..)
-    , Min (..)
-    , Max (..)
-    , Sum (..)
-    , Product (..)
-    , integralToSign
+    , fromIntegral
     )

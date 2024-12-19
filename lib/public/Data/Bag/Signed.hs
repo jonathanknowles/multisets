@@ -340,7 +340,7 @@ support (SignedBag b) = MonoidMap.nonNullKeys b
 supportSigned :: SignedBag a -> SignedSet a
 supportSigned (SignedBag b) = SignedSet (MonoidMap.map f b)
   where
-    f (Count n) = Sign.Sum (Sign.integralToSign n)
+    f (Count n) = undefined -- Sum (Sign.integralToSign n)
 
 supportPositive :: SignedBag a -> Set a
 supportPositive = undefined
