@@ -1,5 +1,6 @@
 module Data.Set.Signed
-    ( SignedSet
+    ( Sign (..)
+    , SignedSet
     , fromListWith
     , lookup
     , invert
