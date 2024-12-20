@@ -4,44 +4,43 @@ module Data.Set.Signed
     , lookup
     , invert
     , union
-    , unions
+    , unions1
     , intersection
-    , intersections
+    , intersections1
     )
 where
 
 import Data.Foldable1
     ( Foldable1
     )
-import Data.Foldable1 qualified as Foldable1
+import Internal.Data.CountMap qualified as CountMap
 import Internal.Data.Sign
     ( Sign (..)
     )
 import Internal.Shared
     ( SignedSet
     )
-import Internal.Shared qualified as Internal
 import Prelude hiding
     ( lookup
     )
 
 fromListWith :: Ord a => (Sign -> Sign -> Sign) -> [(a, Sign)] -> SignedSet a
-fromListWith = Internal.fromListWith
+fromListWith = CountMap.fromListWith
 
 lookup :: Ord a => a -> SignedSet a -> Sign
-lookup = Internal.lookup
+lookup = CountMap.lookup
 
 invert :: SignedSet a -> SignedSet a
-invert = Internal.invert
+invert = CountMap.invert
 
 union :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
-union = Internal.union
+union = CountMap.union
 
 intersection :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
-intersection = Internal.intersection
+intersection = CountMap.intersection
 
-unions :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
-unions = Foldable1.foldl1' union
+unions1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
+unions1 = CountMap.unions1
 
-intersections :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
-intersections = Foldable1.foldl1' union
+intersections1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
+intersections1 = CountMap.intersections1

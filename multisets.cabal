@@ -95,7 +95,9 @@ library internal
     exposed-modules:
         Data.Bag.Combinators
         Data.Bag.Internal
+        Internal.Data.CountMap
         Internal.Data.Monoid
+        Internal.Data.Packed
         Internal.Data.Sign
         Internal.Data.Sign.Model
         Internal.Shared
