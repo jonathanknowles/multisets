@@ -6,7 +6,9 @@ module Internal.Data.CountMap where
 import Data.Coerce
     ( coerce
     )
-import Data.Foldable1 (Foldable1)
+import Data.Foldable1
+    ( Foldable1
+    )
 import Data.Foldable1 qualified as Foldable1
 import Data.Group
     ( Group
