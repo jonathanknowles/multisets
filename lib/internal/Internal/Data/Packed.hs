@@ -8,19 +8,19 @@ import Data.Coerce
     )
 import Prelude
 
-class Packed w where
-    type Unpacked w
+class Packed p where
+    type Unpacked p
 
-    unpack :: w -> Unpacked w
-    default unpack :: Coercible w (Unpacked w) => w -> Unpacked w
+    unpack :: p -> Unpacked p
+    default unpack :: Coercible p (Unpacked p) => p -> Unpacked p
     unpack = coerce
 
-    pack :: Unpacked w -> w
-    default pack :: Coercible (Unpacked w) w => Unpacked w -> w
+    pack :: Unpacked p -> p
+    default pack :: Coercible (Unpacked p) p => Unpacked p -> p
     pack = coerce
 
-unpacked :: Packed w => (Unpacked w -> Unpacked w) -> w -> w
+unpacked :: Packed p => (Unpacked p -> Unpacked p) -> p -> p
 unpacked f = pack . f . unpack
 
-unpacked2 :: Packed w => (Unpacked w -> Unpacked w -> Unpacked w) -> w -> w -> w
-unpacked2 f w1 w2 = pack (f (unpack w1) (unpack w2))
+unpacked2 :: Packed p => (Unpacked p -> Unpacked p -> Unpacked p) -> p -> p -> p
+unpacked2 f p1 p2 = pack (f (unpack p1) (unpack p2))
