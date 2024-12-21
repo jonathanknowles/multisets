@@ -1,6 +1,7 @@
 module Data.Set.Signed
     ( Sign (..)
     , SignedSet
+    , empty
     , fromListWith
     , lookup
     , invert
@@ -24,9 +25,22 @@ import Internal.Shared
 import Prelude hiding
     ( lookup
     )
+import Data.Map.Strict (Map)
+
+empty :: SignedSet a
+empty = CountMap.empty
 
 fromListWith :: Ord a => (Sign -> Sign -> Sign) -> [(a, Sign)] -> SignedSet a
 fromListWith = CountMap.fromListWith
+
+toList :: SignedSet a -> [(a, Sign)]
+toList = CountMap.toList
+
+fromMap :: Map a Sign -> SignedSet a
+fromMap = CountMap.fromMap
+
+toMap :: SignedSet a -> Map a Sign
+toMap = CountMap.toMap
 
 lookup :: Ord a => a -> SignedSet a -> Sign
 lookup = CountMap.lookup

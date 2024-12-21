@@ -87,6 +87,18 @@ cardinality (Bag s) = coerce (Foldable.fold s)
 member :: Ord a => a -> Bag a -> Bool
 member a (Bag s) = MonoidMap.nonNullKey a s
 
+-- height (greatest)
+-- depth (least)
+-- isRegular (all objects have same multiplicity
+-- isSimple (all objects are the same)
+-- isWholeSubset (contains all multiplicities of the common objects)
+-- isFullSubset (supports are the same)
+-- powermultiset - multiset of all submultisets
+-- dominates - Knuth
+-- is this a semiring?
+-- products?
+-- https://quivergeometry.net/multisets/
+
 multiplicity :: Ord a => a -> Bag a -> Natural
 multiplicity a (Bag s) = coerce (MonoidMap.get a s)
 

@@ -5,21 +5,15 @@
 
 module Data.Bag.Signed
     ( SignedBag
-    , toUnsignedPair
-    , support
-    , supportNegative
-    , supportPositive
-    , supportSigned
-    , testA
+    --, toUnsignedPair
+    --, support
+    --, supportNegative
+    --, supportPositive
+    --, supportSigned
     )
 where
 
 import Data.Bag qualified as Bag
-import Data.Bag.Internal
-    ( Bag (Bag)
-    , Count (Count, getCount)
-    , SignedBag (SignedBag)
-    )
 import Data.Coerce
     ( coerce
     )
@@ -42,13 +36,18 @@ import Data.Map.Strict
     )
 import Data.Map.Strict qualified as Map
 import Data.MonoidMap qualified as MonoidMap
+import Data.Semigroup qualified as Semigroup
 import Data.Set
     ( Set
     )
 import Data.Set qualified as Set
 import Data.Set.Signed
-    ( SignedSet (..)
+    ( SignedSet
     )
+import Data.Sign qualified as Sign
+import Internal.Data.CountMap (Count (..))
+import Internal.Data.CountMap qualified as CountMap
+import Internal.Shared (Bag (Bag), SignedBag (SignedBag))
 import Numeric.Natural
     ( Natural
     )
@@ -57,37 +56,31 @@ import Prelude hiding
     , sum
     )
 import Prelude qualified
-import qualified Data.Semigroup as Semigroup
-import qualified Data.Sign as Sign
-
-testA :: SignedBag Char
-testA = fromListWith (+) [('a', -1), ('b', 1), ('c', 0), ('d', -2), ('e', 5)]
-
-testB :: SignedBag Char
-testB = fromListWith (+) [('a', -2), ('b', 2)]
 
 empty :: SignedBag a
-empty = SignedBag MonoidMap.empty
-
+empty = CountMap.empty
+{-
 fromListWith
     :: Ord a
     => (Integer -> Integer -> Integer)
     -> [(a, Integer)]
     -> SignedBag a
-fromListWith f =
-    SignedBag
-        . MonoidMap.fromListWith (coerce f)
-        -- use coerce
-        . fmap (fmap Count)
+fromListWith = CountMap.fromListWith
 
 toList :: SignedBag a -> [(a, Integer)]
-toList (SignedBag s) = coerce (MonoidMap.toList s)
+toList = CountMap.toList
 
 fromMap :: Map a Integer -> SignedBag a
-fromMap = SignedBag . MonoidMap.fromMap . coerce
+fromMap = CountMap.fromMap
 
 toMap :: SignedBag a -> Map a Integer
-toMap (SignedBag s) = coerce (MonoidMap.toMap s)
+toMap = CountMap.toMap
+
+lookup :: Ord a => a -> SignedBag a -> Integer
+lookup = CountMap.lookup
+
+invert :: SignedBag a -> SignedBag a
+invert = CountMap.invert
 
 fromSetPositive :: Set a -> SignedBag a
 fromSetPositive = fromSetWith (const 1)
@@ -96,7 +89,7 @@ fromSetNegative :: Set a -> SignedBag a
 fromSetNegative = fromSetWith (const (-1))
 
 fromSetWith :: (a -> Integer) -> Set a -> SignedBag a
-fromSetWith f = SignedBag . MonoidMap.fromMap . Map.fromSet (coerce f)
+fromSetWith f = fromMap . Map.fromSet (coerce f)
 
 toUnsignedPair :: Ord a => SignedBag a -> (Bag a, Bag a)
 toUnsignedPair m =
@@ -107,9 +100,6 @@ toUnsignedPair m =
     )
   where
     (ns, ps) = partition ((< 0) . snd) (toList m)
-
-invert :: SignedBag a -> SignedBag a
-invert (SignedBag s) = undefined -- SignedBag (MonoidMap.invert s)
 
 negativePart :: Ord a => SignedBag a -> Bag a
 negativePart m =
@@ -492,3 +482,4 @@ isSmallerThan v1 v2
     | v1 <= 0 && v2 <= 0 = v1 >= v2
     | v1 >= 0 && v2 >= 0 = v1 <= v2
     | otherwise = False
+-}
