@@ -6,6 +6,7 @@ module Internal.Data.CountMap where
 import Data.Coerce
     ( coerce
     )
+import Data.Foldable qualified as Foldable
 import Data.Foldable1
     ( Foldable1
     )
@@ -19,6 +20,7 @@ import Data.Map.Strict
     )
 import Data.Monoid.Null
     ( MonoidNull
+    , PositiveMonoid
     )
 import Data.MonoidMap
     ( MonoidMap
@@ -112,6 +114,16 @@ intersections1
     => Foldable1 f
     => f p -> p
 intersections1 = Foldable1.foldl1' intersection
+
+unions
+    :: PackedCountMap p k c
+    => MonoidNull (Count c)
+    => PositiveMonoid (Count c)
+    => Ord k
+    => Ord c
+    => Foldable f
+    => f p -> p
+unions = Foldable.foldl' union empty
 
 unions1
     :: PackedCountMap p k c
