@@ -34,12 +34,42 @@ import Internal.Data.Packed
     , unpacked
     , unpacked2
     )
+import Internal.Data.Sign (Sign (..))
+import Numeric.Natural (Natural)
 import Prelude hiding
     ( sum
     )
 
 newtype Count a = Count a
     deriving stock (Eq, Ord, Functor)
+
+class CountMagnitude c where
+    countToInteger :: Count c -> Integer
+    countToNatural :: Count c -> Natural
+
+instance CountMagnitude Integer where
+{- ORMOLU_DISABLE -}
+    countToInteger (Count i) = i
+    countToNatural (Count i) = fromIntegral (abs i)
+{- ORMOLU_ENABLE -}
+
+instance CountMagnitude Natural where
+{- ORMOLU_DISABLE -}
+    countToInteger (Count n) = fromIntegral n
+    countToNatural (Count n) = n
+{- ORMOLU_ENABLE -}
+
+instance CountMagnitude Sign where
+{- ORMOLU_DISABLE -}
+    countToInteger (Count s) = case s of
+        Negative -> -1
+        Zero     ->  0
+        Positive ->  1
+    countToNatural (Count s) = case s of
+        Negative ->  1
+        Zero     ->  0
+        Positive ->  1
+{- ORMOLU_ENABLE -}
 
 instance Packed (Count a) where
     type Unpacked (Count a) = a
@@ -335,11 +365,22 @@ symmetricPowersetElements =
     go            [] = [[]]
     go ((a, p) : xs) = [(a, q) : ys | q <- shrinkInclusive p, ys <- go xs]
 
+    shrinkInclusive :: (Enum a, Monoid a, Ord a) => a -> [a]
     shrinkInclusive a
         | a < mempty = [a .. mempty]
         | a > mempty = [mempty .. a]
-        | otherwise = [mempty]
+        | otherwise  = [mempty]
 {- ORMOLU_ENABLE -}
+
+symmetricPowersetSize
+    :: (PackedCountMap p k c, CountMagnitude c)
+    => p
+    -> Natural
+symmetricPowersetSize m =
+    Foldable.foldl'
+        (\x y -> x * (countToNatural y + 1))
+        1
+        (unpack m)
 
 --------------------------------------------------------------------------------
 -- Utilities
