@@ -31,7 +31,9 @@ import Internal.Data.Packed
     , unpacked
     , unpacked2
     )
-import Prelude
+import Prelude hiding
+    ( sum
+    )
 
 newtype Count a = Count a
     deriving stock (Eq, Ord, Functor)
@@ -106,6 +108,14 @@ union
     => p -> p -> p
 union = unpacked2 (MonoidMap.unionWith max)
 
+sum
+    :: PackedCountMap p k c
+    => Ord k
+    => Ord c
+    => MonoidNull (Count c)
+    => p -> p -> p
+sum = unpacked2 (MonoidMap.unionWith (<>))
+
 intersections1
     :: PackedCountMap p k c
     => MonoidNull (Count c)
@@ -133,6 +143,16 @@ unions1
     => Foldable1 f
     => f p -> p
 unions1 = Foldable1.foldl1' union
+
+sums
+    :: PackedCountMap p k c
+    => MonoidNull (Count c)
+    => PositiveMonoid (Count c)
+    => Ord k
+    => Ord c
+    => Foldable f
+    => f p -> p
+sums = Foldable.foldl' sum empty
 
 -- Note: evaluation will terminate early if (and only if) the maps are
 -- incomparable.
