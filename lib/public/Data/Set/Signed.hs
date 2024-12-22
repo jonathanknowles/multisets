@@ -7,6 +7,7 @@ module Data.Set.Signed
     , toList
     , toMap
     , lookup
+    , member
     , invert
     , union
     , unions1
@@ -66,6 +67,9 @@ toMap = CountMap.toMap
 
 lookup :: Ord a => a -> SignedSet a -> Sign
 lookup = CountMap.lookup
+
+member :: Ord a => a -> SignedSet a -> Bool
+member = CountMap.member
 
 invert :: SignedSet a -> SignedSet a
 invert = CountMap.invert

@@ -45,7 +45,6 @@ import Data.Set.Signed
     ( SignedSet
     )
 import Data.Sign qualified as Sign
-import Internal.Data.CountMap (Count (..))
 import Internal.Data.CountMap qualified as CountMap
 import Internal.Shared (Bag (Bag), SignedBag (SignedBag))
 import Numeric.Natural

@@ -87,7 +87,13 @@ lookup
     => Ord k
     => Monoid (Count c)
     => k -> p -> c
-lookup a = unpack . MonoidMap.get a . unpack
+lookup k = unpack . MonoidMap.get k . unpack
+
+member
+    :: PackedCountMap p k c
+    => Ord k
+    => k -> p -> Bool
+member k = MonoidMap.nonNullKey k . unpack
 
 invert
     :: PackedCountMap p a c
