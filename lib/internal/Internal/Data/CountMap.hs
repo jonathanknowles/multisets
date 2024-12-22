@@ -34,6 +34,9 @@ import Internal.Data.Packed
 import Prelude hiding
     ( sum
     )
+import qualified Data.Map.Strict as Map
+import Data.Set (Set)
+import qualified Data.Set as Set
 
 newtype Count a = Count a
     deriving stock (Eq, Ord, Functor)
@@ -160,7 +163,7 @@ sums = Foldable.foldl' sum empty
 {- ORMOLU_DISABLE -}
 compare
     :: PackedCountMap p k c
-    => Monoid c
+    => Monoid (Count c)
     => Ord c
     => Ord k
     => p -> p -> Maybe Ordering
@@ -177,34 +180,18 @@ compare s1 s2 = go False False (compareElements s1 s2)
 
 compareElements
     :: PackedCountMap p k c
-    => Monoid c
+    => Monoid (Count c)
     => Ord c
     => Ord k
     => p -> p -> [(k, Ordering)]
 compareElements s1 s2 = fmap (uncurry Prelude.compare) <$> align s1 s2
-
-isLessThanOrEqualTo
-    :: PackedCountMap p k c
-    => Monoid c
-    => Ord c
-    => Ord k
-    => p -> p -> Bool
-isLessThanOrEqualTo m1 m2 = GT `notElem` (snd <$> compareElements m1 m2)
-
-isGreaterThanOrEqualTo
-    :: PackedCountMap p k c
-    => Monoid c
-    => Ord c
-    => Ord k
-    => p -> p -> Bool
-isGreaterThanOrEqualTo s1 s2 = LT `notElem` (snd <$> compareElements s1 s2)
 
 -- Note: evaluation will terminate early if (and only if) a GT is detected.
 --
 {- ORMOLU_DISABLE -}
 isLessThan
     :: PackedCountMap p k c
-    => Monoid c
+    => Monoid (Count c)
     => Ord c
     => Ord k
     => p -> p -> Bool
@@ -221,7 +208,7 @@ isLessThan m1 m2 = go False (compareElements m1 m2)
 {- ORMOLU_DISABLE -}
 isGreaterThan
     :: PackedCountMap p k c
-    => Monoid c
+    => Monoid (Count c)
     => Ord c
     => Ord k
     => p -> p -> Bool
@@ -233,6 +220,128 @@ isGreaterThan m1 m2 = go False (compareElements m1 m2)
     go _      ((_, GT) : xs) = go True   xs
 {- ORMOLU_ENABLE -}
 
+isLessThanOrEqualTo
+    :: PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord c
+    => Ord k
+    => p -> p -> Bool
+isLessThanOrEqualTo m1 m2 = GT `notElem` (snd <$> compareElements m1 m2)
+
+isGreaterThanOrEqualTo
+    :: PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord c
+    => Ord k
+    => p -> p -> Bool
+isGreaterThanOrEqualTo s1 s2 = LT `notElem` (snd <$> compareElements s1 s2)
+
+isSubmapOf
+    :: PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord c
+    => Ord k
+    => p -> p -> Bool
+isSubmapOf m1 m2 =
+    Map.isSubmapOfBy (<=) (toMap m1) (toMap m2)
+
+isProperSubmapOf
+    :: PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord c
+    => Ord k
+    => p -> p -> Bool
+isProperSubmapOf m1 m2 =
+    Map.isProperSubmapOfBy (<=) (toMap m1) (toMap m2)
+
+isSupermapOf
+    :: PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord c
+    => Ord k
+    => p -> p -> Bool
+isSupermapOf m1 m2 =
+    Map.isSubmapOfBy (<=) (toMap m2) (toMap m1)
+
+isProperSupermapOf
+    :: PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord c
+    => Ord k
+    => p -> p -> Bool
+isProperSupermapOf m1 m2 =
+    Map.isProperSubmapOfBy (<=) (toMap m2) (toMap m1)
+
+isSymmetricSubmapOf
+    :: PackedCountMap p k c
+    => Group (Count c)
+    => Ord c
+    => Ord k
+    => p -> p -> Bool
+isSymmetricSubmapOf m1 m2 =
+    Map.isSubmapOfBy isBoundedBy (toMap m1) (toMap m2)
+
+isProperSymmetricSubmapOf
+    :: PackedCountMap p k c
+    => Group (Count c)
+    => Ord c
+    => Ord k
+    => p -> p -> Bool
+isProperSymmetricSubmapOf m1 m2 =
+    Map.isProperSubmapOfBy isBoundedBy (toMap m1) (toMap m2)
+
+isSymmetricSupermapOf
+    :: PackedCountMap p k c
+    => Group (Count c)
+    => Ord c
+    => Ord k
+    => p -> p -> Bool
+isSymmetricSupermapOf m1 m2 =
+    Map.isSubmapOfBy isBoundedBy (toMap m2) (toMap m1)
+
+isProperSymmetricSupermapOf
+    :: PackedCountMap p k c
+    => Group (Count c)
+    => Ord c
+    => Ord k
+    => p -> p -> Bool
+isProperSymmetricSupermapOf m1 m2 =
+    Map.isProperSubmapOfBy isBoundedBy (toMap m2) (toMap m1)
+
+-- The set of all symmetric subsets.
+symmetricPowerset
+    :: PackedCountMap p k c
+    => MonoidNull (Count c)
+    => Group (Count c)
+    => Ord k
+    => Ord c
+    => Ord p
+    => Enum (Count c)
+    => p -> Set p
+symmetricPowerset = Set.fromList . symmetricPowersetElements
+
+-- Generates all symmetric subsets in lexicograhic order.
+{- ORMOLU_DISABLE -}
+symmetricPowersetElements
+    :: PackedCountMap p k c
+    => MonoidNull (Count c)
+    => Group (Count c)
+    => Ord k
+    => Ord c
+    => Enum (Count c)
+    => p -> [p]
+symmetricPowersetElements =
+    fmap (pack . MonoidMap.fromListWith (<>)) . go . MonoidMap.toList . unpack
+  where
+    go            [] = [[]]
+    go ((a, p) : xs) = [(a, q) : ys | q <- shrinkInclusive p, ys <- go xs]
+
+    shrinkInclusive a
+        | a < mempty = [a .. mempty]
+        | a > mempty = [mempty .. a]
+        | otherwise = [mempty]
+{- ORMOLU_ENABLE -}
+
 --------------------------------------------------------------------------------
 -- Utilities
 --------------------------------------------------------------------------------
@@ -241,11 +350,11 @@ isGreaterThan m1 m2 = go False (compareElements m1 m2)
 align
     :: PackedCountMap p k c
     => Ord k
-    => Monoid c
+    => Monoid (Count c)
     => p
     -> p
-    -> [(k, (c, c))]
-align = go `on` toList
+    -> [(k, (Count c, Count c))]
+align = go `on` (coerce . toList)
   where
     go            []            [] = []
     go ((a, p) : xs)            [] = (a, (p, z)) : go xs []
@@ -257,3 +366,9 @@ align = go `on` toList
 
     z = mempty
 {- ORMOLU_ENABLE -}
+
+isBoundedBy :: (Ord a, Monoid (Count a)) => a -> a -> Bool
+isBoundedBy v1 v2
+    | Count v1 <= mempty && Count v2 <= mempty = v1 >= v2
+    | Count v1 >= mempty && Count v2 >= mempty = v1 <= v2
+    | otherwise = False

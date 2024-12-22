@@ -33,6 +33,7 @@ deriving via Sum Sign instance Semigroup  (Count Sign)
 deriving via Sum Sign instance Monoid     (Count Sign)
 deriving via Sum Sign instance MonoidNull (Count Sign)
 deriving via Sum Sign instance Group      (Count Sign)
+deriving instance Enum (Count Sign)
 {- ORMOLU_ENABLE -}
 
 newtype Bag a = Bag (CountMap a Natural)
