@@ -18,6 +18,7 @@ import Data.Group
 import Data.Map.Strict
     ( Map
     )
+import Data.Map.Strict qualified as Map
 import Data.Monoid.Null
     ( MonoidNull
     , PositiveMonoid
@@ -26,6 +27,8 @@ import Data.MonoidMap
     ( MonoidMap
     )
 import Data.MonoidMap qualified as MonoidMap
+import Data.Set (Set)
+import Data.Set qualified as Set
 import Internal.Data.Packed
     ( Packed (Unpacked, pack, unpack)
     , unpacked
@@ -34,9 +37,6 @@ import Internal.Data.Packed
 import Prelude hiding
     ( sum
     )
-import qualified Data.Map.Strict as Map
-import Data.Set (Set)
-import qualified Data.Set as Set
 
 newtype Count a = Count a
     deriving stock (Eq, Ord, Functor)
@@ -187,8 +187,6 @@ compareElements
 compareElements s1 s2 = fmap (uncurry Prelude.compare) <$> align s1 s2
 
 -- Note: evaluation will terminate early if (and only if) a GT is detected.
---
-{- ORMOLU_DISABLE -}
 isLessThan
     :: PackedCountMap p k c
     => Monoid (Count c)
@@ -196,6 +194,7 @@ isLessThan
     => Ord k
     => p -> p -> Bool
 isLessThan m1 m2 = go False (compareElements m1 m2)
+{- ORMOLU_DISABLE -}
   where
     go seenLT             [] = seenLT
     go _      ((_, LT) : xs) = go True   xs
@@ -205,7 +204,6 @@ isLessThan m1 m2 = go False (compareElements m1 m2)
 
 -- Note: evaluation will terminate early if (and only if) a LT is detected.
 --
-{- ORMOLU_DISABLE -}
 isGreaterThan
     :: PackedCountMap p k c
     => Monoid (Count c)
@@ -213,6 +211,7 @@ isGreaterThan
     => Ord k
     => p -> p -> Bool
 isGreaterThan m1 m2 = go False (compareElements m1 m2)
+{- ORMOLU_DISABLE -}
   where
     go seenGT             [] = seenGT
     go _      ((_, LT) :  _) = False
@@ -321,7 +320,6 @@ symmetricPowerset
 symmetricPowerset = Set.fromList . symmetricPowersetElements
 
 -- Generates all symmetric subsets in lexicograhic order.
-{- ORMOLU_DISABLE -}
 symmetricPowersetElements
     :: PackedCountMap p k c
     => MonoidNull (Count c)
@@ -330,6 +328,7 @@ symmetricPowersetElements
     => Ord c
     => Enum (Count c)
     => p -> [p]
+{- ORMOLU_DISABLE -}
 symmetricPowersetElements =
     fmap (pack . MonoidMap.fromListWith (<>)) . go . MonoidMap.toList . unpack
   where
