@@ -1,22 +1,9 @@
-{-# LANGUAGE StandaloneDeriving #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
-
 module Internal.Shared where
 
-import Data.Group
-    ( Group
-    )
-import Data.Monoid.Null
-    ( MonoidNull
-    )
 import Internal.Data.CountMap
-    ( Count (..)
-    , CountMap
+    ( CountMap
     )
 import Internal.Data.CountMap qualified as CountMap
-import Internal.Data.Monoid
-    ( Sum (..)
-    )
 import Internal.Data.Packed
     ( Packed (Unpacked)
     )
@@ -27,14 +14,6 @@ import Numeric.Natural
     ( Natural
     )
 import Prelude
-
-{- ORMOLU_DISABLE -}
-deriving via Sum Sign instance Semigroup  (Count Sign)
-deriving via Sum Sign instance Monoid     (Count Sign)
-deriving via Sum Sign instance MonoidNull (Count Sign)
-deriving via Sum Sign instance Group      (Count Sign)
-deriving instance Enum (Count Sign)
-{- ORMOLU_ENABLE -}
 
 newtype Bag a = Bag (CountMap a Natural)
     deriving newtype (Eq)

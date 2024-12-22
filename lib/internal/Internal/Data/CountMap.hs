@@ -29,50 +29,21 @@ import Data.MonoidMap
 import Data.MonoidMap qualified as MonoidMap
 import Data.Set (Set)
 import Data.Set qualified as Set
+import Internal.Data.Count
+    ( Count (Count)
+    , CountMagnitude (countToNatural)
+    )
 import Internal.Data.Packed
     ( Packed (Unpacked, pack, unpack)
     , unpacked
     , unpacked2
     )
-import Internal.Data.Sign (Sign (..))
-import Numeric.Natural (Natural)
+import Numeric.Natural
+    ( Natural
+    )
 import Prelude hiding
     ( sum
     )
-
-newtype Count a = Count a
-    deriving stock (Eq, Ord, Functor)
-
-class CountMagnitude c where
-    countToInteger :: Count c -> Integer
-    countToNatural :: Count c -> Natural
-
-instance CountMagnitude Integer where
-{- ORMOLU_DISABLE -}
-    countToInteger (Count i) = i
-    countToNatural (Count i) = fromIntegral (abs i)
-{- ORMOLU_ENABLE -}
-
-instance CountMagnitude Natural where
-{- ORMOLU_DISABLE -}
-    countToInteger (Count n) = fromIntegral n
-    countToNatural (Count n) = n
-{- ORMOLU_ENABLE -}
-
-instance CountMagnitude Sign where
-{- ORMOLU_DISABLE -}
-    countToInteger (Count s) = case s of
-        Negative -> -1
-        Zero     ->  0
-        Positive ->  1
-    countToNatural (Count s) = case s of
-        Negative ->  1
-        Zero     ->  0
-        Positive ->  1
-{- ORMOLU_ENABLE -}
-
-instance Packed (Count a) where
-    type Unpacked (Count a) = a
 
 type CountMap a c = MonoidMap a (Count c)
 
