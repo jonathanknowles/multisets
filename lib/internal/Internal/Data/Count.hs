@@ -1,17 +1,18 @@
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE StandaloneDeriving #-}
-
 module Internal.Data.Count where
 
 import Data.Group
     ( Group
     )
+import Data.Monoid qualified as Monoid
 import Data.Monoid.Null
     ( MonoidNull
+    , PositiveMonoid
     )
+import Data.Semiring (Semiring)
 import Internal.Data.Monoid
     ( Sum (Sum)
     )
+import Internal.Data.Monoid qualified as Sign
 import Internal.Data.Packed
     ( Packed (Unpacked)
     )
@@ -22,12 +23,10 @@ import Numeric.Natural
     ( Natural
     )
 import Prelude
-import qualified Internal.Data.Monoid as Sign
-import qualified Data.Monoid as Monoid
 
 newtype Count a = Count a
     deriving stock (Eq, Ord, Functor)
-    deriving newtype (Bounded, Enum)
+    deriving newtype (Bounded, Enum, Semiring)
 
 instance Packed (Count a) where
     type Unpacked (Count a) = a
@@ -44,6 +43,13 @@ deriving via Monoid.Sum Integer instance Semigroup  (Count Integer)
 deriving via Monoid.Sum Integer instance Monoid     (Count Integer)
 deriving via Monoid.Sum Integer instance MonoidNull (Count Integer)
 deriving via Monoid.Sum Integer instance Group      (Count Integer)
+{- ORMOLU_ENABLE -}
+
+{- ORMOLU_DISABLE -}
+deriving via Monoid.Sum Natural instance Semigroup      (Count Natural)
+deriving via Monoid.Sum Natural instance Monoid         (Count Natural)
+deriving via Monoid.Sum Natural instance MonoidNull     (Count Natural)
+deriving via Monoid.Sum Natural instance PositiveMonoid (Count Natural)
 {- ORMOLU_ENABLE -}
 
 class CountMagnitude c where

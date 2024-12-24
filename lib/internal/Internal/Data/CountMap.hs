@@ -1,6 +1,3 @@
-{-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE DeriveFunctor #-}
-
 module Internal.Data.CountMap where
 
 import Data.Coerce
@@ -11,7 +8,9 @@ import Data.Foldable1
     ( Foldable1
     )
 import Data.Foldable1 qualified as Foldable1
-import Data.Function (on)
+import Data.Function
+    ( on
+    )
 import Data.Group
     ( Group
     )
@@ -27,7 +26,12 @@ import Data.MonoidMap
     ( MonoidMap
     )
 import Data.MonoidMap qualified as MonoidMap
-import Data.Set (Set)
+import Data.Semiring
+    ( Semiring (one)
+    )
+import Data.Set
+    ( Set
+    )
 import Data.Set qualified as Set
 import Internal.Data.Count
     ( Count (Count)
@@ -60,6 +64,14 @@ showWith typeName operatorName m =
 empty :: PackedCountMap p k c => p
 empty = pack MonoidMap.empty
 
+singleton
+    :: PackedCountMap p k c
+    => Ord k
+    => MonoidNull (Count c)
+    => Semiring (Count c)
+    => k -> p
+singleton k = pack $ MonoidMap.singleton k one
+
 fromListWith
     :: PackedCountMap p k c
     => Ord k
@@ -70,7 +82,7 @@ fromListWith
 fromListWith f xs = pack $ MonoidMap.fromListWith (coerce f) (coerce xs)
 
 toList :: forall p k c. PackedCountMap p k c => p -> [(k, c)]
-toList = coerce @([(k, Count c)]) @([(k, c)]) . MonoidMap.toList . unpack
+toList = coerce @[(k, Count c)] @[(k, c)] . MonoidMap.toList . unpack
 
 fromMap
     :: forall p k c
@@ -166,8 +178,6 @@ sums = Foldable.foldl' sum empty
 
 -- Note: evaluation will terminate early if (and only if) the maps are
 -- incomparable.
---
-{- ORMOLU_DISABLE -}
 compare
     :: PackedCountMap p k c
     => Monoid (Count c)
@@ -175,6 +185,7 @@ compare
     => Ord k
     => p -> p -> Maybe Ordering
 compare s1 s2 = go False False (compareElements s1 s2)
+{- ORMOLU_DISABLE -}
   where
     go    True    True              _ = Nothing
     go    True   False             [] = Just LT
@@ -210,7 +221,6 @@ isLessThan m1 m2 = go False (compareElements m1 m2)
 {- ORMOLU_ENABLE -}
 
 -- Note: evaluation will terminate early if (and only if) a LT is detected.
---
 isGreaterThan
     :: PackedCountMap p k c
     => Monoid (Count c)
@@ -314,14 +324,56 @@ isProperSymmetricSupermapOf
 isProperSymmetricSupermapOf m1 m2 =
     Map.isProperSubmapOfBy isBoundedBy (toMap m2) (toMap m1)
 
+-- The set of all subsets.
+powerset
+    :: PackedCountMap p k c
+    => MonoidNull (Count c)
+    => PositiveMonoid (Count c)
+    => Ord p
+    => Ord k
+    => Enum (Count c)
+    => p -> Set p
+powerset = Set.fromList . powersetElements
+
+-- Generates all subsets in lexicograhic order.
+powersetElements
+    :: PackedCountMap p k c
+    => MonoidNull (Count c)
+    => PositiveMonoid (Count c)
+    => Ord k
+    => Enum (Count c)
+    => p -> [p]
+{- ORMOLU_DISABLE -}
+powersetElements =
+    fmap (pack . MonoidMap.fromListWith (<>)) . go . MonoidMap.toList . unpack
+  where
+    go            [] = [[]]
+    go ((a, p) : xs) = [(a, q) : ys | q <- shrinkInclusive p, ys <- go xs]
+
+    shrinkInclusive :: (Enum a, Monoid a) => a -> [a]
+    shrinkInclusive a = [mempty .. a]
+{- ORMOLU_ENABLE -}
+
+powersetSize
+    :: PackedCountMap p k c
+    => CountMagnitude c
+    => PositiveMonoid (Count c)
+    => p
+    -> Natural
+powersetSize m =
+    Foldable.foldl'
+        (\x y -> x * (countToNatural y + 1))
+        1
+        (unpack m)
+
 -- The set of all symmetric subsets.
 symmetricPowerset
     :: PackedCountMap p k c
     => MonoidNull (Count c)
     => Group (Count c)
+    => Ord p
     => Ord k
     => Ord c
-    => Ord p
     => Enum (Count c)
     => p -> Set p
 symmetricPowerset = Set.fromList . symmetricPowersetElements
@@ -350,7 +402,9 @@ symmetricPowersetElements =
 {- ORMOLU_ENABLE -}
 
 symmetricPowersetSize
-    :: (PackedCountMap p k c, CountMagnitude c)
+    :: PackedCountMap p k c
+    => CountMagnitude c
+    => Group (Count c)
     => p
     -> Natural
 symmetricPowersetSize m =
@@ -363,7 +417,6 @@ symmetricPowersetSize m =
 -- Utilities
 --------------------------------------------------------------------------------
 
-{- ORMOLU_DISABLE -}
 align
     :: PackedCountMap p k c
     => Ord k
@@ -371,6 +424,7 @@ align
     => p
     -> p
     -> [(k, (Count c, Count c))]
+{- ORMOLU_DISABLE -}
 align = go `on` (coerce . toList)
   where
     go            []            [] = []

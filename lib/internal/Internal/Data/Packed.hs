@@ -1,5 +1,3 @@
-{-# LANGUAGE DefaultSignatures #-}
-
 module Internal.Data.Packed where
 
 import Data.Coerce

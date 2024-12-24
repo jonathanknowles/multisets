@@ -41,6 +41,9 @@ common dependency-semirings
 
 common extensions
     default-extensions:
+        ConstraintKinds
+        DefaultSignatures
+        DeriveFunctor
         DerivingStrategies
         DerivingVia
         FlexibleContexts
@@ -51,6 +54,7 @@ common extensions
         MultiParamTypeClasses
         NoImplicitPrelude
         ScopedTypeVariables
+        StandaloneDeriving
         TupleSections
         TypeApplications
         TypeFamilies

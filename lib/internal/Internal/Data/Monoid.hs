@@ -1,5 +1,3 @@
-{-# LANGUAGE StandaloneDeriving #-}
-
 module Internal.Data.Monoid
     ( Sum (..)
     , Product (..)

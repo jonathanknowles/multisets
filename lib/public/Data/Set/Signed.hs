@@ -2,6 +2,7 @@ module Data.Set.Signed
     ( Sign (..)
     , SignedSet
     , empty
+    , singleton
     , fromListWith
     , fromMap
     , toList
@@ -52,6 +53,9 @@ import Prelude hiding
 
 empty :: SignedSet a
 empty = CountMap.empty
+
+singleton :: Ord a => a -> SignedSet a
+singleton = CountMap.singleton
 
 fromListWith :: Ord a => (Sign -> Sign -> Sign) -> [(a, Sign)] -> SignedSet a
 fromListWith = CountMap.fromListWith

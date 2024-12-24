@@ -1,6 +1,7 @@
 module Data.Bag.Signed
     ( SignedBag
     , empty
+    , singleton
     , fromListWith
     , fromMap
     , toList
@@ -49,6 +50,9 @@ import Prelude hiding
 
 empty :: SignedBag a
 empty = CountMap.empty
+
+singleton :: Ord a => a -> SignedBag a
+singleton = CountMap.singleton
 
 fromListWith
     :: Ord a
