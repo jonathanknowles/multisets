@@ -22,21 +22,29 @@ import Numeric.Natural
     ( Natural
     )
 import Prelude
+import qualified Internal.Data.Monoid as Sign
+import qualified Data.Monoid as Monoid
 
 newtype Count a = Count a
     deriving stock (Eq, Ord, Functor)
+    deriving newtype (Bounded, Enum)
 
 instance Packed (Count a) where
     type Unpacked (Count a) = a
 
 {- ORMOLU_DISABLE -}
-deriving via Sum Sign instance Semigroup  (Count Sign)
-deriving via Sum Sign instance Monoid     (Count Sign)
-deriving via Sum Sign instance MonoidNull (Count Sign)
-deriving via Sum Sign instance Group      (Count Sign)
+deriving via Sign.Sum Sign instance Semigroup  (Count Sign)
+deriving via Sign.Sum Sign instance Monoid     (Count Sign)
+deriving via Sign.Sum Sign instance MonoidNull (Count Sign)
+deriving via Sign.Sum Sign instance Group      (Count Sign)
 {- ORMOLU_ENABLE -}
 
-deriving instance Enum (Count Sign)
+{- ORMOLU_DISABLE -}
+deriving via Monoid.Sum Integer instance Semigroup  (Count Integer)
+deriving via Monoid.Sum Integer instance Monoid     (Count Integer)
+deriving via Monoid.Sum Integer instance MonoidNull (Count Integer)
+deriving via Monoid.Sum Integer instance Group      (Count Integer)
+{- ORMOLU_ENABLE -}
 
 class CountMagnitude c where
     countToInteger :: Count c -> Integer

@@ -1,64 +1,55 @@
-{-# LANGUAGE UndecidableInstances #-}
-{-# HLINT ignore "Use camelCase" #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-
 module Data.Bag.Signed
     ( SignedBag
-    --, toUnsignedPair
-    --, support
-    --, supportNegative
-    --, supportPositive
-    --, supportSigned
+    , empty
+    , fromListWith
+    , fromMap
+    , toList
+    , toMap
+    , lookup
+    , member
+    , invert
+    , union
+    , unions1
+    , intersection
+    , intersections1
+    , isLessThan
+    , isLessThanOrEqualTo
+    , isGreaterThan
+    , isGreaterThanOrEqualTo
+    , isSubbagOf
+    , isSuperbagOf
+    , isProperSubbagOf
+    , isProperSuperbagOf
+    , isSymmetricSubbagOf
+    , isSymmetricSuperbagOf
+    , isProperSymmetricSubbagOf
+    , isProperSymmetricSuperbagOf
+    , symmetricPowersetElements
+    , symmetricPowersetSize
     )
 where
 
-import Data.Bag qualified as Bag
-import Data.Coerce
-    ( coerce
-    )
-import Data.Foldable qualified as Foldable
-    ( Foldable (foldl')
-    , all
-    )
 import Data.Foldable1
     ( Foldable1
-    )
-import Data.Foldable1 qualified as Foldable1
-import Data.Function
-    ( on
-    )
-import Data.List
-    ( partition
     )
 import Data.Map.Strict
     ( Map
     )
-import Data.Map.Strict qualified as Map
-import Data.MonoidMap qualified as MonoidMap
-import Data.Semigroup qualified as Semigroup
-import Data.Set
-    ( Set
-    )
-import Data.Set qualified as Set
-import Data.Set.Signed
-    ( SignedSet
-    )
-import Data.Sign qualified as Sign
 import Internal.Data.CountMap qualified as CountMap
-import Internal.Shared (Bag (Bag), SignedBag (SignedBag))
+import Internal.Shared
+    ( SignedBag )
 import Numeric.Natural
     ( Natural
     )
 import Prelude hiding
     ( compare
+    , lookup
     , sum
     )
-import Prelude qualified
 
 empty :: SignedBag a
 empty = CountMap.empty
-{-
+
 fromListWith
     :: Ord a
     => (Integer -> Integer -> Integer)
@@ -66,11 +57,11 @@ fromListWith
     -> SignedBag a
 fromListWith = CountMap.fromListWith
 
-toList :: SignedBag a -> [(a, Integer)]
-toList = CountMap.toList
-
 fromMap :: Map a Integer -> SignedBag a
 fromMap = CountMap.fromMap
+
+toList :: SignedBag a -> [(a, Integer)]
+toList = CountMap.toList
 
 toMap :: SignedBag a -> Map a Integer
 toMap = CountMap.toMap
@@ -78,8 +69,67 @@ toMap = CountMap.toMap
 lookup :: Ord a => a -> SignedBag a -> Integer
 lookup = CountMap.lookup
 
+member :: Ord a => a -> SignedBag a -> Bool
+member = CountMap.member
+
 invert :: SignedBag a -> SignedBag a
 invert = CountMap.invert
+
+union :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
+union = CountMap.union
+
+unions1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
+unions1 = CountMap.unions1
+
+intersection :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
+intersection = CountMap.intersection
+
+intersections1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
+intersections1 = CountMap.intersections1
+
+isLessThan :: Ord a => SignedBag a -> SignedBag a -> Bool
+isLessThan = CountMap.isLessThan
+
+isLessThanOrEqualTo :: Ord a => SignedBag a -> SignedBag a -> Bool
+isLessThanOrEqualTo = CountMap.isLessThanOrEqualTo
+
+isGreaterThan :: Ord a => SignedBag a -> SignedBag a -> Bool
+isGreaterThan = CountMap.isGreaterThan
+
+isGreaterThanOrEqualTo :: Ord a => SignedBag a -> SignedBag a -> Bool
+isGreaterThanOrEqualTo = CountMap.isGreaterThanOrEqualTo
+
+isSubbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
+isSubbagOf = CountMap.isSubmapOf
+
+isSuperbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
+isSuperbagOf = CountMap.isSupermapOf
+
+isProperSubbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
+isProperSubbagOf = CountMap.isProperSubmapOf
+
+isProperSuperbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
+isProperSuperbagOf = CountMap.isProperSupermapOf
+
+isSymmetricSubbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
+isSymmetricSubbagOf = CountMap.isSymmetricSubmapOf
+
+isSymmetricSuperbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
+isSymmetricSuperbagOf = CountMap.isSymmetricSupermapOf
+
+isProperSymmetricSubbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
+isProperSymmetricSubbagOf = CountMap.isProperSymmetricSubmapOf
+
+isProperSymmetricSuperbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
+isProperSymmetricSuperbagOf = CountMap.isProperSymmetricSupermapOf
+
+symmetricPowersetElements :: Ord a => SignedBag a -> [SignedBag a]
+symmetricPowersetElements = CountMap.symmetricPowersetElements
+
+symmetricPowersetSize :: Ord a => SignedBag a -> Natural
+symmetricPowersetSize = CountMap.symmetricPowersetSize
+
+{-
 
 fromSetPositive :: Set a -> SignedBag a
 fromSetPositive = fromSetWith (const 1)
@@ -180,35 +230,6 @@ sums
     -> SignedBag a
 sums = Foldable.foldl' sum empty
 
-union
-    :: Ord a
-    => SignedBag a
-    -> SignedBag a
-    -> SignedBag a
-union (SignedBag m1) (SignedBag m2) =
-    SignedBag $ MonoidMap.unionWith max m1 m2
-
-unions
-    :: Foldable1 f
-    => Ord a
-    => f (SignedBag a)
-    -> SignedBag a
-unions = Foldable1.foldl1' union
-
-intersection
-    :: Ord a
-    => SignedBag a
-    -> SignedBag a
-    -> SignedBag a
-intersection (SignedBag m1) (SignedBag m2) =
-    SignedBag $ MonoidMap.unionWith min m1 m2
-
-intersections
-    :: Foldable1 f
-    => Ord a
-    => f (SignedBag a) -> SignedBag a
-intersections = Foldable1.foldl1' intersection
-
 isPositive :: SignedBag a -> Bool
 isPositive = undefined
 
@@ -233,92 +254,9 @@ maybePositiveSet = undefined
 maybeNegativeSet :: SignedBag a -> Maybe (Set a)
 maybeNegativeSet = undefined
 
--- Caution: this function will only short-circuit if the sets are incomparable.
---
-{- ORMOLU_DISABLE -}
-compare :: Ord a => SignedBag a -> SignedBag a -> Maybe Ordering
-compare s1 s2 = go False False (compareAll s1 s2)
-  where
-    go    True    True              _ = Nothing
-    go    True   False             [] = Just LT
-    go   False    True             [] = Just GT
-    go   False   False             [] = Just EQ
-    go _seenLT  seenGT ((_, LT) : xs) = go True   seenGT xs
-    go  seenLT _seenGT ((_, GT) : xs) = go seenLT   True xs
-    go  seenLT  seenGT ((_, EQ) : xs) = go seenLT seenGT xs
-{- ORMOLU_ENABLE -}
-
-compareAll :: Ord a => SignedBag a -> SignedBag a -> [(a, Ordering)]
-compareAll s1 s2 = fmap (uncurry Prelude.compare) <$> align s1 s2
-
-isSubsetOf :: Ord a => SignedBag a -> SignedBag a -> Bool
-isSubsetOf s1 s2 = GT `notElem` (snd <$> compareAll s1 s2)
-
--- Note this will terminate early if (and only if) a GT is detected.
-{- ORMOLU_DISABLE -}
-isProperSubsetOf :: Ord a => SignedBag a -> SignedBag a -> Bool
-isProperSubsetOf s1 s2 = go False (compareAll s1 s2)
-  where
-    go seenLT             [] = seenLT
-    go _      ((_, LT) : xs) = go True   xs
-    go seenLT ((_, EQ) : xs) = go seenLT xs
-    go _      ((_, GT) :  _) = False
-{- ORMOLU_ENABLE -}
-
-isSupersetOf :: Ord a => SignedBag a -> SignedBag a -> Bool
-isSupersetOf s1 s2 = LT `notElem` (snd <$> compareAll s1 s2)
-
--- Note this will terminate early if (and only if) a LT is detected.
-{- ORMOLU_DISABLE -}
-isProperSupersetOf :: Ord a => SignedBag a -> SignedBag a -> Bool
-isProperSupersetOf s1 s2 = go False (compareAll s1 s2)
-  where
-    go seenGT             [] = seenGT
-    go _      ((_, LT) :  _) = False
-    go seenGT ((_, EQ) : xs) = go seenGT xs
-    go _      ((_, GT) : xs) = go True   xs
-{- ORMOLU_ENABLE -}
-
-isSymmetricSubsetOf :: Ord a => SignedBag a -> SignedBag a -> Bool
-isSymmetricSubsetOf = Map.isSubmapOfBy isSmallerThan `on` toMap
-
-isProperSymmetricSubsetOf
-    :: Ord a => SignedBag a -> SignedBag a -> Bool
-isProperSymmetricSubsetOf = Map.isProperSubmapOfBy isSmallerThan `on` toMap
-
-isSymmetricSupersetOf :: Ord a => SignedBag a -> SignedBag a -> Bool
-isSymmetricSupersetOf = flip isSymmetricSubsetOf
-
-isProperSymmetricSupersetOf
-    :: Ord a => SignedBag a -> SignedBag a -> Bool
-isProperSymmetricSupersetOf = flip isProperSymmetricSubsetOf
-
 -- The set of all symmetric subsets.
 symmetricPowerset :: Ord a => SignedBag a -> Set (SignedBag a)
 symmetricPowerset = Set.fromList . symmetricPowersetElements
-
--- Generates all symmetric subsets in lexicograhic order.
-{- ORMOLU_DISABLE -}
-symmetricPowersetElements :: Ord a => SignedBag a -> [SignedBag a]
-symmetricPowersetElements = fmap (fromListWith (+)) . go . toList
-  where
-    go            [] = [[]]
-    go ((a, p) : xs) = [(a, q) : ys | q <- shrinkInclusive p, ys <- go xs]
-
-    shrinkInclusive :: Integer -> [Integer]
-    shrinkInclusive a
-        | a < 0 = [a .. 0]
-        | a > 0 = [0 .. a]
-        | otherwise = [0]
-{- ORMOLU_ENABLE -}
-
-symmetricPowersetSize :: Ord a => SignedBag a -> Natural
-symmetricPowersetSize (SignedBag s) =
-    getCount $
-        Foldable.foldl'
-            (\x y -> x * (coerce integerMagnitude y + 1))
-            1
-            s
 
 multiplicity :: Ord a => a -> SignedBag a -> Integer
 multiplicity a (SignedBag s) = coerce (MonoidMap.get a s)
