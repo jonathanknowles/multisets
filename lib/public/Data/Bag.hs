@@ -16,6 +16,7 @@ module Data.Bag
     , intersection
     , intersections1
     , difference
+    , symmetricDifference
     , isLessThan
     , isLessThanOrEqualTo
     , isGreaterThan
@@ -92,6 +93,9 @@ intersections1 = CountMap.intersections1
 
 difference :: Ord a => Bag a -> Bag a -> Bag a
 difference = CountMap.monus
+
+symmetricDifference :: Ord a => Bag a -> Bag a -> Bag a
+symmetricDifference = CountMap.symmetricDifference
 
 isLessThan :: Ord a => Bag a -> Bag a -> Bool
 isLessThan = CountMap.isLessThan

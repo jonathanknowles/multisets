@@ -18,7 +18,9 @@ import Data.Map.Strict
     ( Map
     )
 import Data.Map.Strict qualified as Map
-import Data.Monoid.Monus (Monus)
+import Data.Monoid.Monus
+    ( Monus ((<\>))
+    )
 import Data.Monoid.Null
     ( MonoidNull
     , PositiveMonoid
@@ -195,6 +197,17 @@ monus
     => Ord k
     => p -> p -> p
 monus = unpacked2 MonoidMap.monus
+
+symmetricDifference
+    :: PackedCountMap p k c
+    => MonoidNull (Count c)
+    => Monus (Count c)
+    => Ord k
+    => p -> p -> p
+symmetricDifference =
+    unpacked2 $
+        MonoidMap.unionWith $
+            \c1 c2 -> (c1 <\> c2) <> (c2 <\> c1)
 
 -- Note: evaluation will terminate early if (and only if) the maps are
 -- incomparable.
