@@ -88,6 +88,7 @@ library
 library internal
     import:
       , dependency-base
+      , dependency-commutative-semigroups
       , dependency-containers
       , dependency-groups
       , dependency-monoid-subclasses

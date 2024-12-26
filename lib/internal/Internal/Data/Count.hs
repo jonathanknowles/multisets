@@ -4,11 +4,26 @@ import Data.Group
     ( Group
     )
 import Data.Monoid qualified as Monoid
+import Data.Monoid.Cancellative
+    ( LeftReductive
+    )
+import Data.Monoid.Monus
+    ( Monus
+    , OverlappingGCDMonoid
+    )
 import Data.Monoid.Null
     ( MonoidNull
     , PositiveMonoid
     )
-import Data.Semiring (Semiring)
+import Data.Semigroup.Cancellative
+    ( RightReductive
+    )
+import Data.Semigroup.Commutative
+    ( Commutative
+    )
+import Data.Semiring
+    ( Semiring
+    )
 import Internal.Data.Monoid
     ( Sum (Sum)
     )
@@ -46,10 +61,15 @@ deriving via Monoid.Sum Integer instance Group      (Count Integer)
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
-deriving via Monoid.Sum Natural instance Semigroup      (Count Natural)
-deriving via Monoid.Sum Natural instance Monoid         (Count Natural)
-deriving via Monoid.Sum Natural instance MonoidNull     (Count Natural)
-deriving via Monoid.Sum Natural instance PositiveMonoid (Count Natural)
+deriving via Monoid.Sum Natural instance Semigroup            (Count Natural)
+deriving via Monoid.Sum Natural instance Commutative          (Count Natural)
+deriving via Monoid.Sum Natural instance Monoid               (Count Natural)
+deriving via Monoid.Sum Natural instance MonoidNull           (Count Natural)
+deriving via Monoid.Sum Natural instance Monus                (Count Natural)
+deriving via Monoid.Sum Natural instance OverlappingGCDMonoid (Count Natural)
+deriving via Monoid.Sum Natural instance LeftReductive        (Count Natural)
+deriving via Monoid.Sum Natural instance RightReductive       (Count Natural)
+deriving via Monoid.Sum Natural instance PositiveMonoid       (Count Natural)
 {- ORMOLU_ENABLE -}
 
 class CountMagnitude c where

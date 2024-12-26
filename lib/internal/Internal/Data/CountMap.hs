@@ -18,6 +18,7 @@ import Data.Map.Strict
     ( Map
     )
 import Data.Map.Strict qualified as Map
+import Data.Monoid.Monus (Monus)
 import Data.Monoid.Null
     ( MonoidNull
     , PositiveMonoid
@@ -175,6 +176,15 @@ sums
     => Foldable f
     => f p -> p
 sums = Foldable.foldl' sum empty
+
+difference
+    :: PackedCountMap p k c
+    => MonoidNull (Count c)
+    => Monus (Count c)
+    => Ord k
+    => Ord c
+    => p -> p -> p
+difference = unpacked2 MonoidMap.monus
 
 -- Note: evaluation will terminate early if (and only if) the maps are
 -- incomparable.
