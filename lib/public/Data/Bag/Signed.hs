@@ -6,6 +6,7 @@ module Data.Bag.Signed
     , fromMap
     , toList
     , toMap
+    , null
     , lookup
     , member
     , invert
@@ -46,6 +47,7 @@ import Numeric.Natural
 import Prelude hiding
     ( compare
     , lookup
+    , null
     , sum
     )
 
@@ -70,6 +72,9 @@ toList = CountMap.toList
 
 toMap :: SignedBag a -> Map a Integer
 toMap = CountMap.toMap
+
+null :: SignedBag a -> Bool
+null = CountMap.null
 
 lookup :: Ord a => a -> SignedBag a -> Integer
 lookup = CountMap.lookup

@@ -95,6 +95,9 @@ fromMap = pack . MonoidMap.fromMap . coerce @(Map k c) @(Map k (Count c))
 toMap :: forall p k c. PackedCountMap p k c => p -> Map k c
 toMap = coerce @(Map k (Count c)) @(Map k c) . MonoidMap.toMap . unpack
 
+null :: PackedCountMap p k c => p -> Bool
+null = MonoidMap.null . unpack
+
 lookup
     :: PackedCountMap p k c
     => Ord k

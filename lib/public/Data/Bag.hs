@@ -8,6 +8,7 @@ module Data.Bag
     , fromMap
     , toList
     , toMap
+    , null
     , lookup
     , member
     , union
@@ -38,8 +39,9 @@ import Numeric.Natural
     ( Natural
     )
 import Prelude hiding
-    ( sum
-    , lookup
+    ( lookup
+    , null
+    , sum
     )
 import qualified Internal.Data.CountMap as CountMap
 import Internal.Shared
@@ -66,6 +68,9 @@ toList = CountMap.toList
 
 toMap :: Bag a -> Map a Natural
 toMap = CountMap.toMap
+
+null :: Bag a -> Bool
+null = CountMap.null
 
 lookup :: Ord a => a -> Bag a -> Natural
 lookup = CountMap.lookup

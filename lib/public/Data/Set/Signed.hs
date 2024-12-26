@@ -7,6 +7,7 @@ module Data.Set.Signed
     , fromMap
     , toList
     , toMap
+    , null
     , lookup
     , member
     , invert
@@ -49,6 +50,7 @@ import Numeric.Natural
     )
 import Prelude hiding
     ( lookup
+    , null
     )
 
 empty :: SignedSet a
@@ -68,6 +70,9 @@ toList = CountMap.toList
 
 toMap :: SignedSet a -> Map a Sign
 toMap = CountMap.toMap
+
+null :: SignedSet a -> Bool
+null = CountMap.null
 
 lookup :: Ord a => a -> SignedSet a -> Sign
 lookup = CountMap.lookup
