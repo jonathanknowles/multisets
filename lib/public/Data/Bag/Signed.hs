@@ -13,6 +13,7 @@ module Data.Bag.Signed
     , unions1
     , intersection
     , intersections1
+    , difference
     , isLessThan
     , isLessThanOrEqualTo
     , isGreaterThan
@@ -90,6 +91,9 @@ intersection = CountMap.intersection
 
 intersections1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
 intersections1 = CountMap.intersections1
+
+difference :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
+difference = CountMap.minus
 
 isLessThan :: Ord a => SignedBag a -> SignedBag a -> Bool
 isLessThan = CountMap.isLessThan

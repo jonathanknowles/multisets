@@ -177,14 +177,21 @@ sums
     => f p -> p
 sums = Foldable.foldl' sum empty
 
-difference
+minus
+    :: PackedCountMap p k c
+    => MonoidNull (Count c)
+    => Group (Count c)
+    => Ord k
+    => p -> p -> p
+minus = unpacked2 MonoidMap.minus
+
+monus
     :: PackedCountMap p k c
     => MonoidNull (Count c)
     => Monus (Count c)
     => Ord k
-    => Ord c
     => p -> p -> p
-difference = unpacked2 MonoidMap.monus
+monus = unpacked2 MonoidMap.monus
 
 -- Note: evaluation will terminate early if (and only if) the maps are
 -- incomparable.
