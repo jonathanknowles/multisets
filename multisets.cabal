@@ -79,6 +79,7 @@ library
         Data.Bag.Signed
         Data.Set.Signed
         Data.Sign
+        Data.Map.SeqMap
         Data.Map.SetMap
     default-language:
         Haskell2010
