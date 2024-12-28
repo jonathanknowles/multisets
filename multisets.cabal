@@ -98,8 +98,6 @@ library internal
     hs-source-dirs:
         lib/internal
     exposed-modules:
-        Data.Bag.Combinators
-        Data.Bag.Internal
         Internal.Data.Count
         Internal.Data.CountMap
         Internal.Data.Monoid
