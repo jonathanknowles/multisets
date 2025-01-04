@@ -19,7 +19,7 @@ import Data.Map.Strict
     )
 import Data.Map.Strict qualified as Map
 import Data.Monoid.Monus
-    ( Monus ((<\>))
+    ( Monus
     )
 import Data.Monoid.Null
     ( MonoidNull
@@ -39,6 +39,11 @@ import Data.Set qualified as Set
 import Internal.Data.Count
     ( Count (Count)
     , CountMagnitude (countToNatural)
+    , CountSymmetricDifference
+        ( CountSymmetricDifferenceAbsolute
+        , countSymmetricDifference
+        , countSymmetricDifferenceAbsolute
+        )
     )
 import Internal.Data.Packed
     ( Packed (Unpacked, pack, unpack)
@@ -201,13 +206,23 @@ monus = unpacked2 MonoidMap.monus
 symmetricDifference
     :: PackedCountMap p k c
     => MonoidNull (Count c)
-    => Monus (Count c)
+    => CountSymmetricDifference c
     => Ord k
     => p -> p -> p
 symmetricDifference =
-    unpacked2 $
-        MonoidMap.unionWith $
-            \c1 c2 -> (c1 <\> c2) <> (c2 <\> c1)
+    unpacked2 $ MonoidMap.unionWith countSymmetricDifference
+
+symmetricDifferenceAbsolute
+    :: PackedCountMap p k c
+    => PackedCountMap q k d
+    => CountSymmetricDifference c
+    => CountSymmetricDifferenceAbsolute c ~ d
+    => MonoidNull (Count c)
+    => MonoidNull (Count d)
+    => Ord k
+    => p -> p -> q
+symmetricDifferenceAbsolute =
+    unpacked2 $ MonoidMap.unionWith countSymmetricDifferenceAbsolute
 
 -- Note: evaluation will terminate early if (and only if) the maps are
 -- incomparable.

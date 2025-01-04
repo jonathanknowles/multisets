@@ -17,8 +17,18 @@ class Packed p where
     default pack :: Coercible (Unpacked p) p => Unpacked p -> p
     pack = coerce
 
-unpacked :: Packed p => (Unpacked p -> Unpacked p) -> p -> p
+{- ORMOLU_DISABLE -}
+unpacked
+    :: (  Packed p,     Packed q)
+    => (Unpacked p -> Unpacked q)
+    -> (         p ->          q)
 unpacked f = pack . f . unpack
+{- ORMOLU_ENABLE -}
 
-unpacked2 :: Packed p => (Unpacked p -> Unpacked p -> Unpacked p) -> p -> p -> p
+{- ORMOLU_DISABLE -}
+unpacked2
+    :: (  Packed p,     Packed q,     Packed r)
+    => (Unpacked p -> Unpacked q -> Unpacked r)
+    -> (         p ->          q ->          r)
 unpacked2 f p1 p2 = pack (f (unpack p1) (unpack p2))
+{- ORMOLU_ENABLE -}

@@ -15,6 +15,8 @@ module Data.Bag.Signed
     , intersection
     , intersections1
     , difference
+    , symmetricDifference
+    , symmetricDifferenceUnsigned
     , isLessThan
     , isLessThanOrEqualTo
     , isGreaterThan
@@ -40,7 +42,7 @@ import Data.Map.Strict
     )
 import Internal.Data.CountMap qualified as CountMap
 import Internal.Shared
-    ( SignedBag )
+    ( SignedBag, Bag )
 import Numeric.Natural
     ( Natural
     )
@@ -99,6 +101,12 @@ intersections1 = CountMap.intersections1
 
 difference :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
 difference = CountMap.minus
+
+symmetricDifference :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
+symmetricDifference = CountMap.symmetricDifference
+
+symmetricDifferenceUnsigned :: Ord a => SignedBag a -> SignedBag a -> Bag a
+symmetricDifferenceUnsigned = CountMap.symmetricDifferenceAbsolute
 
 isLessThan :: Ord a => SignedBag a -> SignedBag a -> Bool
 isLessThan = CountMap.isLessThan

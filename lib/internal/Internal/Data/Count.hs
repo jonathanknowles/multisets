@@ -99,3 +99,30 @@ instance CountMagnitude Sign where
         Zero     ->  0
         Positive ->  1
 {- ORMOLU_ENABLE -}
+
+class CountSymmetricDifference c where
+    type CountSymmetricDifferenceAbsolute c
+    countSymmetricDifference
+        :: Count c
+        -> Count c
+        -> Count c
+    countSymmetricDifferenceAbsolute
+        :: Count c
+        -> Count c
+        -> Count (CountSymmetricDifferenceAbsolute c)
+
+instance CountSymmetricDifference Integer where
+    type CountSymmetricDifferenceAbsolute Integer = Natural
+    countSymmetricDifference
+        (Count i1) (Count i2) = Count $ abs $ i1 - i2
+    countSymmetricDifferenceAbsolute
+        (Count i1) (Count i2) = Count $ fromIntegral $ abs $ i1 - i2
+
+{- ORMOLU_DISABLE -}
+instance CountSymmetricDifference Natural where
+    type CountSymmetricDifferenceAbsolute Natural = Natural
+    countSymmetricDifference (Count n1) (Count n2)
+        | n1 > n2   = Count $ n1 - n2
+        | otherwise = Count $ n2 - n1
+    countSymmetricDifferenceAbsolute = countSymmetricDifference
+{- ORMOLU_ENABLE -}
