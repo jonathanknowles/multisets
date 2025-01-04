@@ -48,32 +48,30 @@ import qualified Internal.Data.CountMap as CountMap
 import Internal.Shared
     ( Bag )
 
+type N = Natural
+
 empty :: Bag a
 empty = CountMap.empty
 
 singleton :: Ord a => a -> Bag a
 singleton = CountMap.singleton
 
-fromListWith
-    :: Ord a
-    => (Natural -> Natural -> Natural)
-    -> [(a, Natural)]
-    -> Bag a
+fromListWith :: Ord a => (N -> N -> N) -> [(a, N)] -> Bag a
 fromListWith = CountMap.fromListWith
 
-fromMap :: Map a Natural -> Bag a
+fromMap :: Map a N -> Bag a
 fromMap = CountMap.fromMap
 
-toList :: Bag a -> [(a, Natural)]
+toList :: Bag a -> [(a, N)]
 toList = CountMap.toList
 
-toMap :: Bag a -> Map a Natural
+toMap :: Bag a -> Map a N
 toMap = CountMap.toMap
 
 null :: Bag a -> Bool
 null = CountMap.null
 
-lookup :: Ord a => a -> Bag a -> Natural
+lookup :: Ord a => a -> Bag a -> N
 lookup = CountMap.lookup
 
 member :: Ord a => a -> Bag a -> Bool
@@ -124,7 +122,7 @@ isProperSuperbagOf = CountMap.isProperSupermapOf
 powersetElements :: Ord a => Bag a -> [Bag a]
 powersetElements = CountMap.powersetElements
 
-powersetSize :: Ord a => Bag a -> Natural
+powersetSize :: Ord a => Bag a -> N
 powersetSize = CountMap.powersetSize
 
 {-
@@ -147,7 +145,7 @@ fromUnaryList = sums . fmap singleton
 singleton :: Ord a => a -> Bag a
 singleton a = fromListWith (+) [(a, 1)]
 
-cardinality :: Bag a -> Natural
+cardinality :: Bag a -> N
 cardinality (Bag s) = coerce (Foldable.fold s)
 
 member :: Ord a => a -> Bag a -> Bool
@@ -165,7 +163,7 @@ member a (Bag s) = MonoidMap.nonNullKey a s
 -- products?
 -- https://quivergeometry.net/multisets/
 
-multiplicity :: Ord a => a -> Bag a -> Natural
+multiplicity :: Ord a => a -> Bag a -> N
 multiplicity a (Bag s) = coerce (MonoidMap.get a s)
 
 support :: Bag a -> Set a
@@ -174,7 +172,7 @@ support (Bag s) = MonoidMap.nonNullKeys s
 fromSet :: Set a -> Bag a
 fromSet = fromSetWith (const 1)
 
-fromSetWith :: (a -> Natural) -> Set a -> Bag a
+fromSetWith :: (a -> N) -> Set a -> Bag a
 fromSetWith f = Bag . MonoidMap.fromMap . Map.fromSet (coerce f)
 
 isSet :: Bag a -> Bool
@@ -204,7 +202,7 @@ symmetricDifference
 symmetricDifference (Bag s1) (Bag s2) =
     Bag $ MonoidMap.unionWith (coerce naturalDistance) s1 s2
 
--- consider having a single monoid (analogous to Count Natural) where
+-- consider having a single monoid (analogous to Count N) where
 -- <> = sum
 -- lcm = union
 -- gcd = intersection
@@ -225,13 +223,13 @@ sums = Foldable.foldl' sum empty
 --------------------------------------------------------------------------------
 
 {- ORMOLU_DISABLE -}
-naturalDistance :: Natural -> Natural -> Natural
+naturalDistance :: N -> N -> N
 naturalDistance a b
     | a > b     = a - b
     | otherwise = b - a
 {- ORMOLU_ENABLE -}
 
-naturalToPositiveInteger :: Natural -> Integer
+naturalToPositiveInteger :: N -> Integer
 naturalToPositiveInteger = fromIntegral
 
 -}

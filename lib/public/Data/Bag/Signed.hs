@@ -53,32 +53,30 @@ import Prelude hiding
     , sum
     )
 
+type I = Integer
+
 empty :: SignedBag a
 empty = CountMap.empty
 
 singleton :: Ord a => a -> SignedBag a
 singleton = CountMap.singleton
 
-fromListWith
-    :: Ord a
-    => (Integer -> Integer -> Integer)
-    -> [(a, Integer)]
-    -> SignedBag a
+fromListWith :: Ord a => (I -> I -> I) -> [(a, I)] -> SignedBag a
 fromListWith = CountMap.fromListWith
 
-fromMap :: Map a Integer -> SignedBag a
+fromMap :: Map a I -> SignedBag a
 fromMap = CountMap.fromMap
 
-toList :: SignedBag a -> [(a, Integer)]
+toList :: SignedBag a -> [(a, I)]
 toList = CountMap.toList
 
-toMap :: SignedBag a -> Map a Integer
+toMap :: SignedBag a -> Map a I
 toMap = CountMap.toMap
 
 null :: SignedBag a -> Bool
 null = CountMap.null
 
-lookup :: Ord a => a -> SignedBag a -> Integer
+lookup :: Ord a => a -> SignedBag a -> I
 lookup = CountMap.lookup
 
 member :: Ord a => a -> SignedBag a -> Bool
@@ -158,7 +156,7 @@ fromSetPositive = fromSetWith (const 1)
 fromSetNegative :: Set a -> SignedBag a
 fromSetNegative = fromSetWith (const (-1))
 
-fromSetWith :: (a -> Integer) -> Set a -> SignedBag a
+fromSetWith :: (a -> I) -> Set a -> SignedBag a
 fromSetWith f = fromMap . Map.fromSet (coerce f)
 
 toUnsignedPair :: Ord a => SignedBag a -> (Bag a, Bag a)
@@ -188,7 +186,7 @@ positivePart m =
 -- cardinalityPositive
 -- cardinalityNegative
 
-cardinality :: SignedBag a -> Integer
+cardinality :: SignedBag a -> I
 cardinality (SignedBag s) =
     getCount $ Foldable.foldl' (+) 0 s
 
@@ -204,14 +202,14 @@ fromUnsignedPositive = undefined
 
 fromUnsignedPairWith
     :: Ord a
-    => (Integer -> Integer -> Integer)
+    => (I -> I -> I)
     -> (Bag a, Bag a)
     -> SignedBag a
 fromUnsignedPairWith f (s1, s2) =
     fromListWith f (ns <> ps)
   where
-    ns = fmap naturalToNegativeInteger <$> Bag.toList s1
-    ps = fmap naturalToPositiveInteger <$> Bag.toList s2
+    ns = fmap naturalToNegativeI <$> Bag.toList s1
+    ps = fmap naturalToPositiveI <$> Bag.toList s2
 
 difference
     :: Ord a
@@ -279,7 +277,7 @@ maybeNegativeSet = undefined
 symmetricPowerset :: Ord a => SignedBag a -> Set (SignedBag a)
 symmetricPowerset = Set.fromList . symmetricPowersetElements
 
-multiplicity :: Ord a => a -> SignedBag a -> Integer
+multiplicity :: Ord a => a -> SignedBag a -> I
 multiplicity a (SignedBag s) = coerce (MonoidMap.get a s)
 
 support :: SignedBag a -> Set a
@@ -392,7 +390,7 @@ align
     :: Ord a
     => SignedBag a
     -> SignedBag a
-    -> [(a, (Integer, Integer))]
+    -> [(a, (I, I))]
 align = go `on` toList
   where
     go            []            [] = []
@@ -405,35 +403,35 @@ align = go `on` toList
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
-integerDistance :: Integer -> Integer -> Natural
+integerDistance :: I -> I -> Natural
 integerDistance a b
     | a > b     = fromIntegral (a - b)
     | otherwise = fromIntegral (b - a)
 {- ORMOLU_ENABLE -}
 
-integerMagnitude :: Integer -> Natural
+integerMagnitude :: I -> Natural
 integerMagnitude n = fromIntegral (abs n)
 
-integerToNaturalPair :: Integer -> (Natural, Natural)
+integerToNaturalPair :: I -> (Natural, Natural)
 integerToNaturalPair n
     | n < 0 = (fromIntegral (abs n), 0)
     | otherwise = (0, fromIntegral n)
 
-integerNegativePartToNatural :: Integer -> Natural
+integerNegativePartToNatural :: I -> Natural
 integerNegativePartToNatural n
     | n < 0 = fromIntegral (abs n)
     | otherwise = 0
 
-integerPositivePartToNatural :: Integer -> Natural
+integerPositivePartToNatural :: I -> Natural
 integerPositivePartToNatural n
     | n > 0 = fromIntegral n
     | otherwise = 0
 
-naturalToNegativeInteger :: Natural -> Integer
-naturalToNegativeInteger = negate . fromIntegral
+naturalToNegativeI :: Natural -> I
+naturalToNegativeI = negate . fromIntegral
 
-naturalToPositiveInteger :: Natural -> Integer
-naturalToPositiveInteger = fromIntegral
+naturalToPositiveI :: Natural -> I
+naturalToPositiveI = fromIntegral
 
 isSmallerThan :: (Ord a, Num a) => a -> a -> Bool
 isSmallerThan v1 v2
