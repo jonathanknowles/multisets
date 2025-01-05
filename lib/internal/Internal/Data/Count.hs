@@ -4,9 +4,6 @@ import Data.Group
     ( Group
     )
 import Data.Monoid qualified as Monoid
-import Data.Monoid.Cancellative
-    ( LeftReductive
-    )
 import Data.Monoid.Monus
     ( Monus
     , OverlappingGCDMonoid
@@ -16,7 +13,12 @@ import Data.Monoid.Null
     , PositiveMonoid
     )
 import Data.Semigroup.Cancellative
-    ( RightReductive
+    ( Cancellative
+    , LeftCancellative
+    , LeftReductive
+    , Reductive
+    , RightCancellative
+    , RightReductive
     )
 import Data.Semigroup.Commutative
     ( Commutative
@@ -47,17 +49,19 @@ instance Packed (Count a) where
     type Unpacked (Count a) = a
 
 {- ORMOLU_DISABLE -}
-deriving via Sign.Sum Sign instance Semigroup  (Count Sign)
-deriving via Sign.Sum Sign instance Monoid     (Count Sign)
-deriving via Sign.Sum Sign instance MonoidNull (Count Sign)
-deriving via Sign.Sum Sign instance Group      (Count Sign)
+deriving via Sign.Sum Sign instance Semigroup   (Count Sign)
+deriving via Sign.Sum Sign instance Commutative (Count Sign)
+deriving via Sign.Sum Sign instance Monoid      (Count Sign)
+deriving via Sign.Sum Sign instance MonoidNull  (Count Sign)
+deriving via Sign.Sum Sign instance Group       (Count Sign)
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
-deriving via Monoid.Sum Integer instance Semigroup  (Count Integer)
-deriving via Monoid.Sum Integer instance Monoid     (Count Integer)
-deriving via Monoid.Sum Integer instance MonoidNull (Count Integer)
-deriving via Monoid.Sum Integer instance Group      (Count Integer)
+deriving via Monoid.Sum Integer instance Semigroup            (Count Integer)
+deriving via Monoid.Sum Integer instance Commutative          (Count Integer)
+deriving via Monoid.Sum Integer instance Monoid               (Count Integer)
+deriving via Monoid.Sum Integer instance MonoidNull           (Count Integer)
+deriving via Monoid.Sum Integer instance Group                (Count Integer)
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
@@ -67,8 +71,12 @@ deriving via Monoid.Sum Natural instance Monoid               (Count Natural)
 deriving via Monoid.Sum Natural instance MonoidNull           (Count Natural)
 deriving via Monoid.Sum Natural instance Monus                (Count Natural)
 deriving via Monoid.Sum Natural instance OverlappingGCDMonoid (Count Natural)
+deriving via Monoid.Sum Natural instance Reductive            (Count Natural)
 deriving via Monoid.Sum Natural instance LeftReductive        (Count Natural)
 deriving via Monoid.Sum Natural instance RightReductive       (Count Natural)
+deriving via Monoid.Sum Natural instance Cancellative         (Count Natural)
+deriving via Monoid.Sum Natural instance LeftCancellative     (Count Natural)
+deriving via Monoid.Sum Natural instance RightCancellative    (Count Natural)
 deriving via Monoid.Sum Natural instance PositiveMonoid       (Count Natural)
 {- ORMOLU_ENABLE -}
 
@@ -114,9 +122,11 @@ class CountSymmetricDifference c where
 instance CountSymmetricDifference Integer where
     type CountSymmetricDifferenceAbsolute Integer = Natural
     countSymmetricDifference
-        (Count i1) (Count i2) = Count $ abs $ i1 - i2
+        (Count i1)
+        (Count i2) = Count $ abs $ i1 - i2
     countSymmetricDifferenceAbsolute
-        (Count i1) (Count i2) = Count $ fromIntegral $ abs $ i1 - i2
+        (Count i1)
+        (Count i2) = Count $ fromIntegral $ abs $ i1 - i2
 
 {- ORMOLU_DISABLE -}
 instance CountSymmetricDifference Natural where

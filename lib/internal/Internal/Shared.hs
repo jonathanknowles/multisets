@@ -1,5 +1,27 @@
 module Internal.Shared where
 
+import Data.Group
+    ( Group
+    )
+import Data.Monoid.Monus
+    ( Monus
+    , OverlappingGCDMonoid
+    )
+import Data.Monoid.Null
+    ( MonoidNull
+    , PositiveMonoid
+    )
+import Data.Semigroup.Cancellative
+    ( Cancellative
+    , LeftCancellative
+    , LeftReductive
+    , Reductive
+    , RightCancellative
+    , RightReductive
+    )
+import Data.Semigroup.Commutative
+    ( Commutative
+    )
 import Internal.Data.CountMap
     ( CountMap
     )
@@ -17,12 +39,20 @@ import Prelude
 
 newtype Bag a = Bag (CountMap a Natural)
     deriving newtype (Eq)
+    deriving newtype (Semigroup, Monoid, MonoidNull, PositiveMonoid)
+    deriving newtype (Commutative, OverlappingGCDMonoid, Monus)
+    deriving newtype (Cancellative, LeftCancellative, RightCancellative)
+    deriving newtype (Reductive, LeftReductive, RightReductive)
 
 newtype SignedBag a = SignedBag (CountMap a Integer)
     deriving newtype (Eq)
+    deriving newtype (Semigroup, Monoid, MonoidNull)
+    deriving newtype (Commutative, Group)
 
 newtype SignedSet a = SignedSet (CountMap a Sign)
     deriving newtype (Eq)
+    deriving newtype (Semigroup, Monoid, MonoidNull)
+    deriving newtype (Commutative, Group)
 
 instance Packed (Bag a) where
     type Unpacked (Bag a) = CountMap a Natural
