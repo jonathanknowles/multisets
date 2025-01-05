@@ -4,7 +4,7 @@
 
 module Internal.Data.Sign
     ( Sign (..)
-    , fromIntegral
+    , fromNum
     )
 where
 
@@ -87,10 +87,10 @@ instance Monoid (Product Sign) where
 --------------------------------------------------------------------------------
 
 {- ORMOLU_DISABLE -}
-fromIntegral :: Integral i => i -> Sign
-fromIntegral i
-    | i < 0     = Negative
-    | i > 0     = Positive
+fromNum :: (Num n, Ord n) => n -> Sign
+fromNum n
+    | n < 0     = Negative
+    | n > 0     = Positive
     | otherwise = Zero
 {- ORMOLU_ENABLE -}
 

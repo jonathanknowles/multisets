@@ -1,10 +1,10 @@
 module Data.Sign
     ( Sign (..)
-    , fromIntegral
+    , fromNum
     )
     where
 
 import Internal.Data.Sign
     ( Sign (..)
-    , fromIntegral
+    , fromNum
     )
