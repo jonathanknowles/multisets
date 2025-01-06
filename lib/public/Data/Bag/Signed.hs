@@ -53,30 +53,32 @@ import Prelude hiding
     , sum
     )
 
-type I = Integer
-
 empty :: SignedBag a
 empty = CountMap.empty
 
 singleton :: Ord a => a -> SignedBag a
 singleton = CountMap.singleton
 
-fromListWith :: Ord a => (I -> I -> I) -> [(a, I)] -> SignedBag a
+fromListWith
+    :: Ord a
+    => (Integer -> Integer -> Integer)
+    -> [(a, Integer)]
+    -> SignedBag a
 fromListWith = CountMap.fromListWith
 
-fromMap :: Map a I -> SignedBag a
+fromMap :: Map a Integer -> SignedBag a
 fromMap = CountMap.fromMap
 
-toList :: SignedBag a -> [(a, I)]
+toList :: SignedBag a -> [(a, Integer)]
 toList = CountMap.toList
 
-toMap :: SignedBag a -> Map a I
+toMap :: SignedBag a -> Map a Integer
 toMap = CountMap.toMap
 
 null :: SignedBag a -> Bool
 null = CountMap.null
 
-lookup :: Ord a => a -> SignedBag a -> I
+lookup :: Ord a => a -> SignedBag a -> Integer
 lookup = CountMap.lookup
 
 member :: Ord a => a -> SignedBag a -> Bool

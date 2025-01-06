@@ -48,30 +48,32 @@ import qualified Internal.Data.CountMap as CountMap
 import Internal.Shared
     ( Bag )
 
-type N = Natural
-
 empty :: Bag a
 empty = CountMap.empty
 
 singleton :: Ord a => a -> Bag a
 singleton = CountMap.singleton
 
-fromListWith :: Ord a => (N -> N -> N) -> [(a, N)] -> Bag a
+fromListWith
+    :: Ord a
+    => (Natural -> Natural -> Natural)
+    -> [(a, Natural)]
+    -> Bag a
 fromListWith = CountMap.fromListWith
 
-fromMap :: Map a N -> Bag a
+fromMap :: Map a Natural -> Bag a
 fromMap = CountMap.fromMap
 
-toList :: Bag a -> [(a, N)]
+toList :: Bag a -> [(a, Natural)]
 toList = CountMap.toList
 
-toMap :: Bag a -> Map a N
+toMap :: Bag a -> Map a Natural
 toMap = CountMap.toMap
 
 null :: Bag a -> Bool
 null = CountMap.null
 
-lookup :: Ord a => a -> Bag a -> N
+lookup :: Ord a => a -> Bag a -> Natural
 lookup = CountMap.lookup
 
 member :: Ord a => a -> Bag a -> Bool
@@ -122,7 +124,7 @@ isProperSuperbagOf = CountMap.isProperSupermapOf
 powersetElements :: Ord a => Bag a -> [Bag a]
 powersetElements = CountMap.powersetElements
 
-powersetSize :: Ord a => Bag a -> N
+powersetSize :: Ord a => Bag a -> Natural
 powersetSize = CountMap.powersetSize
 
 {-
