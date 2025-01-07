@@ -11,6 +11,10 @@ module Data.Bag
     , null
     , lookup
     , member
+    , foldl
+    , foldl'
+    , foldr
+    , foldr'
     , union
     , unions
     , intersection
@@ -43,7 +47,10 @@ import Numeric.Natural
     ( Natural
     )
 import Prelude hiding
-    ( lookup
+    ( foldl
+    , foldl'
+    , foldr
+    , lookup
     , null
     , sum
     )
@@ -88,6 +95,18 @@ lookup = CountMap.lookup
 
 member :: Ord a => a -> Bag a -> Bool
 member = CountMap.member
+
+foldl :: (r -> a -> Natural -> r) -> r -> Bag a -> r
+foldl = CountMap.foldl
+
+foldl' :: (r -> a -> Natural -> r) -> r -> Bag a -> r
+foldl' = CountMap.foldl'
+
+foldr :: (a -> Natural -> r -> r) -> r -> Bag a -> r
+foldr = CountMap.foldr
+
+foldr' :: (a -> Natural -> r -> r) -> r -> Bag a -> r
+foldr' = CountMap.foldr'
 
 union :: Ord a => Bag a -> Bag a -> Bag a
 union = CountMap.union

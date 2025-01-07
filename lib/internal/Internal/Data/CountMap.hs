@@ -139,6 +139,30 @@ member
     => k -> p -> Bool
 member k = MonoidMap.nonNullKey k . unpack
 
+foldl
+    :: PackedCountMap p k c
+    => (r -> k -> c -> r)
+    -> r -> p -> r
+foldl f r p = MonoidMap.foldlWithKey (coerce f) r (unpack p)
+
+foldl'
+    :: PackedCountMap p k c
+    => (r -> k -> c -> r)
+    -> r -> p -> r
+foldl' f r p = MonoidMap.foldlWithKey' (coerce f) r (unpack p)
+
+foldr
+    :: PackedCountMap p k c
+    => (k -> c -> r -> r)
+    -> r -> p -> r
+foldr f r p = MonoidMap.foldrWithKey (coerce f) r (unpack p)
+
+foldr'
+    :: PackedCountMap p k c
+    => (k -> c -> r -> r)
+    -> r -> p -> r
+foldr' f r p = MonoidMap.foldrWithKey' (coerce f) r (unpack p)
+
 invert
     :: PackedCountMap p a c
     => MonoidNull (Count c)

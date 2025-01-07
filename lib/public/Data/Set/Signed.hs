@@ -11,6 +11,10 @@ module Data.Set.Signed
     , null
     , lookup
     , member
+    , foldl
+    , foldl'
+    , foldr
+    , foldr'
     , invert
     , union
     , unions1
@@ -53,7 +57,10 @@ import Numeric.Natural
     ( Natural
     )
 import Prelude hiding
-    ( lookup
+    ( foldl
+    , foldl'
+    , foldr
+    , lookup
     , null
     )
 
@@ -86,6 +93,18 @@ lookup = CountMap.lookup
 
 member :: Ord a => a -> SignedSet a -> Bool
 member = CountMap.member
+
+foldl :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
+foldl = CountMap.foldl
+
+foldl' :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
+foldl' = CountMap.foldl'
+
+foldr :: (a -> Sign -> r -> r) -> r -> SignedSet a -> r
+foldr = CountMap.foldr
+
+foldr' :: (a -> Sign -> r -> r) -> r -> SignedSet a -> r
+foldr' = CountMap.foldr'
 
 invert :: SignedSet a -> SignedSet a
 invert = CountMap.invert

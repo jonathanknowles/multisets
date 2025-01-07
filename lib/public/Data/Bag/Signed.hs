@@ -11,6 +11,10 @@ module Data.Bag.Signed
     , null
     , lookup
     , member
+    , foldl
+    , foldl'
+    , foldr
+    , foldr'
     , invert
     , union
     , unions1
@@ -53,6 +57,9 @@ import Numeric.Natural
     )
 import Prelude hiding
     ( compare
+    , foldl
+    , foldl'
+    , foldr
     , lookup
     , null
     , sum
@@ -94,6 +101,18 @@ lookup = CountMap.lookup
 
 member :: Ord a => a -> SignedBag a -> Bool
 member = CountMap.member
+
+foldl :: (r -> a -> Integer -> r) -> r -> SignedBag a -> r
+foldl = CountMap.foldl
+
+foldl' :: (r -> a -> Integer -> r) -> r -> SignedBag a -> r
+foldl' = CountMap.foldl'
+
+foldr :: (a -> Integer -> r -> r) -> r -> SignedBag a -> r
+foldr = CountMap.foldr
+
+foldr' :: (a -> Integer -> r -> r) -> r -> SignedBag a -> r
+foldr' = CountMap.foldr'
 
 invert :: SignedBag a -> SignedBag a
 invert = CountMap.invert
