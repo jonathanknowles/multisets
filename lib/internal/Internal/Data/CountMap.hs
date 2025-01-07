@@ -445,7 +445,7 @@ powerset
     => p -> Set p
 powerset = Set.fromList . powersetElements
 
--- Generates all subsets in lexicograhic order.
+-- Generates all subsets in lexicographic order.
 powersetElements
     :: PackedCountMap p k c
     => MonoidNull (Count c)
