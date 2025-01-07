@@ -15,6 +15,8 @@ module Data.Bag
     , foldl'
     , foldr
     , foldr'
+    , foldMap
+    , foldMap'
     , union
     , unions
     , intersection
@@ -50,6 +52,7 @@ import Prelude hiding
     ( foldl
     , foldl'
     , foldr
+    , foldMap
     , lookup
     , null
     , sum
@@ -107,6 +110,12 @@ foldr = CountMap.foldr
 
 foldr' :: (a -> Natural -> r -> r) -> r -> Bag a -> r
 foldr' = CountMap.foldr'
+
+foldMap :: Monoid m => (a -> Natural -> m) -> Bag a -> m
+foldMap = CountMap.foldMap
+
+foldMap' :: Monoid m => (a -> Natural -> m) -> Bag a -> m
+foldMap' = CountMap.foldMap'
 
 union :: Ord a => Bag a -> Bag a -> Bag a
 union = CountMap.union

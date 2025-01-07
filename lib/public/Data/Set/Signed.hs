@@ -15,6 +15,8 @@ module Data.Set.Signed
     , foldl'
     , foldr
     , foldr'
+    , foldMap
+    , foldMap'
     , invert
     , union
     , unions1
@@ -60,6 +62,7 @@ import Prelude hiding
     ( foldl
     , foldl'
     , foldr
+    , foldMap
     , lookup
     , null
     )
@@ -105,6 +108,12 @@ foldr = CountMap.foldr
 
 foldr' :: (a -> Sign -> r -> r) -> r -> SignedSet a -> r
 foldr' = CountMap.foldr'
+
+foldMap :: Monoid m => (a -> Sign -> m) -> SignedSet a -> m
+foldMap = CountMap.foldMap
+
+foldMap' :: Monoid m => (a -> Sign -> m) -> SignedSet a -> m
+foldMap' = CountMap.foldMap'
 
 invert :: SignedSet a -> SignedSet a
 invert = CountMap.invert

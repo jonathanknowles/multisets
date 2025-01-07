@@ -15,6 +15,8 @@ module Data.Bag.Signed
     , foldl'
     , foldr
     , foldr'
+    , foldMap
+    , foldMap'
     , invert
     , union
     , unions1
@@ -60,6 +62,7 @@ import Prelude hiding
     , foldl
     , foldl'
     , foldr
+    , foldMap
     , lookup
     , null
     , sum
@@ -113,6 +116,12 @@ foldr = CountMap.foldr
 
 foldr' :: (a -> Integer -> r -> r) -> r -> SignedBag a -> r
 foldr' = CountMap.foldr'
+
+foldMap :: Monoid m => (a -> Integer -> m) -> SignedBag a -> m
+foldMap = CountMap.foldMap
+
+foldMap' :: Monoid m => (a -> Integer -> m) -> SignedBag a -> m
+foldMap' = CountMap.foldMap'
 
 invert :: SignedBag a -> SignedBag a
 invert = CountMap.invert

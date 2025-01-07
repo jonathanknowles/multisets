@@ -163,6 +163,20 @@ foldr'
     -> r -> p -> r
 foldr' f r p = MonoidMap.foldrWithKey' (coerce f) r (unpack p)
 
+foldMap
+    :: PackedCountMap p k c
+    => Monoid m
+    => (k -> c -> m)
+    -> p -> m
+foldMap f p = MonoidMap.foldMapWithKey (coerce f) (unpack p)
+
+foldMap'
+    :: PackedCountMap p k c
+    => Monoid m
+    => (k -> c -> m)
+    -> p -> m
+foldMap' f p = MonoidMap.foldMapWithKey' (coerce f) (unpack p)
+
 invert
     :: PackedCountMap p a c
     => MonoidNull (Count c)
