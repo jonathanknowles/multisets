@@ -12,16 +12,17 @@ module Data.Bag
     , null
     , lookup
     , member
-    , foldl
-    , foldl'
-    , foldr
-    , foldr'
-    , foldMap
-    , foldMap'
+    , foldlWithCount
+    , foldlWithCount'
+    , foldrWithCount
+    , foldrWithCount'
+    , foldMapWithCount
+    , foldMapWithCount'
     , union
     , unions
     , intersection
     , intersections1
+    , add
     , difference
     , symmetricDifference
     , isLessThan
@@ -103,23 +104,23 @@ lookup = CountMap.lookup
 member :: Ord a => a -> Bag a -> Bool
 member = CountMap.member
 
-foldl :: (r -> a -> Natural -> r) -> r -> Bag a -> r
-foldl = CountMap.foldl
+foldlWithCount :: (r -> a -> Natural -> r) -> r -> Bag a -> r
+foldlWithCount = CountMap.foldlWithCount
 
-foldl' :: (r -> a -> Natural -> r) -> r -> Bag a -> r
-foldl' = CountMap.foldl'
+foldlWithCount' :: (r -> a -> Natural -> r) -> r -> Bag a -> r
+foldlWithCount' = CountMap.foldlWithCount'
 
-foldr :: (a -> Natural -> r -> r) -> r -> Bag a -> r
-foldr = CountMap.foldr
+foldrWithCount :: (a -> Natural -> r -> r) -> r -> Bag a -> r
+foldrWithCount = CountMap.foldrWithCount
 
-foldr' :: (a -> Natural -> r -> r) -> r -> Bag a -> r
-foldr' = CountMap.foldr'
+foldrWithCount' :: (a -> Natural -> r -> r) -> r -> Bag a -> r
+foldrWithCount' = CountMap.foldrWithCount'
 
-foldMap :: Monoid m => (a -> Natural -> m) -> Bag a -> m
-foldMap = CountMap.foldMap
+foldMapWithCount :: Monoid m => (a -> Natural -> m) -> Bag a -> m
+foldMapWithCount = CountMap.foldMapWithCount
 
-foldMap' :: Monoid m => (a -> Natural -> m) -> Bag a -> m
-foldMap' = CountMap.foldMap'
+foldMapWithCount' :: Monoid m => (a -> Natural -> m) -> Bag a -> m
+foldMapWithCount' = CountMap.foldMapWithCount'
 
 union :: Ord a => Bag a -> Bag a -> Bag a
 union = CountMap.union
@@ -132,6 +133,9 @@ intersection = CountMap.intersection
 
 intersections1 :: Foldable1 f => Ord a => f (Bag a) -> Bag a
 intersections1 = CountMap.intersections1
+
+add :: Ord a => Bag a -> Bag a -> Bag a
+add = CountMap.add
 
 difference :: Ord a => Bag a -> Bag a -> Bag a
 difference = CountMap.monus

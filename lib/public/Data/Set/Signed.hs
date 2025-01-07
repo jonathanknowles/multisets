@@ -12,12 +12,12 @@ module Data.Set.Signed
     , null
     , lookup
     , member
-    , foldl
-    , foldl'
-    , foldr
-    , foldr'
-    , foldMap
-    , foldMap'
+    , foldlWithSign
+    , foldlWithSign'
+    , foldrWithSign
+    , foldrWithSign'
+    , foldMapWithSign
+    , foldMapWithSign'
     , invert
     , union
     , unions1
@@ -101,23 +101,23 @@ lookup = CountMap.lookup
 member :: Ord a => a -> SignedSet a -> Bool
 member = CountMap.member
 
-foldl :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
-foldl = CountMap.foldl
+foldlWithSign :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
+foldlWithSign = CountMap.foldlWithCount
 
-foldl' :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
-foldl' = CountMap.foldl'
+foldlWithSign' :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
+foldlWithSign' = CountMap.foldlWithCount'
 
-foldr :: (a -> Sign -> r -> r) -> r -> SignedSet a -> r
-foldr = CountMap.foldr
+foldrWithSign :: (a -> Sign -> r -> r) -> r -> SignedSet a -> r
+foldrWithSign = CountMap.foldrWithCount
 
-foldr' :: (a -> Sign -> r -> r) -> r -> SignedSet a -> r
-foldr' = CountMap.foldr'
+foldrWithSign' :: (a -> Sign -> r -> r) -> r -> SignedSet a -> r
+foldrWithSign' = CountMap.foldrWithCount'
 
-foldMap :: Monoid m => (a -> Sign -> m) -> SignedSet a -> m
-foldMap = CountMap.foldMap
+foldMapWithSign :: Monoid m => (a -> Sign -> m) -> SignedSet a -> m
+foldMapWithSign = CountMap.foldMapWithCount
 
-foldMap' :: Monoid m => (a -> Sign -> m) -> SignedSet a -> m
-foldMap' = CountMap.foldMap'
+foldMapWithSign' :: Monoid m => (a -> Sign -> m) -> SignedSet a -> m
+foldMapWithSign' = CountMap.foldMapWithCount'
 
 invert :: SignedSet a -> SignedSet a
 invert = CountMap.invert

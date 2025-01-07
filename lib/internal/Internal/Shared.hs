@@ -1,5 +1,8 @@
 module Internal.Shared where
 
+import Data.Foldable
+    ( Foldable (..)
+    )
 import Data.Group
     ( Group
     )
@@ -71,3 +74,36 @@ instance Show a => Show (SignedBag a) where
 
 instance Show a => Show (SignedSet a) where
     show = CountMap.showWith "SignedSet" "Sign.add"
+
+{- ORMOLU_DISABLE -}
+instance Foldable Bag where
+    fold     = CountMap.foldKeys
+    foldMap  = CountMap.foldMapKeys
+    foldMap' = CountMap.foldMapKeys'
+    foldr    = CountMap.foldrKeys
+    foldr'   = CountMap.foldrKeys'
+    foldl    = CountMap.foldlKeys
+    foldl'   = CountMap.foldlKeys'
+{- ORMOLU_ENABLE -}
+
+{- ORMOLU_DISABLE -}
+instance Foldable SignedBag where
+    fold     = CountMap.foldKeys
+    foldMap  = CountMap.foldMapKeys
+    foldMap' = CountMap.foldMapKeys'
+    foldr    = CountMap.foldrKeys
+    foldr'   = CountMap.foldrKeys'
+    foldl    = CountMap.foldlKeys
+    foldl'   = CountMap.foldlKeys'
+{- ORMOLU_ENABLE -}
+
+{- ORMOLU_DISABLE -}
+instance Foldable SignedSet where
+    fold     = CountMap.foldKeys
+    foldMap  = CountMap.foldMapKeys
+    foldMap' = CountMap.foldMapKeys'
+    foldr    = CountMap.foldrKeys
+    foldr'   = CountMap.foldrKeys'
+    foldl    = CountMap.foldlKeys
+    foldl'   = CountMap.foldlKeys'
+{- ORMOLU_ENABLE -}

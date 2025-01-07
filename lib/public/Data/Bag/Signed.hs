@@ -12,17 +12,18 @@ module Data.Bag.Signed
     , null
     , lookup
     , member
-    , foldl
-    , foldl'
-    , foldr
-    , foldr'
-    , foldMap
-    , foldMap'
+    , foldlWithCount
+    , foldlWithCount'
+    , foldrWithCount
+    , foldrWithCount'
+    , foldMapWithCount
+    , foldMapWithCount'
     , invert
     , union
     , unions1
     , intersection
     , intersections1
+    , add
     , difference
     , symmetricDifference
     , symmetricDifferenceUnsigned
@@ -109,23 +110,23 @@ lookup = CountMap.lookup
 member :: Ord a => a -> SignedBag a -> Bool
 member = CountMap.member
 
-foldl :: (r -> a -> Integer -> r) -> r -> SignedBag a -> r
-foldl = CountMap.foldl
+foldlWithCount :: (r -> a -> Integer -> r) -> r -> SignedBag a -> r
+foldlWithCount = CountMap.foldlWithCount
 
-foldl' :: (r -> a -> Integer -> r) -> r -> SignedBag a -> r
-foldl' = CountMap.foldl'
+foldlWithCount' :: (r -> a -> Integer -> r) -> r -> SignedBag a -> r
+foldlWithCount' = CountMap.foldlWithCount'
 
-foldr :: (a -> Integer -> r -> r) -> r -> SignedBag a -> r
-foldr = CountMap.foldr
+foldrWithCount :: (a -> Integer -> r -> r) -> r -> SignedBag a -> r
+foldrWithCount = CountMap.foldrWithCount
 
-foldr' :: (a -> Integer -> r -> r) -> r -> SignedBag a -> r
-foldr' = CountMap.foldr'
+foldrWithCount' :: (a -> Integer -> r -> r) -> r -> SignedBag a -> r
+foldrWithCount' = CountMap.foldrWithCount'
 
-foldMap :: Monoid m => (a -> Integer -> m) -> SignedBag a -> m
-foldMap = CountMap.foldMap
+foldMapWithCount :: Monoid m => (a -> Integer -> m) -> SignedBag a -> m
+foldMapWithCount = CountMap.foldMapWithCount
 
-foldMap' :: Monoid m => (a -> Integer -> m) -> SignedBag a -> m
-foldMap' = CountMap.foldMap'
+foldMapWithCount' :: Monoid m => (a -> Integer -> m) -> SignedBag a -> m
+foldMapWithCount' = CountMap.foldMapWithCount'
 
 invert :: SignedBag a -> SignedBag a
 invert = CountMap.invert
@@ -141,6 +142,9 @@ intersection = CountMap.intersection
 
 intersections1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
 intersections1 = CountMap.intersections1
+
+add :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
+add = CountMap.add
 
 difference :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
 difference = CountMap.minus
