@@ -8,6 +8,7 @@ module Data.Set.Signed
     , fromSet
     , toList
     , toMap
+    , toSet
     , null
     , lookup
     , member
@@ -87,6 +88,9 @@ toList = CountMap.toList
 
 toMap :: SignedSet a -> Map a Sign
 toMap = CountMap.toMap
+
+toSet :: SignedSet a -> Set a
+toSet = CountMap.toSet
 
 null :: SignedSet a -> Bool
 null = CountMap.null

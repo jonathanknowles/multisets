@@ -8,6 +8,7 @@ module Data.Bag
     , fromSet
     , toList
     , toMap
+    , toSet
     , null
     , lookup
     , member
@@ -89,6 +90,9 @@ toList = CountMap.toList
 
 toMap :: Bag a -> Map a Natural
 toMap = CountMap.toMap
+
+toSet :: Bag a -> Set a
+toSet = CountMap.toSet
 
 null :: Bag a -> Bool
 null = CountMap.null

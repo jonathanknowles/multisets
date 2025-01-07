@@ -8,6 +8,7 @@ module Data.Bag.Signed
     , fromSet
     , toList
     , toMap
+    , toSet
     , null
     , lookup
     , member
@@ -95,6 +96,9 @@ toList = CountMap.toList
 
 toMap :: SignedBag a -> Map a Integer
 toMap = CountMap.toMap
+
+toSet :: SignedBag a -> Set a
+toSet = CountMap.toSet
 
 null :: SignedBag a -> Bool
 null = CountMap.null
