@@ -85,13 +85,13 @@ instance Ord a => IsList (SignedSet a) where
     toList = CountMap.toList
 
 instance Show a => Show (Bag a) where
-    show = CountMap.showWith "Bag" "(+)"
+    show = CountMap.showFromList "Bag"
 
 instance Show a => Show (SignedBag a) where
-    show = CountMap.showWith "SignedBag" "(+)"
+    show = CountMap.showFromList "SignedBag"
 
 instance Show a => Show (SignedSet a) where
-    show = CountMap.showWith "SignedSet" "Sign.add"
+    show = CountMap.showFromListWith "SignedSet" "Sign.add"
 
 {- ORMOLU_DISABLE -}
 instance Foldable Bag where

@@ -69,12 +69,20 @@ type CountMap a c = MonoidMap a (Count c)
 
 type PackedCountMap p k c = (Packed p, Unpacked p ~ CountMap k c)
 
-showWith
+showFromList
+    :: PackedCountMap p k c
+    => Show k
+    => Show c
+    => String -> p -> String
+showFromList typeName m =
+    typeName <> ".fromList " <> Prelude.show (toList m)
+
+showFromListWith
     :: PackedCountMap p k c
     => Show k
     => Show c
     => String -> String -> p -> String
-showWith typeName operatorName m =
+showFromListWith typeName operatorName m =
     typeName <> ".fromListWith " <> operatorName <> " " <> show (toList m)
 
 empty :: PackedCountMap p k c => p
@@ -96,11 +104,13 @@ fromList
     => [(k, c)]
     -> p
 fromList =
+{- ORMOLU_DISABLE -}
     fromListWith $
         coerce
             @(Count c -> Count c -> Count c)
-            @(c -> c -> c)
+            @(      c ->       c ->       c)
             mappend
+{- ORMOLU_ENABLE -}
 
 fromListWith
     :: PackedCountMap p k c
