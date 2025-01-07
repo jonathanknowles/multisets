@@ -2,8 +2,10 @@ module Data.Bag.Signed
     ( SignedBag
     , empty
     , singleton
+    , fromList
     , fromListWith
     , fromMap
+    , fromSet
     , toList
     , toMap
     , null
@@ -40,6 +42,9 @@ import Data.Foldable1
 import Data.Map.Strict
     ( Map
     )
+import Data.Set
+    ( Set
+    )
 import Internal.Data.CountMap qualified as CountMap
 import Internal.Shared
     ( SignedBag, Bag )
@@ -59,6 +64,9 @@ empty = CountMap.empty
 singleton :: Ord a => a -> SignedBag a
 singleton = CountMap.singleton
 
+fromList :: Ord a => [(a, Integer)] -> SignedBag a
+fromList = CountMap.fromList
+
 fromListWith
     :: Ord a
     => (Integer -> Integer -> Integer)
@@ -68,6 +76,9 @@ fromListWith = CountMap.fromListWith
 
 fromMap :: Map a Integer -> SignedBag a
 fromMap = CountMap.fromMap
+
+fromSet :: (a -> Integer) -> Set a -> SignedBag a
+fromSet = CountMap.fromSet
 
 toList :: SignedBag a -> [(a, Integer)]
 toList = CountMap.toList

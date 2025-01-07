@@ -80,6 +80,19 @@ singleton
     => k -> p
 singleton k = pack $ MonoidMap.singleton k one
 
+fromList
+    :: forall p k c. PackedCountMap p k c
+    => Ord k
+    => MonoidNull (Count c)
+    => [(k, c)]
+    -> p
+fromList =
+    fromListWith $
+    coerce
+        @(Count c -> Count c -> Count c)
+        @(c -> c -> c)
+        mappend
+
 fromListWith
     :: PackedCountMap p k c
     => Ord k
@@ -101,6 +114,14 @@ fromMap = pack . MonoidMap.fromMap . coerce @(Map k c) @(Map k (Count c))
 
 toMap :: forall p k c. PackedCountMap p k c => p -> Map k c
 toMap = coerce @(Map k (Count c)) @(Map k c) . MonoidMap.toMap . unpack
+
+fromSet
+    :: PackedCountMap p k c
+    => MonoidNull (Count c)
+    => (k -> c)
+    -> Set k
+    -> p
+fromSet f s = pack $ MonoidMap.fromSet (coerce f) s
 
 null :: PackedCountMap p k c => p -> Bool
 null = MonoidMap.null . unpack

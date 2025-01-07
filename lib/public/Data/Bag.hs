@@ -1,11 +1,11 @@
-{-# OPTIONS_GHC -Wno-orphans #-}
-
 module Data.Bag
     ( Bag
     , empty
     , singleton
+    , fromList
     , fromListWith
     , fromMap
+    , fromSet
     , toList
     , toMap
     , null
@@ -36,6 +36,9 @@ import Data.Foldable1
 import Data.Map.Strict
     ( Map
     )
+import Data.Set
+    ( Set
+    )
 import Numeric.Natural
     ( Natural
     )
@@ -44,15 +47,19 @@ import Prelude hiding
     , null
     , sum
     )
-import qualified Internal.Data.CountMap as CountMap
+import Internal.Data.CountMap qualified as CountMap
 import Internal.Shared
-    ( Bag )
+    ( Bag
+    )
 
 empty :: Bag a
 empty = CountMap.empty
 
 singleton :: Ord a => a -> Bag a
 singleton = CountMap.singleton
+
+fromList :: Ord a => [(a, Natural)] -> Bag a
+fromList = CountMap.fromList
 
 fromListWith
     :: Ord a
@@ -63,6 +70,9 @@ fromListWith = CountMap.fromListWith
 
 fromMap :: Map a Natural -> Bag a
 fromMap = CountMap.fromMap
+
+fromSet :: (a -> Natural) -> Set a -> Bag a
+fromSet = CountMap.fromSet
 
 toList :: Bag a -> [(a, Natural)]
 toList = CountMap.toList

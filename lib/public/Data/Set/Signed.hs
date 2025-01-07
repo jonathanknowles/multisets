@@ -5,6 +5,7 @@ module Data.Set.Signed
     , singleton
     , fromListWith
     , fromMap
+    , fromSet
     , toList
     , toMap
     , null
@@ -64,6 +65,9 @@ fromListWith = CountMap.fromListWith
 
 fromMap :: Map a Sign -> SignedSet a
 fromMap = CountMap.fromMap
+
+fromSet :: (a -> Sign) -> Set a -> SignedSet a
+fromSet = CountMap.fromSet
 
 toList :: SignedSet a -> [(a, Sign)]
 toList = CountMap.toList
