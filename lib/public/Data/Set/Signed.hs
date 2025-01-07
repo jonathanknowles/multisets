@@ -39,6 +39,9 @@ import Data.Foldable1
 import Data.Map.Strict
     ( Map
     )
+import Data.Set
+    ( Set
+    )
 import Internal.Data.CountMap qualified as CountMap
 import Internal.Data.Sign
     ( Sign (..)
