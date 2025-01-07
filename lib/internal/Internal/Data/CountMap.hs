@@ -10,6 +10,7 @@ module Internal.Data.CountMap where
 import Data.Coerce
     ( coerce
     )
+import Data.Foldable qualified as F
 import Data.Foldable qualified as Foldable
 import Data.Foldable1
     ( Foldable1
@@ -63,7 +64,6 @@ import Numeric.Natural
 import Prelude hiding
     ( sum
     )
-import qualified Data.Foldable as F
 
 type CountMap a c = MonoidMap a (Count c)
 
@@ -89,17 +89,18 @@ singleton
 singleton k = pack $ MonoidMap.singleton k one
 
 fromList
-    :: forall p k c. PackedCountMap p k c
+    :: forall p k c
+     . PackedCountMap p k c
     => Ord k
     => MonoidNull (Count c)
     => [(k, c)]
     -> p
 fromList =
     fromListWith $
-    coerce
-        @(Count c -> Count c -> Count c)
-        @(c -> c -> c)
-        mappend
+        coerce
+            @(Count c -> Count c -> Count c)
+            @(c -> c -> c)
+            mappend
 
 fromListWith
     :: PackedCountMap p k c
@@ -198,52 +199,64 @@ foldMapKeys
     :: PackedCountMap p k c
     => Monoid m
     => (k -> m)
-    -> p -> m
+    -> p
+    -> m
 foldMapKeys f = F.foldMap f . toSet
 
 foldMapKeys'
     :: PackedCountMap p k c
     => Monoid m
     => (k -> m)
-    -> p -> m
+    -> p
+    -> m
 foldMapKeys' f = F.foldMap' f . toSet
 
 foldlWithCount
     :: PackedCountMap p k c
     => (r -> k -> c -> r)
-    -> r -> p -> r
+    -> r
+    -> p
+    -> r
 foldlWithCount f r p = MonoidMap.foldlWithKey (coerce f) r (unpack p)
 
 foldlWithCount'
     :: PackedCountMap p k c
     => (r -> k -> c -> r)
-    -> r -> p -> r
+    -> r
+    -> p
+    -> r
 foldlWithCount' f r p = MonoidMap.foldlWithKey' (coerce f) r (unpack p)
 
 foldrWithCount
     :: PackedCountMap p k c
     => (k -> c -> r -> r)
-    -> r -> p -> r
+    -> r
+    -> p
+    -> r
 foldrWithCount f r p = MonoidMap.foldrWithKey (coerce f) r (unpack p)
 
 foldrWithCount'
     :: PackedCountMap p k c
     => (k -> c -> r -> r)
-    -> r -> p -> r
+    -> r
+    -> p
+    -> r
 foldrWithCount' f r p = MonoidMap.foldrWithKey' (coerce f) r (unpack p)
 
 foldMapWithCount
     :: PackedCountMap p k c
     => Monoid m
     => (k -> c -> m)
-    -> p -> m
+    -> p
+    -> m
 foldMapWithCount f p = MonoidMap.foldMapWithKey (coerce f) (unpack p)
 
 foldMapWithCount'
     :: PackedCountMap p k c
     => Monoid m
     => (k -> c -> m)
-    -> p -> m
+    -> p
+    -> m
 foldMapWithCount' f p = MonoidMap.foldMapWithKey' (coerce f) (unpack p)
 
 invert

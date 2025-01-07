@@ -25,6 +25,9 @@ import Data.Semigroup.Cancellative
 import Data.Semigroup.Commutative
     ( Commutative
     )
+import GHC.IsList
+    ( IsList (..)
+    )
 import Internal.Data.CountMap
     ( CountMap
     )
@@ -65,6 +68,21 @@ instance Packed (SignedBag a) where
 
 instance Packed (SignedSet a) where
     type Unpacked (SignedSet a) = CountMap a Sign
+
+instance Ord a => IsList (Bag a) where
+    type Item (Bag a) = (a, Natural)
+    fromList = CountMap.fromList
+    toList = CountMap.toList
+
+instance Ord a => IsList (SignedBag a) where
+    type Item (SignedBag a) = (a, Integer)
+    fromList = CountMap.fromList
+    toList = CountMap.toList
+
+instance Ord a => IsList (SignedSet a) where
+    type Item (SignedSet a) = (a, Sign)
+    fromList = CountMap.fromList
+    toList = CountMap.toList
 
 instance Show a => Show (Bag a) where
     show = CountMap.showWith "Bag" "(+)"
