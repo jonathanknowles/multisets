@@ -269,6 +269,15 @@ foldMapWithCount'
     -> m
 foldMapWithCount' f p = MonoidMap.foldMapWithKey' (coerce f) (unpack p)
 
+map
+    :: PackedCountMap p1 k1 c
+    => PackedCountMap p2 k2 c
+    => Ord k2
+    => MonoidNull (Count c)
+    => (k1 -> k2)
+    -> (p1 -> p2)
+map f = unpacked (MonoidMap.mapKeys f)
+
 invert
     :: PackedCountMap p a c
     => MonoidNull (Count c)

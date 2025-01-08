@@ -2,25 +2,40 @@ module Data.Bag.Signed
     (
     -- * Type
       SignedBag
+
+    -- * Construction
     , empty
     , singleton
     , fromList
     , fromListWith
     , fromMap
     , fromSet
+
+    -- * Deconstruction
     , toList
     , toMap
     , toSet
+
+    -- * Membership
     , null
     , lookup
     , member
+
+    -- * Folding
     , foldlWithCount
     , foldlWithCount'
     , foldrWithCount
     , foldrWithCount'
     , foldMapWithCount
     , foldMapWithCount'
+
+    -- * Mapping
+    , map
+
+    -- * Transformation
     , invert
+
+    -- * Combination
     , union
     , unions1
     , intersection
@@ -29,6 +44,8 @@ module Data.Bag.Signed
     , difference
     , symmetricDifference
     , symmetricDifferenceUnsigned
+
+    -- * Comparison
     , isLessThan
     , isLessThanOrEqualTo
     , isGreaterThan
@@ -41,6 +58,8 @@ module Data.Bag.Signed
     , isSymmetricSuperbagOf
     , isProperSymmetricSubbagOf
     , isProperSymmetricSuperbagOf
+
+    -- * Combinatorics
     , symmetricPowersetElements
     , symmetricPowersetSize
     )
@@ -68,6 +87,7 @@ import Prelude hiding
     , foldr
     , foldMap
     , lookup
+    , map
     , null
     , sum
     )
@@ -129,6 +149,9 @@ foldMapWithCount = CountMap.foldMapWithCount
 
 foldMapWithCount' :: Monoid m => (a -> Integer -> m) -> SignedBag a -> m
 foldMapWithCount' = CountMap.foldMapWithCount'
+
+map :: Ord b => (a -> b) -> Bag a -> Bag b
+map = CountMap.map
 
 invert :: SignedBag a -> SignedBag a
 invert = CountMap.invert

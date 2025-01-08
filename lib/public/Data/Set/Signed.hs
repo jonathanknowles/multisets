@@ -1,28 +1,47 @@
 module Data.Set.Signed
-    ( Sign (..)
+    (
+    -- * Types
+      Sign (..)
     , SignedSet
+
+    -- * Construction
     , empty
     , singleton
     , fromListWith
     , fromMap
     , fromSet
+
+    -- * Deconstruction
     , toList
     , toMap
     , toSet
+
+    -- * Membership
     , null
     , lookup
     , member
+
+    -- * Folding
     , foldlWithSign
     , foldlWithSign'
     , foldrWithSign
     , foldrWithSign'
     , foldMapWithSign
     , foldMapWithSign'
+
+    -- * Mapping
+    , map
+
+    -- * Transformation
     , invert
+
+    -- * Combination
     , union
     , unions1
     , intersection
     , intersections1
+
+    -- * Comparison
     , isLessThan
     , isLessThanOrEqualTo
     , isGreaterThan
@@ -35,6 +54,8 @@ module Data.Set.Signed
     , isSymmetricSupersetOf
     , isProperSymmetricSubsetOf
     , isProperSymmetricSupersetOf
+
+    -- * Combinatorics
     , symmetricPowersetElements
     , symmetricPowersetSize
     )
@@ -65,6 +86,7 @@ import Prelude hiding
     , foldr
     , foldMap
     , lookup
+    , map
     , null
     )
 
@@ -118,6 +140,9 @@ foldMapWithSign = CountMap.foldMapWithCount
 
 foldMapWithSign' :: Monoid m => (a -> Sign -> m) -> SignedSet a -> m
 foldMapWithSign' = CountMap.foldMapWithCount'
+
+map :: Ord b => (a -> b) -> SignedSet a -> SignedSet b
+map = CountMap.map
 
 invert :: SignedSet a -> SignedSet a
 invert = CountMap.invert

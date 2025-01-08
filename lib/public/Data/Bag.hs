@@ -29,6 +29,9 @@ module Data.Bag
     , foldMapWithCount
     , foldMapWithCount'
 
+    -- * Mapping
+    , map
+
     -- * Combination
     , union
     , unions
@@ -72,6 +75,7 @@ import Prelude hiding
     , foldr
     , foldMap
     , lookup
+    , map
     , null
     , sum
     )
@@ -137,6 +141,9 @@ foldMapWithCount = CountMap.foldMapWithCount
 
 foldMapWithCount' :: Monoid m => (a -> Natural -> m) -> Bag a -> m
 foldMapWithCount' = CountMap.foldMapWithCount'
+
+map :: Ord b => (a -> b) -> Bag a -> Bag b
+map = CountMap.map
 
 union :: Ord a => Bag a -> Bag a -> Bag a
 union = CountMap.union
