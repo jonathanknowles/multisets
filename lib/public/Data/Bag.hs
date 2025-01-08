@@ -1,23 +1,35 @@
 module Data.Bag
-    ( Bag
+    (
+    -- * Type
+      Bag
+
+    -- * Construction
     , empty
     , singleton
     , fromList
     , fromListWith
     , fromMap
     , fromSet
+
+    -- * Deconstruction
     , toList
     , toMap
     , toSet
+
+    -- * Membership
     , null
     , lookup
     , member
+
+    -- * Folding
     , foldlWithCount
     , foldlWithCount'
     , foldrWithCount
     , foldrWithCount'
     , foldMapWithCount
     , foldMapWithCount'
+
+    -- * Combination
     , union
     , unions
     , intersection
@@ -25,6 +37,8 @@ module Data.Bag
     , add
     , difference
     , symmetricDifference
+
+    -- * Comparison
     , isLessThan
     , isLessThanOrEqualTo
     , isGreaterThan
@@ -33,6 +47,8 @@ module Data.Bag
     , isSuperbagOf
     , isProperSubbagOf
     , isProperSuperbagOf
+
+    -- * Combinatorics
     , powersetElements
     , powersetSize
     )

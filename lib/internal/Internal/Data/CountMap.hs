@@ -161,65 +161,65 @@ member
     => k -> p -> Bool
 member k = MonoidMap.nonNullKey k . unpack
 
-foldKeys
+foldRoots
     :: PackedCountMap p k c
     => Monoid k
     => p -> k
-foldKeys = F.fold . toSet
+foldRoots = F.fold . toSet
 
-foldKeys'
+foldRoots'
     :: PackedCountMap p k c
     => Monoid k
     => p -> k
-foldKeys' = F.foldMap' id . toSet
+foldRoots' = F.foldMap' id . toSet
 
-foldlKeys
+foldlRoots
     :: PackedCountMap p k c
     => (r -> k -> r)
     -> r
     -> p
     -> r
-foldlKeys f r p = F.foldl f r (toSet p)
+foldlRoots f r p = F.foldl f r (toSet p)
 
-foldlKeys'
+foldlRoots'
     :: PackedCountMap p k c
     => (r -> k -> r)
     -> r
     -> p
     -> r
-foldlKeys' f r p = F.foldl' f r (toSet p)
+foldlRoots' f r p = F.foldl' f r (toSet p)
 
-foldrKeys
+foldrRoots
     :: PackedCountMap p k c
     => (k -> r -> r)
     -> r
     -> p
     -> r
-foldrKeys f r p = F.foldr f r (toSet p)
+foldrRoots f r p = F.foldr f r (toSet p)
 
-foldrKeys'
+foldrRoots'
     :: PackedCountMap p k c
     => (k -> r -> r)
     -> r
     -> p
     -> r
-foldrKeys' f r p = F.foldr' f r (toSet p)
+foldrRoots' f r p = F.foldr' f r (toSet p)
 
-foldMapKeys
+foldMapRoots
     :: PackedCountMap p k c
     => Monoid m
     => (k -> m)
     -> p
     -> m
-foldMapKeys f = F.foldMap f . toSet
+foldMapRoots f = F.foldMap f . toSet
 
-foldMapKeys'
+foldMapRoots'
     :: PackedCountMap p k c
     => Monoid m
     => (k -> m)
     -> p
     -> m
-foldMapKeys' f = F.foldMap' f . toSet
+foldMapRoots' f = F.foldMap' f . toSet
 
 foldlWithCount
     :: PackedCountMap p k c

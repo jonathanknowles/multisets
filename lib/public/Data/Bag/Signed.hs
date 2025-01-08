@@ -1,5 +1,7 @@
 module Data.Bag.Signed
-    ( SignedBag
+    (
+    -- * Type
+      SignedBag
     , empty
     , singleton
     , fromList

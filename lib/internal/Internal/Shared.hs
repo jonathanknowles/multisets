@@ -1,8 +1,5 @@
 module Internal.Shared where
 
-import Data.Foldable
-    ( Foldable (..)
-    )
 import Data.Group
     ( Group
     )
@@ -93,35 +90,54 @@ instance Show a => Show (SignedBag a) where
 instance Show a => Show (SignedSet a) where
     show = CountMap.showFromListWith "SignedSet" "Sign.add"
 
+-- Think about the relative utility of:
+--
+-- - folding over just the roots of a set
+-- - folding over each element n times, where n is the multiplicity
+--
+-- Consider whether the latter can be made more efficient in the case of large
+-- multiplicities.
+--
+-- There are many possible cases to consider:
+--
+-- Roots         - fold over the entire root set
+-- RootsNegative - fold over the negative subset of the root set (not for Bag)
+-- RootsPositive - fold over the positive subset of the root set (not for Bag)
+-- Unary         - fold over all repetitions of each element (only for Bag)
+-- UnaryNegative - fold over all repetitions of each positive element
+-- UnaryPositive - fold over all repetitions of each negative element
+{-
+
 {- ORMOLU_DISABLE -}
 instance Foldable Bag where
-    fold     = CountMap.foldKeys
-    foldMap  = CountMap.foldMapKeys
-    foldMap' = CountMap.foldMapKeys'
-    foldr    = CountMap.foldrKeys
-    foldr'   = CountMap.foldrKeys'
-    foldl    = CountMap.foldlKeys
-    foldl'   = CountMap.foldlKeys'
+    fold     = CountMap.foldRoots
+    foldMap  = CountMap.foldMapRoots
+    foldMap' = CountMap.foldMapRoots'
+    foldr    = CountMap.foldrRoots
+    foldr'   = CountMap.foldrRoots'
+    foldl    = CountMap.foldlRoots
+    foldl'   = CountMap.foldlRoots'
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
 instance Foldable SignedBag where
-    fold     = CountMap.foldKeys
-    foldMap  = CountMap.foldMapKeys
-    foldMap' = CountMap.foldMapKeys'
-    foldr    = CountMap.foldrKeys
-    foldr'   = CountMap.foldrKeys'
-    foldl    = CountMap.foldlKeys
-    foldl'   = CountMap.foldlKeys'
+    fold     = CountMap.foldRoots
+    foldMap  = CountMap.foldMapRoots
+    foldMap' = CountMap.foldMapRoots'
+    foldr    = CountMap.foldrRoots
+    foldr'   = CountMap.foldrRoots'
+    foldl    = CountMap.foldlRoots
+    foldl'   = CountMap.foldlRoots'
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
 instance Foldable SignedSet where
-    fold     = CountMap.foldKeys
-    foldMap  = CountMap.foldMapKeys
-    foldMap' = CountMap.foldMapKeys'
-    foldr    = CountMap.foldrKeys
-    foldr'   = CountMap.foldrKeys'
-    foldl    = CountMap.foldlKeys
-    foldl'   = CountMap.foldlKeys'
+    fold     = CountMap.foldRoots
+    foldMap  = CountMap.foldMapRoots
+    foldMap' = CountMap.foldMapRoots'
+    foldr    = CountMap.foldrRoots
+    foldr'   = CountMap.foldrRoots'
+    foldl    = CountMap.foldlRoots
+    foldl'   = CountMap.foldlRoots'
 {- ORMOLU_ENABLE -}
+-}
