@@ -22,12 +22,12 @@ module Data.Bag
     , member
 
     -- * Folding
-    , foldlWithCount
-    , foldlWithCount'
-    , foldrWithCount
-    , foldrWithCount'
-    , foldMapWithCount
-    , foldMapWithCount'
+    , foldl
+    , foldl'
+    , foldr
+    , foldr'
+    , foldMap
+    , foldMap'
 
     -- * Mapping
     , map
@@ -124,23 +124,23 @@ lookup = CountMap.lookup
 member :: Ord a => a -> Bag a -> Bool
 member = CountMap.member
 
-foldlWithCount :: (r -> a -> Natural -> r) -> r -> Bag a -> r
-foldlWithCount = CountMap.foldlWithCount
+foldl :: (r -> a -> Natural -> r) -> r -> Bag a -> r
+foldl = CountMap.foldl
 
-foldlWithCount' :: (r -> a -> Natural -> r) -> r -> Bag a -> r
-foldlWithCount' = CountMap.foldlWithCount'
+foldl' :: (r -> a -> Natural -> r) -> r -> Bag a -> r
+foldl' = CountMap.foldl'
 
-foldrWithCount :: (a -> Natural -> r -> r) -> r -> Bag a -> r
-foldrWithCount = CountMap.foldrWithCount
+foldr :: (a -> Natural -> r -> r) -> r -> Bag a -> r
+foldr = CountMap.foldr
 
-foldrWithCount' :: (a -> Natural -> r -> r) -> r -> Bag a -> r
-foldrWithCount' = CountMap.foldrWithCount'
+foldr' :: (a -> Natural -> r -> r) -> r -> Bag a -> r
+foldr' = CountMap.foldr'
 
-foldMapWithCount :: Monoid m => (a -> Natural -> m) -> Bag a -> m
-foldMapWithCount = CountMap.foldMapWithCount
+foldMap :: Monoid m => (a -> Natural -> m) -> Bag a -> m
+foldMap = CountMap.foldMap
 
-foldMapWithCount' :: Monoid m => (a -> Natural -> m) -> Bag a -> m
-foldMapWithCount' = CountMap.foldMapWithCount'
+foldMap' :: Monoid m => (a -> Natural -> m) -> Bag a -> m
+foldMap' = CountMap.foldMap'
 
 map :: Ord b => (a -> b) -> Bag a -> Bag b
 map = CountMap.map

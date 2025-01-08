@@ -221,53 +221,53 @@ foldMapRoots'
     -> m
 foldMapRoots' f = F.foldMap' f . toSet
 
-foldlWithCount
+foldl
     :: PackedCountMap p k c
     => (r -> k -> c -> r)
     -> r
     -> p
     -> r
-foldlWithCount f r p = MonoidMap.foldlWithKey (coerce f) r (unpack p)
+foldl f r p = MonoidMap.foldlWithKey (coerce f) r (unpack p)
 
-foldlWithCount'
+foldl'
     :: PackedCountMap p k c
     => (r -> k -> c -> r)
     -> r
     -> p
     -> r
-foldlWithCount' f r p = MonoidMap.foldlWithKey' (coerce f) r (unpack p)
+foldl' f r p = MonoidMap.foldlWithKey' (coerce f) r (unpack p)
 
-foldrWithCount
+foldr
     :: PackedCountMap p k c
     => (k -> c -> r -> r)
     -> r
     -> p
     -> r
-foldrWithCount f r p = MonoidMap.foldrWithKey (coerce f) r (unpack p)
+foldr f r p = MonoidMap.foldrWithKey (coerce f) r (unpack p)
 
-foldrWithCount'
+foldr'
     :: PackedCountMap p k c
     => (k -> c -> r -> r)
     -> r
     -> p
     -> r
-foldrWithCount' f r p = MonoidMap.foldrWithKey' (coerce f) r (unpack p)
+foldr' f r p = MonoidMap.foldrWithKey' (coerce f) r (unpack p)
 
-foldMapWithCount
+foldMap
     :: PackedCountMap p k c
     => Monoid m
     => (k -> c -> m)
     -> p
     -> m
-foldMapWithCount f p = MonoidMap.foldMapWithKey (coerce f) (unpack p)
+foldMap f p = MonoidMap.foldMapWithKey (coerce f) (unpack p)
 
-foldMapWithCount'
+foldMap'
     :: PackedCountMap p k c
     => Monoid m
     => (k -> c -> m)
     -> p
     -> m
-foldMapWithCount' f p = MonoidMap.foldMapWithKey' (coerce f) (unpack p)
+foldMap' f p = MonoidMap.foldMapWithKey' (coerce f) (unpack p)
 
 map
     :: PackedCountMap p1 k1 c
