@@ -31,6 +31,10 @@ module Data.Bag.Signed
 
     -- * Mapping
     , map
+    , mapAdd
+    , mapMin
+    , mapMax
+    , mapCounts
 
     -- * Transformation
     , invert
@@ -150,8 +154,25 @@ foldMap = CountMap.foldMap
 foldMap' :: Monoid m => (a -> Integer -> m) -> SignedBag a -> m
 foldMap' = CountMap.foldMap'
 
-map :: Ord b => (a -> b) -> Bag a -> Bag b
+map
+    :: Ord b
+    => (Integer -> Integer -> Integer)
+    -> (a -> b)
+    -> SignedBag a
+    -> SignedBag b
 map = CountMap.map
+
+mapAdd :: Ord b => (a -> b) -> SignedBag a -> SignedBag b
+mapAdd = CountMap.mapAdd
+
+mapMin :: Ord b => (a -> b) -> SignedBag a -> SignedBag b
+mapMin = CountMap.mapMin
+
+mapMax :: Ord b => (a -> b) -> SignedBag a -> SignedBag b
+mapMax = CountMap.mapMax
+
+mapCounts :: (Integer -> Integer) -> SignedBag a -> SignedBag a
+mapCounts = CountMap.mapCounts
 
 invert :: SignedBag a -> SignedBag a
 invert = CountMap.invert
