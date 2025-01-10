@@ -40,11 +40,12 @@ module Data.Bag.Signed
     , invert
 
     -- * Combination
-    , union
-    , unions1
-    , intersection
-    , intersections1
     , add
+    , addMany
+    , union
+    , unionMany1
+    , intersection
+    , intersectionMany1
     , difference
     , symmetricDifference
     , symmetricDifferenceUnsigned
@@ -177,20 +178,23 @@ mapCounts = CountMap.mapCounts
 invert :: SignedBag a -> SignedBag a
 invert = CountMap.invert
 
+add :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
+add = CountMap.add
+
+addMany :: Foldable f => Ord a => f (SignedBag a) -> SignedBag a
+addMany = CountMap.addMany
+
 union :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
 union = CountMap.union
 
-unions1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
-unions1 = CountMap.unions1
+unionMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
+unionMany1 = CountMap.unionMany1
 
 intersection :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
 intersection = CountMap.intersection
 
-intersections1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
-intersections1 = CountMap.intersections1
-
-add :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
-add = CountMap.add
+intersectionMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
+intersectionMany1 = CountMap.intersectionMany1
 
 difference :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
 difference = CountMap.minus

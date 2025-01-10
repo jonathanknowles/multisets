@@ -37,11 +37,12 @@ module Data.Bag
     , mapCounts
 
     -- * Combination
-    , union
-    , unions
-    , intersection
-    , intersections1
     , add
+    , addMany
+    , union
+    , unionMany
+    , intersection
+    , intersectionMany1
     , difference
     , symmetricDifference
 
@@ -161,20 +162,23 @@ mapMax = CountMap.mapMax
 mapCounts :: (Natural -> Natural) -> Bag a -> Bag a
 mapCounts = CountMap.mapCounts
 
+add :: Ord a => Bag a -> Bag a -> Bag a
+add = CountMap.add
+
+addMany :: Foldable f => Ord a => f (Bag a) -> Bag a
+addMany = CountMap.addMany
+
 union :: Ord a => Bag a -> Bag a -> Bag a
 union = CountMap.union
 
-unions :: Foldable f => Ord a => f (Bag a) -> Bag a
-unions = CountMap.unions
+unionMany :: Foldable f => Ord a => f (Bag a) -> Bag a
+unionMany = CountMap.unionMany
 
 intersection :: Ord a => Bag a -> Bag a -> Bag a
 intersection = CountMap.intersection
 
-intersections1 :: Foldable1 f => Ord a => f (Bag a) -> Bag a
-intersections1 = CountMap.intersections1
-
-add :: Ord a => Bag a -> Bag a -> Bag a
-add = CountMap.add
+intersectionMany1 :: Foldable1 f => Ord a => f (Bag a) -> Bag a
+intersectionMany1 = CountMap.intersectionMany1
 
 difference :: Ord a => Bag a -> Bag a -> Bag a
 difference = CountMap.monus

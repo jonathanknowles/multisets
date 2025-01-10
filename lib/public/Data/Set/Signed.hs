@@ -41,9 +41,9 @@ module Data.Set.Signed
 
     -- * Combination
     , union
-    , unions1
+    , unionMany1
     , intersection
-    , intersections1
+    , intersectionMany1
 
     -- * Comparison
     , isLessThan
@@ -171,14 +171,14 @@ invert = CountMap.invert
 union :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
 union = CountMap.union
 
-unions1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
-unions1 = CountMap.unions1
+unionMany1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
+unionMany1 = CountMap.unionMany1
 
 intersection :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
 intersection = CountMap.intersection
 
-intersections1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
-intersections1 = CountMap.intersections1
+intersectionMany1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
+intersectionMany1 = CountMap.intersectionMany1
 
 isLessThan :: Ord a => SignedSet a -> SignedSet a -> Bool
 isLessThan = CountMap.isLessThan
