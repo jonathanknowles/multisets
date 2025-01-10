@@ -28,6 +28,8 @@ import GHC.IsList
     )
 import Internal.Data.CountMap
     ( CountMap
+    , Lex (Lex)
+    , CoLex (CoLex)
     )
 import Internal.Data.CountMap qualified as CountMap
 import Internal.Data.Packed
@@ -40,11 +42,6 @@ import Numeric.Natural
     ( Natural
     )
 import Prelude
-
-newtype Lex a = Lex a
-    deriving Eq
-newtype CoLex a = CoLex a
-    deriving Eq
 
 newtype Bag a = Bag (CountMap a Natural)
     deriving newtype (Eq)

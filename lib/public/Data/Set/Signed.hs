@@ -63,6 +63,7 @@ module Data.Set.Signed
     , isProperSymmetricSupersetOf
 
     -- * Combinatorics
+    , symmetricPowerset
     , symmetricPowersetElements
     , symmetricPowersetSize
     )
@@ -76,6 +77,9 @@ import Data.Map.Strict
     )
 import Data.Set
     ( Set
+    )
+import Internal.Data.CountMap
+    ( Lex
     )
 import Internal.Data.CountMap qualified as CountMap
 import Internal.Data.Sign
@@ -214,6 +218,9 @@ isProperSymmetricSubsetOf = CountMap.isProperSymmetricSubmapOf
 
 isProperSymmetricSupersetOf :: Ord a => SignedSet a -> SignedSet a -> Bool
 isProperSymmetricSupersetOf = CountMap.isProperSymmetricSupermapOf
+
+powerset :: Ord a => SignedSet a -> Set (Lex (SignedSet a))
+powerset = CountMap.powerset
 
 symmetricPowersetElements :: Ord a => SignedSet a -> [SignedSet a]
 symmetricPowersetElements = CountMap.symmetricPowersetElements

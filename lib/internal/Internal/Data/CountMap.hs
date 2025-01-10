@@ -76,6 +76,11 @@ type PackedCountMap p k c = (Packed p, Unpacked p ~ CountMap k c)
 
 type Naked c = c
 
+newtype Lex a = Lex a
+    deriving Eq
+newtype CoLex a = CoLex a
+    deriving Eq
+
 showFromList
     :: PackedCountMap p k c
     => Show k
@@ -617,11 +622,11 @@ powerset
     :: PackedCountMap p k c
     => MonoidNull (Count c)
     => PositiveMonoid (Count c)
-    => Ord p
+    => Ord (Lex p)
     => Ord k
     => Enum (Count c)
-    => p -> Set p
-powerset = Set.fromList . powersetElements
+    => p -> Set (Lex p)
+powerset = Set.fromList . coerce . powersetElements
 
 -- Generates all subsets in lexicographic order.
 powersetElements
@@ -659,12 +664,12 @@ symmetricPowerset
     :: PackedCountMap p k c
     => MonoidNull (Count c)
     => Group (Count c)
-    => Ord p
+    => Ord (Lex p)
     => Ord k
     => Ord c
     => Enum (Count c)
-    => p -> Set p
-symmetricPowerset = Set.fromList . symmetricPowersetElements
+    => p -> Set (Lex p)
+symmetricPowerset = Set.fromList . coerce . symmetricPowersetElements
 
 -- Generates all symmetric subsets in lexicograhic order.
 symmetricPowersetElements
