@@ -29,13 +29,13 @@ import Data.Semiring
 import Internal.Data.Monoid
     ( Sum (Sum)
     )
-import Internal.Data.Monoid qualified as Sign
 import Internal.Data.Packed
     ( Packed (Unpacked)
     )
 import Internal.Data.Sign
-    ( Sign (Negative, Positive, Zero)
+    ( Sign
     )
+import Internal.Data.Sign qualified as Sign
 import Numeric.Natural
     ( Natural
     )
@@ -49,11 +49,11 @@ instance Packed (Count a) where
     type Unpacked (Count a) = a
 
 {- ORMOLU_DISABLE -}
-deriving via Sign.Sum Sign instance Semigroup   (Count Sign)
-deriving via Sign.Sum Sign instance Commutative (Count Sign)
-deriving via Sign.Sum Sign instance Monoid      (Count Sign)
-deriving via Sign.Sum Sign instance MonoidNull  (Count Sign)
-deriving via Sign.Sum Sign instance Group       (Count Sign)
+deriving via Sum Sign instance Semigroup   (Count Sign)
+deriving via Sum Sign instance Commutative (Count Sign)
+deriving via Sum Sign instance Monoid      (Count Sign)
+deriving via Sum Sign instance MonoidNull  (Count Sign)
+deriving via Sum Sign instance Group       (Count Sign)
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
@@ -99,13 +99,13 @@ instance CountMagnitude Natural where
 {- ORMOLU_DISABLE -}
 instance CountMagnitude Sign where
     countToInteger (Count s) = case s of
-        Negative -> -1
-        Zero     ->  0
-        Positive ->  1
+        Sign.N -> -1
+        Sign.Z ->  0
+        Sign.P ->  1
     countToNatural (Count s) = case s of
-        Negative ->  1
-        Zero     ->  0
-        Positive ->  1
+        Sign.N ->  1
+        Sign.Z ->  0
+        Sign.P ->  1
 {- ORMOLU_ENABLE -}
 
 class CountSymmetricDifference c where

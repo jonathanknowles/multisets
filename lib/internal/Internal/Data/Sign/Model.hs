@@ -12,20 +12,16 @@ null s = signToIntegral @Int s == 0
 invert :: Sign -> Sign
 invert s = Sign.fromNum @Int $ negate $ signToIntegral s
 
-{- ORMOLU_DISABLE -}
 add :: Sign -> Sign -> Sign
-add s1 s2
-    = Sign.fromNum @Int
-    $ (`moduloInclusiveRange` (-1, 1))
-    $ signToIntegral s1 + signToIntegral s2
-{- ORMOLU_ENABLE -}
+add s1 s2 =
+    Sign.fromNum @Int $
+        (`moduloInclusiveRange` (-1, 1)) $
+            signToIntegral s1 + signToIntegral s2
 
-{- ORMOLU_DISABLE -}
 multiply :: Sign -> Sign -> Sign
-multiply s1 s2
-    = Sign.fromNum @Int
-    $ signToIntegral s1 * signToIntegral s2
-{- ORMOLU_ENABLE -}
+multiply s1 s2 =
+    Sign.fromNum @Int $
+        signToIntegral s1 * signToIntegral s2
 
 --------------------------------------------------------------------------------
 -- Utilities
@@ -34,10 +30,8 @@ multiply s1 s2
 moduloInclusiveRange :: Integral i => i -> (i, i) -> i
 moduloInclusiveRange i (lo, hi) = ((i - lo) `mod` (hi - lo + 1)) + lo
 
-{- ORMOLU_DISABLE -}
 signToIntegral :: Integral i => Sign -> i
 signToIntegral = \case
-    Negative -> -1
-    Zero     ->  0
-    Positive ->  1
-{- ORMOLU_ENABLE -}
+    N -> -1
+    Z -> 0
+    P -> 1

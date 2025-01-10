@@ -1,6 +1,25 @@
 module Internal.Data.CountMap where
 
 -- TODO:
+--
+-- addMany
+-- unionMany
+-- unionMany1
+--
+-- mapWith and fromListWith are similar
+--
+-- fromListUnary
+-- fromListWith
+-- fromListSum
+-- fromListUnion
+-- fromListIntersection
+--
+-- mapWith
+-- mapSum
+-- mapUnion
+-- mapIntersection
+-- map{Counts,Signs}
+--
 -- add
 -- filter
 -- partition
