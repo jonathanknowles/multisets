@@ -302,44 +302,6 @@ fromUnsignedPairWith f (s1, s2) =
     ns = fmap naturalToNegativeI <$> Bag.toList s1
     ps = fmap naturalToPositiveI <$> Bag.toList s2
 
-difference
-    :: Ord a
-    => SignedBag a
-    -> SignedBag a
-    -> SignedBag a
-difference (SignedBag m1) (SignedBag m2) =
-    undefined -- SignedBag $ m1 `MonoidMap.minus` m2
-
-symmetricDifference
-    :: Ord a
-    => SignedBag a
-    -> SignedBag a
-    -> SignedBag a
-symmetricDifference = undefined
-
-symmetricDifferenceUnsigned
-    :: Ord a
-    => SignedBag a
-    -> SignedBag a
-    -> Bag a
-symmetricDifferenceUnsigned (SignedBag s1) (SignedBag s2) =
-    Bag $ MonoidMap.unionWith (coerce integerDistance) s1 s2
-
-sum
-    :: Ord a
-    => SignedBag a
-    -> SignedBag a
-    -> SignedBag a
-sum (SignedBag m1) (SignedBag m2) =
-    SignedBag $ MonoidMap.unionWith (+) m1 m2
-
-sums
-    :: Foldable f
-    => Ord a
-    => f (SignedBag a)
-    -> SignedBag a
-sums = Foldable.foldl' sum empty
-
 isPositive :: SignedBag a -> Bool
 isPositive = undefined
 
@@ -363,10 +325,6 @@ maybePositiveSet = undefined
 
 maybeNegativeSet :: SignedBag a -> Maybe (Set a)
 maybeNegativeSet = undefined
-
--- The set of all symmetric subsets.
-symmetricPowerset :: Ord a => SignedBag a -> Set (SignedBag a)
-symmetricPowerset = Set.fromList . symmetricPowersetElements
 
 multiplicity :: Ord a => a -> SignedBag a -> I
 multiplicity a (SignedBag s) = coerce (MonoidMap.get a s)

@@ -2,17 +2,8 @@ module Internal.Data.CountMap where
 
 -- TODO:
 --
--- addMany
--- unionMany
--- unionMany1
---
--- mapWith and fromListWith are similar
---
 -- fromListUnary
 -- fromListWith
--- fromListSum
--- fromListUnion
--- fromListIntersection
 --
 -- add
 -- filter
