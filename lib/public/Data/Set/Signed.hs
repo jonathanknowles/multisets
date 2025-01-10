@@ -219,8 +219,8 @@ isProperSymmetricSubsetOf = CountMap.isProperSymmetricSubmapOf
 isProperSymmetricSupersetOf :: Ord a => SignedSet a -> SignedSet a -> Bool
 isProperSymmetricSupersetOf = CountMap.isProperSymmetricSupermapOf
 
-powerset :: Ord a => SignedSet a -> Set (Lex (SignedSet a))
-powerset = CountMap.powerset
+symmetricPowerset :: Ord a => SignedSet a -> Set (Lex (SignedSet a))
+symmetricPowerset = CountMap.symmetricPowerset
 
 symmetricPowersetElements :: Ord a => SignedSet a -> [SignedSet a]
 symmetricPowersetElements = CountMap.symmetricPowersetElements
