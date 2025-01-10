@@ -31,9 +31,7 @@ module Data.Bag
 
     -- * Mapping
     , map
-    , mapAdd
-    , mapMin
-    , mapMax
+    , mapWith
     , mapCounts
 
     -- * Combination
@@ -147,17 +145,16 @@ foldMap = CountMap.foldMap
 foldMap' :: Monoid m => (a -> Natural -> m) -> Bag a -> m
 foldMap' = CountMap.foldMap'
 
-map :: Ord b => (Natural -> Natural -> Natural) -> (a -> b) -> Bag a -> Bag b
+map :: Ord b => (a -> b) -> Bag a -> Bag b
 map = CountMap.map
 
-mapAdd :: Ord b => (a -> b) -> Bag a -> Bag b
-mapAdd = CountMap.mapAdd
-
-mapMin :: Ord b => (a -> b) -> Bag a -> Bag b
-mapMin = CountMap.mapMin
-
-mapMax :: Ord b => (a -> b) -> Bag a -> Bag b
-mapMax = CountMap.mapMax
+mapWith
+    :: Ord b
+    => (Natural -> Natural -> Natural)
+    -> (a -> b)
+    -> Bag a
+    -> Bag b
+mapWith = CountMap.mapWith
 
 mapCounts :: (Natural -> Natural) -> Bag a -> Bag a
 mapCounts = CountMap.mapCounts

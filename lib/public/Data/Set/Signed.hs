@@ -30,10 +30,7 @@ module Data.Set.Signed
     , foldMap'
 
     -- * Mapping
-    , map
-    , mapAdd
-    , mapMin
-    , mapMax
+    , mapWith
     , mapSigns
 
     -- * Transformation
@@ -145,22 +142,13 @@ foldMap = CountMap.foldMap
 foldMap' :: Monoid m => (a -> Sign -> m) -> SignedSet a -> m
 foldMap' = CountMap.foldMap'
 
-map
+mapWith
     :: Ord b
     => (Sign -> Sign -> Sign)
     -> (a -> b)
     -> SignedSet a
     -> SignedSet b
-map = CountMap.map
-
-mapAdd :: Ord b => (a -> b) -> SignedSet a -> SignedSet b
-mapAdd = CountMap.mapAdd
-
-mapMin :: Ord b => (a -> b) -> SignedSet a -> SignedSet b
-mapMin = CountMap.mapMin
-
-mapMax :: Ord b => (a -> b) -> SignedSet a -> SignedSet b
-mapMax = CountMap.mapMax
+mapWith = CountMap.mapWith
 
 mapSigns :: (Sign -> Sign) -> SignedSet a -> SignedSet a
 mapSigns = CountMap.mapCounts

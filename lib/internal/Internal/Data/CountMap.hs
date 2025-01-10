@@ -14,12 +14,6 @@ module Internal.Data.CountMap where
 -- fromListUnion
 -- fromListIntersection
 --
--- mapWith
--- mapSum
--- mapUnion
--- mapIntersection
--- map{Counts,Signs}
---
 -- add
 -- filter
 -- partition
@@ -294,39 +288,19 @@ map
     => PackedCountMap p2 k2 c
     => Ord k2
     => MonoidNull (Count c)
+    => (k1 -> k2)
+    -> (p1 -> p2)
+map f = unpacked (MonoidMap.mapKeysWith (<>) f)
+
+mapWith
+    :: PackedCountMap p1 k1 c
+    => PackedCountMap p2 k2 c
+    => Ord k2
+    => MonoidNull (Count c)
     => (c -> c -> c)
     -> (k1 -> k2)
     -> (p1 -> p2)
-map f g = unpacked (MonoidMap.mapKeysWith (coerce f) g)
-
-mapAdd
-    :: PackedCountMap p1 k1 c
-    => PackedCountMap p2 k2 c
-    => Ord k2
-    => MonoidNull (Count c)
-    => (k1 -> k2)
-    -> (p1 -> p2)
-mapAdd f = unpacked (MonoidMap.mapKeysWith (<>) f)
-
-mapMin
-    :: PackedCountMap p1 k1 c
-    => PackedCountMap p2 k2 c
-    => Ord k2
-    => Ord c
-    => MonoidNull (Count c)
-    => (k1 -> k2)
-    -> (p1 -> p2)
-mapMin f = unpacked (MonoidMap.mapKeysWith Prelude.min f)
-
-mapMax
-    :: PackedCountMap p1 k1 c
-    => PackedCountMap p2 k2 c
-    => Ord k2
-    => Ord c
-    => MonoidNull (Count c)
-    => (k1 -> k2)
-    -> (p1 -> p2)
-mapMax f = unpacked (MonoidMap.mapKeysWith Prelude.max f)
+mapWith f g = unpacked (MonoidMap.mapKeysWith (coerce f) g)
 
 mapCounts
     :: PackedCountMap p k c
