@@ -18,7 +18,7 @@ module Data.Set.Signed
 
     -- * Membership
     , null
-    , lookup
+    , count
     , member
 
     -- * Folding
@@ -86,7 +86,6 @@ import Prelude hiding
     , foldl'
     , foldr
     , foldMap
-    , lookup
     , map
     , null
     )
@@ -118,8 +117,8 @@ toSet = CountMap.toSet
 null :: SignedSet a -> Bool
 null = CountMap.null
 
-lookup :: Ord a => a -> SignedSet a -> Sign
-lookup = CountMap.lookup
+count :: Ord a => a -> SignedSet a -> Sign
+count = CountMap.count
 
 member :: Ord a => a -> SignedSet a -> Bool
 member = CountMap.member

@@ -18,7 +18,7 @@ module Data.Bag.Signed
 
     -- * Membership
     , null
-    , lookup
+    , count
     , member
 
     -- * Folding
@@ -89,7 +89,6 @@ import Prelude hiding
     , foldl'
     , foldr
     , foldMap
-    , lookup
     , map
     , null
     , sum
@@ -129,8 +128,8 @@ toSet = CountMap.toSet
 null :: SignedBag a -> Bool
 null = CountMap.null
 
-lookup :: Ord a => a -> SignedBag a -> Integer
-lookup = CountMap.lookup
+count :: Ord a => a -> SignedBag a -> Integer
+count = CountMap.count
 
 member :: Ord a => a -> SignedBag a -> Bool
 member = CountMap.member

@@ -168,12 +168,12 @@ fromSet f s = pack $ MonoidMap.fromSet (coerce f) s
 null :: PackedCountMap p k c => p -> Bool
 null = MonoidMap.null . unpack
 
-lookup
+count
     :: PackedCountMap p k c
     => Ord k
     => Monoid (Count c)
     => k -> p -> c
-lookup k = unpack . MonoidMap.get k . unpack
+count k = unpack . MonoidMap.get k . unpack
 
 member
     :: PackedCountMap p k c

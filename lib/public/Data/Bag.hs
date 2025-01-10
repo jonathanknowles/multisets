@@ -18,7 +18,7 @@ module Data.Bag
 
     -- * Membership
     , null
-    , lookup
+    , count
     , member
 
     -- * Folding
@@ -77,7 +77,6 @@ import Prelude hiding
     , foldl'
     , foldr
     , foldMap
-    , lookup
     , map
     , null
     , sum
@@ -121,8 +120,8 @@ toSet = CountMap.toSet
 null :: Bag a -> Bool
 null = CountMap.null
 
-lookup :: Ord a => a -> Bag a -> Natural
-lookup = CountMap.lookup
+count :: Ord a => a -> Bag a -> Natural
+count = CountMap.count
 
 member :: Ord a => a -> Bag a -> Bool
 member = CountMap.member
