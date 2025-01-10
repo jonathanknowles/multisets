@@ -20,9 +20,6 @@ import Data.Foldable1
     ( Foldable1
     )
 import Data.Foldable1 qualified as Foldable1
-import Data.Function
-    ( on
-    )
 import Data.Group
     ( Group
     )
@@ -41,6 +38,9 @@ import Data.MonoidMap
     ( MonoidMap
     )
 import Data.MonoidMap qualified as MonoidMap
+import Data.Ord
+    ( Down (Down)
+    )
 import Data.Semiring
     ( Semiring (one)
     )
@@ -133,6 +133,12 @@ toList =
         @[(k, Naked c)]
         . MonoidMap.toList
         . unpack
+
+toListAsc :: forall p k c. PackedCountMap p k c => p -> [(k, c)]
+toListAsc = Map.toAscList . toMap
+
+toListDesc :: forall p k c. PackedCountMap p k c => p -> [(k, c)]
+toListDesc = Map.toDescList . toMap
 
 fromMap
     :: forall p k c
@@ -428,7 +434,7 @@ compare
     => Ord c
     => Ord k
     => p -> p -> Maybe Ordering
-compare s1 s2 = go False False (compareElements s1 s2)
+compare s1 s2 = go False False (compareElementsAsc s1 s2)
 {- ORMOLU_DISABLE -}
   where
     go    True    True              _ = Nothing
@@ -440,13 +446,51 @@ compare s1 s2 = go False False (compareElements s1 s2)
     go  seenLT  seenGT ((_, EQ) : xs) = go seenLT seenGT xs
 {- ORMOLU_ENABLE -}
 
-compareElements
+compareElementsAsc
     :: PackedCountMap p k c
     => Monoid (Count c)
     => Ord c
     => Ord k
     => p -> p -> [(k, Ordering)]
-compareElements s1 s2 = fmap (uncurry Prelude.compare) <$> align s1 s2
+compareElementsAsc s1 s2 = fmap (uncurry Prelude.compare) <$> alignAsc s1 s2
+
+compareElementsDesc
+    :: PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord c
+    => Ord k
+    => p -> p -> [(k, Ordering)]
+compareElementsDesc s1 s2 = fmap (uncurry Prelude.compare) <$> alignDesc s1 s2
+
+compareLexically
+    :: PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord k
+    => Ord c
+    => p -> p -> Ordering
+compareLexically = compareLexicallyWith alignAsc
+
+compareColexically
+    :: PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord k
+    => Ord c
+    => p -> p -> Ordering
+compareColexically = compareLexicallyWith alignDesc
+
+compareLexicallyWith
+    :: Ord c
+    => (p -> p -> [(k, (c, c))])
+    -> p
+    -> p
+    -> Ordering
+compareLexicallyWith align p1 p2 = go (align p1 p2)
+  where
+    go [] = EQ
+    go ((_, (c1, c2)) : kcs)
+        | c1 < c2 = LT
+        | c1 > c2 = GT
+        | otherwise = go kcs
 
 -- Note: evaluation will terminate early if (and only if) a GT is detected.
 isLessThan
@@ -455,7 +499,7 @@ isLessThan
     => Ord c
     => Ord k
     => p -> p -> Bool
-isLessThan m1 m2 = go False (compareElements m1 m2)
+isLessThan m1 m2 = go False (compareElementsAsc m1 m2)
 {- ORMOLU_DISABLE -}
   where
     go seenLT             [] = seenLT
@@ -471,7 +515,7 @@ isGreaterThan
     => Ord c
     => Ord k
     => p -> p -> Bool
-isGreaterThan m1 m2 = go False (compareElements m1 m2)
+isGreaterThan m1 m2 = go False (compareElementsAsc m1 m2)
 {- ORMOLU_DISABLE -}
   where
     go seenGT             [] = seenGT
@@ -486,7 +530,7 @@ isLessThanOrEqualTo
     => Ord c
     => Ord k
     => p -> p -> Bool
-isLessThanOrEqualTo m1 m2 = GT `notElem` (snd <$> compareElements m1 m2)
+isLessThanOrEqualTo m1 m2 = GT `notElem` (snd <$> compareElementsAsc m1 m2)
 
 isGreaterThanOrEqualTo
     :: PackedCountMap p k c
@@ -494,7 +538,7 @@ isGreaterThanOrEqualTo
     => Ord c
     => Ord k
     => p -> p -> Bool
-isGreaterThanOrEqualTo s1 s2 = LT `notElem` (snd <$> compareElements s1 s2)
+isGreaterThanOrEqualTo s1 s2 = LT `notElem` (snd <$> compareElementsAsc s1 s2)
 
 isSubmapOf
     :: PackedCountMap p k c
@@ -661,15 +705,43 @@ symmetricPowersetSize m =
 -- Utilities
 --------------------------------------------------------------------------------
 
-align
-    :: PackedCountMap p k c
+alignAsc
+    :: forall p k c
+     . PackedCountMap p k c
     => Ord k
     => Monoid (Count c)
     => p
     -> p
     -> [(k, (Count c, Count c))]
+alignAsc p1 p2 =
+    coerce $
+        alignKeyValuePairs @k @(Count c)
+            (coerce (toListAsc p1))
+            (coerce (toListAsc p2))
+
+alignDesc
+    :: forall p k c
+     . PackedCountMap p k c
+    => Ord k
+    => Monoid (Count c)
+    => p
+    -> p
+    -> [(k, (Count c, Count c))]
+alignDesc p1 p2 =
+    coerce $
+        alignKeyValuePairs @(Down k) @(Count c)
+            (coerce (toListDesc p1))
+            (coerce (toListDesc p2))
+
+alignKeyValuePairs
+    :: forall k v
+     . Ord k
+    => Monoid v
+    => [(k, v)]
+    -> [(k, v)]
+    -> [(k, (v, v))]
 {- ORMOLU_DISABLE -}
-align = go `on` (coerce . toList)
+alignKeyValuePairs = go
   where
     go            []            [] = []
     go ((a, p) : xs)            [] = (a, (p, z)) : go xs []

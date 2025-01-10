@@ -48,7 +48,13 @@ module Data.Bag.Signed
     , symmetricDifference
     , symmetricDifferenceUnsigned
 
-    -- * Comparison
+    -- * Ordering
+
+    -- ** Total
+    , compareLexically
+    , compareColexically
+
+    -- ** Partial
     , isLessThan
     , isLessThanOrEqualTo
     , isGreaterThan
@@ -195,6 +201,12 @@ symmetricDifference = CountMap.symmetricDifference
 
 symmetricDifferenceUnsigned :: Ord a => SignedBag a -> SignedBag a -> Bag a
 symmetricDifferenceUnsigned = CountMap.symmetricDifferenceAbsolute
+
+compareLexically :: Ord a => SignedBag a -> SignedBag a -> Ordering
+compareLexically = CountMap.compareLexically
+
+compareColexically :: Ord a => SignedBag a -> SignedBag a -> Ordering
+compareColexically = CountMap.compareLexically
 
 isLessThan :: Ord a => SignedBag a -> SignedBag a -> Bool
 isLessThan = CountMap.isLessThan

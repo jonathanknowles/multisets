@@ -43,7 +43,7 @@ import Prelude
 
 newtype Count a = Count a
     deriving stock (Eq, Ord, Functor)
-    deriving newtype (Bounded, Enum, Semiring)
+    deriving newtype (Bounded, Enum, Semiring, Show)
 
 instance Packed (Count a) where
     type Unpacked (Count a) = a

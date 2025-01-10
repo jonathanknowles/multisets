@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 module Internal.Shared where
 
 import Data.Group
@@ -25,6 +26,11 @@ import Data.Semigroup.Commutative
 import GHC.IsList
     ( IsList (..)
     )
+import GHC.TypeError
+    ( ErrorMessage (Text)
+    , Unsatisfiable
+    , unsatisfiable
+    )
 import Internal.Data.CountMap
     ( CountMap
     )
@@ -39,6 +45,11 @@ import Numeric.Natural
     ( Natural
     )
 import Prelude
+
+newtype Lex a = Lex a
+    deriving Eq
+newtype CoLex a = CoLex a
+    deriving Eq
 
 newtype Bag a = Bag (CountMap a Natural)
     deriving newtype (Eq)
@@ -56,6 +67,45 @@ newtype SignedSet a = SignedSet (CountMap a Sign)
     deriving newtype (Eq)
     deriving newtype (Semigroup, Monoid, MonoidNull)
     deriving newtype (Commutative, Group)
+
+instance
+    ( Eq a
+    , Unsatisfiable (Text "Bag is not an instance of Ord")
+    ) => Ord (Bag a)
+  where
+    compare = unsatisfiable
+
+instance
+    ( Eq a
+    , Unsatisfiable (Text "SignedBag is not an instance of Ord")
+    ) => Ord (SignedBag a)
+  where
+    compare = unsatisfiable
+
+instance
+    ( Eq a
+    , Unsatisfiable (Text "SignedSet is not an instance of Ord")
+    ) => Ord (SignedSet a)
+  where
+    compare = unsatisfiable
+
+instance Ord a => Ord (Lex (Bag a)) where
+    compare (Lex b1) (Lex b2) = CountMap.compareLexically b1 b2
+
+instance Ord a => Ord (Lex (SignedBag a)) where
+    compare (Lex b1) (Lex b2) = CountMap.compareLexically b1 b2
+
+instance Ord a => Ord (Lex (SignedSet a)) where
+    compare (Lex b1) (Lex b2) = CountMap.compareLexically b1 b2
+
+instance Ord a => Ord (CoLex (Bag a)) where
+    compare (CoLex b1) (CoLex b2) = CountMap.compareColexically b1 b2
+
+instance Ord a => Ord (CoLex (SignedBag a)) where
+    compare (CoLex b1) (CoLex b2) = CountMap.compareColexically b1 b2
+
+instance Ord a => Ord (CoLex (SignedSet a)) where
+    compare (CoLex b1) (CoLex b2) = CountMap.compareColexically b1 b2
 
 instance Packed (Bag a) where
     type Unpacked (Bag a) = CountMap a Natural

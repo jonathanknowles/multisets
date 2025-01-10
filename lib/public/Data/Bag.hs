@@ -44,7 +44,13 @@ module Data.Bag
     , difference
     , symmetricDifference
 
-    -- * Comparison
+    -- * Ordering
+
+    -- ** Total
+    , compareLexically
+    , compareColexically
+
+    -- ** Partial
     , isLessThan
     , isLessThanOrEqualTo
     , isGreaterThan
@@ -181,6 +187,12 @@ difference = CountMap.monus
 
 symmetricDifference :: Ord a => Bag a -> Bag a -> Bag a
 symmetricDifference = CountMap.symmetricDifference
+
+compareLexically :: Ord a => Bag a -> Bag a -> Ordering
+compareLexically = CountMap.compareLexically
+
+compareColexically :: Ord a => Bag a -> Bag a -> Ordering
+compareColexically = CountMap.compareLexically
 
 isLessThan :: Ord a => Bag a -> Bag a -> Bool
 isLessThan = CountMap.isLessThan
