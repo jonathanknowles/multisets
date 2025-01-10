@@ -83,6 +83,8 @@ type CountMap a c = MonoidMap a (Count c)
 
 type PackedCountMap p k c = (Packed p, Unpacked p ~ CountMap k c)
 
+type Naked c = c
+
 showFromList
     :: PackedCountMap p k c
     => Show k
@@ -118,13 +120,11 @@ fromList
     => [(k, c)]
     -> p
 fromList =
-{- ORMOLU_DISABLE -}
     fromListWith $
         coerce
             @(Count c -> Count c -> Count c)
-            @(      c ->       c ->       c)
+            @(Naked c -> Naked c -> Naked c)
             mappend
-{- ORMOLU_ENABLE -}
 
 fromListWith
     :: PackedCountMap p k c
@@ -136,17 +136,32 @@ fromListWith
 fromListWith f xs = pack $ MonoidMap.fromListWith (coerce f) (coerce xs)
 
 toList :: forall p k c. PackedCountMap p k c => p -> [(k, c)]
-toList = coerce @[(k, Count c)] @[(k, c)] . MonoidMap.toList . unpack
+toList =
+    coerce
+        @[(k, Count c)]
+        @[(k, Naked c)]
+        . MonoidMap.toList
+        . unpack
 
 fromMap
     :: forall p k c
      . PackedCountMap p k c
     => MonoidNull (Count c)
     => Map k c -> p
-fromMap = pack . MonoidMap.fromMap . coerce @(Map k c) @(Map k (Count c))
+fromMap =
+    pack
+        . MonoidMap.fromMap
+        . coerce
+            @(Map k (Naked c))
+            @(Map k (Count c))
 
 toMap :: forall p k c. PackedCountMap p k c => p -> Map k c
-toMap = coerce @(Map k (Count c)) @(Map k c) . MonoidMap.toMap . unpack
+toMap =
+    coerce
+        @(Map k (Count c))
+        @(Map k (Naked c))
+        . MonoidMap.toMap
+        . unpack
 
 toSet :: PackedCountMap p k c => p -> Set k
 toSet p = MonoidMap.nonNullKeys (unpack p)
