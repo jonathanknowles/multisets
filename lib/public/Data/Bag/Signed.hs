@@ -85,7 +85,9 @@ import Data.Set
     )
 import Internal.Data.CountMap qualified as CountMap
 import Internal.Shared
-    ( SignedBag, Bag )
+    ( SignedBag
+    , Bag
+    )
 import Numeric.Natural
     ( Natural
     )

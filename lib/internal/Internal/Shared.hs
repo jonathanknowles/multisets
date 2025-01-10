@@ -26,11 +26,6 @@ import Data.Semigroup.Commutative
 import GHC.IsList
     ( IsList (..)
     )
-import GHC.TypeError
-    ( ErrorMessage (Text)
-    , Unsatisfiable
-    , unsatisfiable
-    )
 import Internal.Data.CountMap
     ( CountMap
     )
@@ -67,27 +62,6 @@ newtype SignedSet a = SignedSet (CountMap a Sign)
     deriving newtype (Eq)
     deriving newtype (Semigroup, Monoid, MonoidNull)
     deriving newtype (Commutative, Group)
-
-instance
-    ( Eq a
-    , Unsatisfiable (Text "Bag is not an instance of Ord")
-    ) => Ord (Bag a)
-  where
-    compare = unsatisfiable
-
-instance
-    ( Eq a
-    , Unsatisfiable (Text "SignedBag is not an instance of Ord")
-    ) => Ord (SignedBag a)
-  where
-    compare = unsatisfiable
-
-instance
-    ( Eq a
-    , Unsatisfiable (Text "SignedSet is not an instance of Ord")
-    ) => Ord (SignedSet a)
-  where
-    compare = unsatisfiable
 
 instance Ord a => Ord (Lex (Bag a)) where
     compare (Lex b1) (Lex b2) = CountMap.compareLexically b1 b2
