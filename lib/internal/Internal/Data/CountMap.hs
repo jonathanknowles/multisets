@@ -664,8 +664,7 @@ symmetricPowerset
     => Enum (Count c)
     => p -> Set p
 symmetricPowerset =
-    -- TODO: Use Set.fromDistinctAscList here
-    Set.fromList . coerce . symmetricPowersetElements
+    Set.fromDistinctAscList . coerce . symmetricPowersetElements
 
 -- Generates all symmetric subsets in lexicograhic order.
 symmetricPowersetElements
