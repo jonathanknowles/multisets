@@ -14,7 +14,6 @@ module Internal.Data.CountMap where
 import Data.Coerce
     ( coerce
     )
-import Data.Foldable qualified as F
 import Data.Foldable qualified as Foldable
 import Data.Foldable1
     ( Foldable1
@@ -191,13 +190,13 @@ foldRoots
     :: PackedCountMap p k c
     => Monoid k
     => p -> k
-foldRoots = F.fold . toSet
+foldRoots = Foldable.fold . toSet
 
 foldRoots'
     :: PackedCountMap p k c
     => Monoid k
     => p -> k
-foldRoots' = F.foldMap' id . toSet
+foldRoots' = Foldable.foldMap' id . toSet
 
 foldlRoots
     :: PackedCountMap p k c
@@ -205,7 +204,7 @@ foldlRoots
     -> r
     -> p
     -> r
-foldlRoots f r p = F.foldl f r (toSet p)
+foldlRoots f r p = Foldable.foldl f r (toSet p)
 
 foldlRoots'
     :: PackedCountMap p k c
@@ -213,7 +212,7 @@ foldlRoots'
     -> r
     -> p
     -> r
-foldlRoots' f r p = F.foldl' f r (toSet p)
+foldlRoots' f r p = Foldable.foldl' f r (toSet p)
 
 foldrRoots
     :: PackedCountMap p k c
@@ -221,7 +220,7 @@ foldrRoots
     -> r
     -> p
     -> r
-foldrRoots f r p = F.foldr f r (toSet p)
+foldrRoots f r p = Foldable.foldr f r (toSet p)
 
 foldrRoots'
     :: PackedCountMap p k c
@@ -229,7 +228,7 @@ foldrRoots'
     -> r
     -> p
     -> r
-foldrRoots' f r p = F.foldr' f r (toSet p)
+foldrRoots' f r p = Foldable.foldr' f r (toSet p)
 
 foldMapRoots
     :: PackedCountMap p k c
@@ -237,7 +236,7 @@ foldMapRoots
     => (k -> m)
     -> p
     -> m
-foldMapRoots f = F.foldMap f . toSet
+foldMapRoots f = Foldable.foldMap f . toSet
 
 foldMapRoots'
     :: PackedCountMap p k c
@@ -245,7 +244,7 @@ foldMapRoots'
     => (k -> m)
     -> p
     -> m
-foldMapRoots' f = F.foldMap' f . toSet
+foldMapRoots' f = Foldable.foldMap' f . toSet
 
 foldl
     :: PackedCountMap p k c
