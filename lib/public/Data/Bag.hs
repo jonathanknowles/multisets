@@ -23,6 +23,8 @@ module Data.Bag
       -- * Indication
     , isRegular
     , isSimple
+    , maybeRegular
+    , maybeSimple
 
       -- * Folding
     , foldl
@@ -136,6 +138,12 @@ isRegular = CountMap.isRegular
 
 isSimple :: Bag a -> Bool
 isSimple = CountMap.isSimple
+
+maybeRegular :: Bag a -> Maybe (Natural, Set a)
+maybeRegular = undefined
+
+maybeSimple :: Bag a -> Maybe (Natural, a)
+maybeSimple = undefined
 
 foldl :: (r -> a -> Natural -> r) -> r -> Bag a -> r
 foldl = CountMap.foldl
