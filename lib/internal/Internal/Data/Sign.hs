@@ -10,6 +10,9 @@ module Internal.Data.Sign
     )
 where
 
+import Control.DeepSeq
+    ( NFData
+    )
 import Data.Coerce
     ( coerce
     )
@@ -42,24 +45,35 @@ import Data.Semiring
     ( Ring (..)
     , Semiring (..)
     )
-import Data.Word (Word16, Word32, Word64, Word8)
+import Data.Word
+    ( Word16
+    , Word32
+    , Word64
+    , Word8
+    )
+import GHC.Generics
+    ( Generic
+    )
 import Internal.Data.Monoid
     ( Product (..)
     , Sum (..)
     )
-import Numeric.Natural (Natural)
+import Numeric.Natural
+    ( Natural
+    )
 import Prelude hiding
     ( null
     )
-import Control.DeepSeq (NFData)
-import GHC.Generics (Generic)
 
 data Sign
-    = N
-    | Z
-    | P
+    = -- | Negative
+      N
+    | -- | Zero
+      Z
+    | -- | Positive
+      P
     deriving stock (Bounded, Enum, Eq, Generic, Ord, Read, Show)
-    deriving anyclass NFData
+    deriving anyclass (NFData)
 
 instance Semiring Sign where
     zero = Z

@@ -61,6 +61,10 @@ import Internal.Data.Packed
     , unpacked
     , unpacked2
     )
+import Internal.Data.Sign
+    ( Sign
+    )
+import Internal.Data.Sign qualified as Sign
 import Numeric.Natural
     ( Natural
     )
@@ -161,6 +165,14 @@ toMap =
 
 toSet :: PackedCountMap p k c => p -> Set k
 toSet p = MonoidMap.nonNullKeys (unpack p)
+
+toSetSigned
+    :: PackedCountMap p1 k c1
+    => PackedCountMap p2 k Sign
+    => Num c1
+    => Ord c1
+    => p1 -> p2
+toSetSigned = fromMap . Map.map Sign.fromNum . toMap
 
 fromSet
     :: PackedCountMap p k c

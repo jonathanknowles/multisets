@@ -15,6 +15,7 @@ module Data.Bag.Signed
     , toList
     , toMap
     , toSet
+    , toSetSigned
 
     -- * Membership
     , null
@@ -82,6 +83,7 @@ import Data.Set
 import Internal.Data.CountMap qualified as CountMap
 import Internal.Shared
     ( SignedBag
+    , SignedSet
     , Bag
     )
 import Numeric.Natural
@@ -127,6 +129,9 @@ toMap = CountMap.toMap
 
 toSet :: SignedBag a -> Set a
 toSet = CountMap.toSet
+
+toSetSigned :: SignedBag a -> SignedSet a
+toSetSigned = CountMap.toSetSigned
 
 null :: SignedBag a -> Bool
 null = CountMap.null
@@ -333,9 +338,6 @@ maybePositiveSet = undefined
 
 maybeNegativeSet :: SignedBag a -> Maybe (Set a)
 maybeNegativeSet = undefined
-
-multiplicity :: Ord a => a -> SignedBag a -> I
-multiplicity a (SignedBag s) = coerce (MonoidMap.get a s)
 
 support :: SignedBag a -> Set a
 support (SignedBag b) = MonoidMap.nonNullKeys b
