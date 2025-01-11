@@ -1,9 +1,8 @@
 module Data.Bag
-    (
-    -- * Type
+    ( -- * Type
       Bag
 
-    -- * Construction
+      -- * Construction
     , empty
     , singleton
     , fromList
@@ -11,17 +10,17 @@ module Data.Bag
     , fromMap
     , fromSet
 
-    -- * Deconstruction
+      -- * Deconstruction
     , toList
     , toMap
     , toSet
 
-    -- * Membership
+      -- * Membership
     , null
     , count
     , member
 
-    -- * Folding
+      -- * Folding
     , foldl
     , foldl'
     , foldr
@@ -29,12 +28,12 @@ module Data.Bag
     , foldMap
     , foldMap'
 
-    -- * Mapping
+      -- * Mapping
     , map
     , mapWith
     , mapCounts
 
-    -- * Algebra
+      -- * Algebra
     , add
     , addMany
     , union
@@ -44,7 +43,7 @@ module Data.Bag
     , difference
     , symmetricDifference
 
-    -- * Comparison
+      -- * Comparison
     , compareLexically
     , isLessThan
     , isLessThanOrEqualTo
@@ -55,7 +54,7 @@ module Data.Bag
     , isProperSubbagOf
     , isProperSuperbagOf
 
-    -- * Combinatorics
+      -- * Combinatorics
     , powerset
     , powersetElements
     , powersetSize
@@ -71,21 +70,21 @@ import Data.Map.Strict
 import Data.Set
     ( Set
     )
+import Internal.Data.CountMap qualified as CountMap
+import Internal.Shared
+    ( Bag
+    )
 import Numeric.Natural
     ( Natural
     )
 import Prelude hiding
-    ( foldl
+    ( foldMap
+    , foldl
     , foldl'
     , foldr
-    , foldMap
     , map
     , null
     , sum
-    )
-import Internal.Data.CountMap qualified as CountMap
-import Internal.Shared
-    ( Bag
     )
 
 empty :: Bag a
@@ -312,19 +311,5 @@ sum (Bag s1) (Bag s2) =
 
 sums :: Foldable f => Ord a => f (Bag a) -> Bag a
 sums = Foldable.foldl' sum empty
-
---------------------------------------------------------------------------------
--- Utilities
---------------------------------------------------------------------------------
-
-{- ORMOLU_DISABLE -}
-naturalDistance :: N -> N -> N
-naturalDistance a b
-    | a > b     = a - b
-    | otherwise = b - a
-{- ORMOLU_ENABLE -}
-
-naturalToPositiveInteger :: N -> Integer
-naturalToPositiveInteger = fromIntegral
 
 -}

@@ -1,9 +1,8 @@
 module Data.Bag.Signed
-    (
-    -- * Type
+    ( -- * Type
       SignedBag
 
-    -- * Construction
+      -- * Construction
     , empty
     , singleton
     , fromList
@@ -11,18 +10,18 @@ module Data.Bag.Signed
     , fromMap
     , fromSet
 
-    -- * Deconstruction
+      -- * Deconstruction
     , toList
     , toMap
     , toSet
     , toSetSigned
 
-    -- * Membership
+      -- * Membership
     , null
     , count
     , member
 
-    -- * Folding
+      -- * Folding
     , foldl
     , foldl'
     , foldr
@@ -30,15 +29,15 @@ module Data.Bag.Signed
     , foldMap
     , foldMap'
 
-    -- * Mapping
+      -- * Mapping
     , map
     , mapWith
     , mapCounts
 
-    -- * Transformation
+      -- * Transformation
     , invert
 
-    -- * Algebra
+      -- * Algebra
     , add
     , addMany
     , union
@@ -49,7 +48,7 @@ module Data.Bag.Signed
     , symmetricDifference
     , symmetricDifferenceUnsigned
 
-    -- * Comparison
+      -- * Comparison
     , compareLexically
     , isLessThan
     , isLessThanOrEqualTo
@@ -64,7 +63,7 @@ module Data.Bag.Signed
     , isProperSymmetricSubbagOf
     , isProperSymmetricSuperbagOf
 
-    -- * Combinatorics
+      -- * Combinatorics
     , symmetricPowerset
     , symmetricPowersetElements
     , symmetricPowersetSize
@@ -82,18 +81,18 @@ import Data.Set
     )
 import Internal.Data.CountMap qualified as CountMap
 import Internal.Shared
-    ( SignedBag
+    ( Bag
+    , SignedBag
     , SignedSet
-    , Bag
     )
 import Numeric.Natural
     ( Natural
     )
 import Prelude hiding
-    ( foldl
+    ( foldMap
+    , foldl
     , foldl'
     , foldr
-    , foldMap
     , map
     , null
     , sum
@@ -434,67 +433,4 @@ model_symmetricPowersetElements as =
   where
     (ns, ps) = toUnsignedPair as
 
---------------------------------------------------------------------------------
--- Utilities
---------------------------------------------------------------------------------
-
-testAlignA :: SignedBag Char
-testAlignA = fromListWith (+) [('a', -1), ('b', 0), ('c', 1)]
-
-testAlignB :: SignedBag Char
-testAlignB = fromListWith (+) [('b', -1), ('c', 0), ('d', 1)]
-
-{- ORMOLU_DISABLE -}
-align
-    :: Ord a
-    => SignedBag a
-    -> SignedBag a
-    -> [(a, (I, I))]
-align = go `on` toList
-  where
-    go            []            [] = []
-    go ((a, p) : xs)            [] = (a, (p, 0)) : go xs []
-    go            [] ((b, q) : ys) = (b, (0, q)) : go [] ys
-    go ((a, p) : xs) ((b, q) : ys)
-        | a < b                    = (a, (p, 0)) : go           xs ((b, q) : ys)
-        | a > b                    = (b, (0, q)) : go ((a, p) : xs)          ys
-        | otherwise                = (a, (p, q)) : go           xs           ys
-{- ORMOLU_ENABLE -}
-
-{- ORMOLU_DISABLE -}
-integerDistance :: I -> I -> Natural
-integerDistance a b
-    | a > b     = fromIntegral (a - b)
-    | otherwise = fromIntegral (b - a)
-{- ORMOLU_ENABLE -}
-
-integerMagnitude :: I -> Natural
-integerMagnitude n = fromIntegral (abs n)
-
-integerToNaturalPair :: I -> (Natural, Natural)
-integerToNaturalPair n
-    | n < 0 = (fromIntegral (abs n), 0)
-    | otherwise = (0, fromIntegral n)
-
-integerNegativePartToNatural :: I -> Natural
-integerNegativePartToNatural n
-    | n < 0 = fromIntegral (abs n)
-    | otherwise = 0
-
-integerPositivePartToNatural :: I -> Natural
-integerPositivePartToNatural n
-    | n > 0 = fromIntegral n
-    | otherwise = 0
-
-naturalToNegativeI :: Natural -> I
-naturalToNegativeI = negate . fromIntegral
-
-naturalToPositiveI :: Natural -> I
-naturalToPositiveI = fromIntegral
-
-isSmallerThan :: (Ord a, Num a) => a -> a -> Bool
-isSmallerThan v1 v2
-    | v1 <= 0 && v2 <= 0 = v1 >= v2
-    | v1 >= 0 && v2 >= 0 = v1 <= v2
-    | otherwise = False
 -}
