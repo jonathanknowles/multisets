@@ -620,9 +620,7 @@ powerset
     => Ord k
     => Enum (Count c)
     => p -> Set p
-powerset =
-    -- TODO: Use Set.fromAscList here
-    Set.fromList . coerce . powersetElements
+powerset = Set.fromDistinctAscList . coerce . powersetElements
 
 -- Generates all subsets in lexicographic order.
 powersetElements
@@ -666,7 +664,7 @@ symmetricPowerset
     => Enum (Count c)
     => p -> Set p
 symmetricPowerset =
-    -- TODO: Use Set.fromAscList here
+    -- TODO: Use Set.fromDistinctAscList here
     Set.fromList . coerce . symmetricPowersetElements
 
 -- Generates all symmetric subsets in lexicograhic order.

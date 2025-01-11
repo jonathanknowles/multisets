@@ -1,5 +1,8 @@
 module Internal.Data.Count where
 
+import Control.DeepSeq
+    ( NFData
+    )
 import Data.Group
     ( Group
     )
@@ -43,7 +46,7 @@ import Prelude
 
 newtype Count a = Count a
     deriving stock (Eq, Ord, Functor)
-    deriving newtype (Bounded, Enum, Semiring, Show)
+    deriving newtype (Bounded, Enum, NFData, Semiring, Show)
 
 instance Packed (Count a) where
     type Unpacked (Count a) = a

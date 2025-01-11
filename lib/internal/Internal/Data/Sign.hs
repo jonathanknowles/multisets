@@ -1,7 +1,6 @@
-{-# HLINT ignore "Use camelCase" #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE MagicHash #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
 module Internal.Data.Sign
     ( Sign (..)
@@ -52,12 +51,15 @@ import Numeric.Natural (Natural)
 import Prelude hiding
     ( null
     )
+import Control.DeepSeq (NFData)
+import GHC.Generics (Generic)
 
 data Sign
     = N
     | Z
     | P
-    deriving stock (Bounded, Enum, Eq, Ord, Read, Show)
+    deriving stock (Bounded, Enum, Eq, Generic, Ord, Read, Show)
+    deriving anyclass NFData
 
 instance Semiring Sign where
     zero = Z
