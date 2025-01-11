@@ -34,7 +34,7 @@ module Data.Bag
     , mapWith
     , mapCounts
 
-    -- * Combination
+    -- * Algebra
     , add
     , addMany
     , union
@@ -44,12 +44,8 @@ module Data.Bag
     , difference
     , symmetricDifference
 
-    -- * Ordering
-
-    -- ** Total
+    -- * Comparison
     , compareLexically
-
-    -- ** Partial
     , isLessThan
     , isLessThanOrEqualTo
     , isGreaterThan

@@ -37,7 +37,7 @@ module Data.Bag.Signed
     -- * Transformation
     , invert
 
-    -- * Combination
+    -- * Algebra
     , add
     , addMany
     , union
@@ -48,12 +48,8 @@ module Data.Bag.Signed
     , symmetricDifference
     , symmetricDifferenceUnsigned
 
-    -- * Ordering
-
-    -- ** Total
+    -- * Comparison
     , compareLexically
-
-    -- ** Partial
     , isLessThan
     , isLessThanOrEqualTo
     , isGreaterThan

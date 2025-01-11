@@ -1,26 +1,27 @@
 module Data.Set.Signed
-    ( -- * Types
+    (
+    -- * Types
       Sign (..)
     , SignedSet
 
-      -- * Construction
+    -- * Construction
     , empty
     , singleton
     , fromListWith
     , fromMap
     , fromSet
 
-      -- * Deconstruction
+    -- * Deconstruction
     , toList
     , toMap
     , toSet
 
-      -- * Membership
+    -- * Membership
     , null
     , count
     , member
 
-      -- * Folding
+    -- * Folding
     , foldl
     , foldl'
     , foldr
@@ -28,25 +29,21 @@ module Data.Set.Signed
     , foldMap
     , foldMap'
 
-      -- * Mapping
+    -- * Mapping
     , mapWith
     , mapSigns
 
-      -- * Transformation
+    -- * Transformation
     , invert
 
-      -- * Combination
+    -- * Algebra
     , union
     , unionMany1
     , intersection
     , intersectionMany1
 
-      -- * Ordering
-
-      -- ** Total
+    -- * Comparison
     , compareLexically
-
-      -- ** Partial
     , isLessThan
     , isLessThanOrEqualTo
     , isGreaterThan
@@ -60,7 +57,7 @@ module Data.Set.Signed
     , isProperSymmetricSubsetOf
     , isProperSymmetricSupersetOf
 
-      -- * Combinatorics
+    -- * Combinatorics
     , symmetricPowerset
     , symmetricPowersetElements
     , symmetricPowersetSize
