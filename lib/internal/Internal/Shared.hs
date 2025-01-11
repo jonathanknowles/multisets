@@ -61,12 +61,15 @@ newtype SignedSet a = SignedSet (CountMap a Sign)
     deriving newtype (Semigroup, Monoid, MonoidNull)
     deriving newtype (Commutative, Group)
 
+-- | See 'Data.Bag.compareLexically'.
 instance Ord a => Ord (Bag a) where
     compare = CountMap.compareLexically
 
+-- | See 'Data.Bag.Signed.compareLexically'.
 instance Ord a => Ord (SignedBag a) where
     compare = CountMap.compareLexically
 
+-- | See 'Data.Set.Signed.compareLexically'.
 instance Ord a => Ord (SignedSet a) where
     compare = CountMap.compareLexically
 
