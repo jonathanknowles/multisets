@@ -45,7 +45,6 @@ module Data.Set.Signed
 
       -- ** Total
     , compareLexically
-    , compareColexically
 
       -- ** Partial
     , isLessThan
@@ -175,9 +174,6 @@ intersectionMany1 = CountMap.intersectionMany1
 
 compareLexically :: Ord a => SignedSet a -> SignedSet a -> Ordering
 compareLexically = CountMap.compareLexically
-
-compareColexically :: Ord a => SignedSet a -> SignedSet a -> Ordering
-compareColexically = CountMap.compareLexically
 
 isLessThan :: Ord a => SignedSet a -> SignedSet a -> Bool
 isLessThan = CountMap.isLessThan

@@ -427,13 +427,13 @@ symmetricDifferenceAbsolute =
 
 -- Note: evaluation will terminate early if (and only if) the maps are
 -- incomparable.
-compare
+compareMaybe
     :: PackedCountMap p k c
     => Monoid (Count c)
     => Ord c
     => Ord k
     => p -> p -> Maybe Ordering
-compare s1 s2 = go False False (compareElementsAsc s1 s2)
+compareMaybe s1 s2 = go False False (compareElementsAsc s1 s2)
 {- ORMOLU_DISABLE -}
   where
     go    True    True              _ = Nothing

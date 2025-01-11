@@ -48,7 +48,6 @@ module Data.Bag
 
     -- ** Total
     , compareLexically
-    , compareColexically
 
     -- ** Partial
     , isLessThan
@@ -191,9 +190,6 @@ symmetricDifference = CountMap.symmetricDifference
 
 compareLexically :: Ord a => Bag a -> Bag a -> Ordering
 compareLexically = CountMap.compareLexically
-
-compareColexically :: Ord a => Bag a -> Bag a -> Ordering
-compareColexically = CountMap.compareLexically
 
 isLessThan :: Ord a => Bag a -> Bag a -> Bool
 isLessThan = CountMap.isLessThan

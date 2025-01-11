@@ -52,7 +52,6 @@ module Data.Bag.Signed
 
     -- ** Total
     , compareLexically
-    , compareColexically
 
     -- ** Partial
     , isLessThan
@@ -93,8 +92,7 @@ import Numeric.Natural
     ( Natural
     )
 import Prelude hiding
-    ( compare
-    , foldl
+    ( foldl
     , foldl'
     , foldr
     , foldMap
@@ -207,9 +205,6 @@ symmetricDifferenceUnsigned = CountMap.symmetricDifferenceAbsolute
 
 compareLexically :: Ord a => SignedBag a -> SignedBag a -> Ordering
 compareLexically = CountMap.compareLexically
-
-compareColexically :: Ord a => SignedBag a -> SignedBag a -> Ordering
-compareColexically = CountMap.compareLexically
 
 isLessThan :: Ord a => SignedBag a -> SignedBag a -> Bool
 isLessThan = CountMap.isLessThan
