@@ -28,8 +28,6 @@ import GHC.IsList
     )
 import Internal.Data.CountMap
     ( CountMap
-    , Lex (Lex)
-    , CoLex (CoLex)
     )
 import Internal.Data.CountMap qualified as CountMap
 import Internal.Data.Packed
@@ -60,23 +58,14 @@ newtype SignedSet a = SignedSet (CountMap a Sign)
     deriving newtype (Semigroup, Monoid, MonoidNull)
     deriving newtype (Commutative, Group)
 
-instance Ord a => Ord (Lex (Bag a)) where
-    compare (Lex b1) (Lex b2) = CountMap.compareLexically b1 b2
+instance Ord a => Ord (Bag a) where
+    compare = CountMap.compareLexically
 
-instance Ord a => Ord (Lex (SignedBag a)) where
-    compare (Lex b1) (Lex b2) = CountMap.compareLexically b1 b2
+instance Ord a => Ord (SignedBag a) where
+    compare = CountMap.compareLexically
 
-instance Ord a => Ord (Lex (SignedSet a)) where
-    compare (Lex b1) (Lex b2) = CountMap.compareLexically b1 b2
-
-instance Ord a => Ord (CoLex (Bag a)) where
-    compare (CoLex b1) (CoLex b2) = CountMap.compareColexically b1 b2
-
-instance Ord a => Ord (CoLex (SignedBag a)) where
-    compare (CoLex b1) (CoLex b2) = CountMap.compareColexically b1 b2
-
-instance Ord a => Ord (CoLex (SignedSet a)) where
-    compare (CoLex b1) (CoLex b2) = CountMap.compareColexically b1 b2
+instance Ord a => Ord (SignedSet a) where
+    compare = CountMap.compareLexically
 
 instance Packed (Bag a) where
     type Unpacked (Bag a) = CountMap a Natural

@@ -76,11 +76,6 @@ type PackedCountMap p k c = (Packed p, Unpacked p ~ CountMap k c)
 
 type Naked c = c
 
-newtype Lex a = Lex a
-    deriving Eq
-newtype CoLex a = CoLex a
-    deriving Eq
-
 showFromList
     :: PackedCountMap p k c
     => Show k
@@ -622,10 +617,10 @@ powerset
     :: PackedCountMap p k c
     => MonoidNull (Count c)
     => PositiveMonoid (Count c)
-    => Ord (Lex p)
+    => Ord p
     => Ord k
     => Enum (Count c)
-    => p -> Set (Lex p)
+    => p -> Set p
 powerset =
     -- TODO: Use Set.fromAscList here
     Set.fromList . coerce . powersetElements
@@ -666,11 +661,11 @@ symmetricPowerset
     :: PackedCountMap p k c
     => MonoidNull (Count c)
     => Group (Count c)
-    => Ord (Lex p)
+    => Ord p
     => Ord k
     => Ord c
     => Enum (Count c)
-    => p -> Set (Lex p)
+    => p -> Set p
 symmetricPowerset =
     -- TODO: Use Set.fromAscList here
     Set.fromList . coerce . symmetricPowersetElements

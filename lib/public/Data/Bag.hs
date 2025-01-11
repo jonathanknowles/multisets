@@ -88,8 +88,6 @@ import Prelude hiding
     , null
     , sum
     )
-import Internal.Data.CountMap
-    ( Lex )
 import Internal.Data.CountMap qualified as CountMap
 import Internal.Shared
     ( Bag
@@ -221,7 +219,7 @@ isProperSubbagOf = CountMap.isProperSubmapOf
 isProperSuperbagOf :: Ord a => Bag a -> Bag a -> Bool
 isProperSuperbagOf = CountMap.isProperSupermapOf
 
-powerset :: Ord a => Bag a -> Set (Lex (Bag a))
+powerset :: Ord a => Bag a -> Set (Bag a)
 powerset = CountMap.powerset
 
 powersetElements :: Ord a => Bag a -> [Bag a]

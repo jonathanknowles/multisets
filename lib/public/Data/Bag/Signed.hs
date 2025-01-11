@@ -84,8 +84,6 @@ import Data.Map.Strict
 import Data.Set
     ( Set
     )
-import Internal.Data.CountMap
-    ( Lex )
 import Internal.Data.CountMap qualified as CountMap
 import Internal.Shared
     ( SignedBag
@@ -249,7 +247,7 @@ isProperSymmetricSubbagOf = CountMap.isProperSymmetricSubmapOf
 isProperSymmetricSuperbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
 isProperSymmetricSuperbagOf = CountMap.isProperSymmetricSupermapOf
 
-symmetricPowerset :: Ord a => SignedBag a -> Set (Lex (SignedBag a))
+symmetricPowerset :: Ord a => SignedBag a -> Set (SignedBag a)
 symmetricPowerset = CountMap.symmetricPowerset
 
 symmetricPowersetElements :: Ord a => SignedBag a -> [SignedBag a]

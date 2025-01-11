@@ -1,27 +1,26 @@
 module Data.Set.Signed
-    (
-    -- * Types
+    ( -- * Types
       Sign (..)
     , SignedSet
 
-    -- * Construction
+      -- * Construction
     , empty
     , singleton
     , fromListWith
     , fromMap
     , fromSet
 
-    -- * Deconstruction
+      -- * Deconstruction
     , toList
     , toMap
     , toSet
 
-    -- * Membership
+      -- * Membership
     , null
     , count
     , member
 
-    -- * Folding
+      -- * Folding
     , foldl
     , foldl'
     , foldr
@@ -29,26 +28,26 @@ module Data.Set.Signed
     , foldMap
     , foldMap'
 
-    -- * Mapping
+      -- * Mapping
     , mapWith
     , mapSigns
 
-    -- * Transformation
+      -- * Transformation
     , invert
 
-    -- * Combination
+      -- * Combination
     , union
     , unionMany1
     , intersection
     , intersectionMany1
 
-    -- * Ordering
+      -- * Ordering
 
-    -- ** Total
+      -- ** Total
     , compareLexically
     , compareColexically
 
-    -- ** Partial
+      -- ** Partial
     , isLessThan
     , isLessThanOrEqualTo
     , isGreaterThan
@@ -62,7 +61,7 @@ module Data.Set.Signed
     , isProperSymmetricSubsetOf
     , isProperSymmetricSupersetOf
 
-    -- * Combinatorics
+      -- * Combinatorics
     , symmetricPowerset
     , symmetricPowersetElements
     , symmetricPowersetSize
@@ -78,9 +77,6 @@ import Data.Map.Strict
 import Data.Set
     ( Set
     )
-import Internal.Data.CountMap
-    ( Lex
-    )
 import Internal.Data.CountMap qualified as CountMap
 import Internal.Data.Sign
     ( Sign (..)
@@ -92,10 +88,10 @@ import Numeric.Natural
     ( Natural
     )
 import Prelude hiding
-    ( foldl
+    ( foldMap
+    , foldl
     , foldl'
     , foldr
-    , foldMap
     , map
     , null
     )
@@ -219,7 +215,7 @@ isProperSymmetricSubsetOf = CountMap.isProperSymmetricSubmapOf
 isProperSymmetricSupersetOf :: Ord a => SignedSet a -> SignedSet a -> Bool
 isProperSymmetricSupersetOf = CountMap.isProperSymmetricSupermapOf
 
-symmetricPowerset :: Ord a => SignedSet a -> Set (Lex (SignedSet a))
+symmetricPowerset :: Ord a => SignedSet a -> Set (SignedSet a)
 symmetricPowerset = CountMap.symmetricPowerset
 
 symmetricPowersetElements :: Ord a => SignedSet a -> [SignedSet a]
