@@ -20,6 +20,10 @@ module Data.Bag
     , count
     , member
 
+      -- * Indication
+    , isRegular
+    , isSimple
+
       -- * Folding
     , foldl
     , foldl'
@@ -126,6 +130,12 @@ count = CountMap.count
 
 member :: Ord a => a -> Bag a -> Bool
 member = CountMap.member
+
+isRegular :: Bag a -> Bool
+isRegular = CountMap.isRegular
+
+isSimple :: Bag a -> Bool
+isSimple = CountMap.isSimple
 
 foldl :: (r -> a -> Natural -> r) -> r -> Bag a -> r
 foldl = CountMap.foldl
@@ -247,8 +257,6 @@ member a (Bag s) = MonoidMap.nonNullKey a s
 
 -- height (greatest)
 -- depth (least)
--- isRegular (all objects have same multiplicity
--- isSimple (all objects are the same)
 -- isWholeSubset (contains all multiplicities of the common objects)
 -- isFullSubset (supports are the same)
 -- powermultiset - multiset of all submultisets

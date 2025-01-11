@@ -21,6 +21,10 @@ module Data.Bag.Signed
     , count
     , member
 
+      -- * Indication
+    , isRegular
+    , isSimple
+
       -- * Folding
     , foldl
     , foldl'
@@ -140,6 +144,12 @@ count = CountMap.count
 
 member :: Ord a => a -> SignedBag a -> Bool
 member = CountMap.member
+
+isRegular :: SignedBag a -> Bool
+isRegular = CountMap.isRegular
+
+isSimple :: SignedBag a -> Bool
+isSimple = CountMap.isSimple
 
 foldl :: (r -> a -> Integer -> r) -> r -> SignedBag a -> r
 foldl = CountMap.foldl

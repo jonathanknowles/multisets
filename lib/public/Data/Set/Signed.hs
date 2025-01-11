@@ -20,6 +20,10 @@ module Data.Set.Signed
     , count
     , member
 
+      -- * Indication
+    , isRegular
+    , isSimple
+
       -- * Folding
     , foldl
     , foldl'
@@ -123,6 +127,12 @@ count = CountMap.count
 
 member :: Ord a => a -> SignedSet a -> Bool
 member = CountMap.member
+
+isRegular :: SignedSet a -> Bool
+isRegular = CountMap.isRegular
+
+isSimple :: SignedSet a -> Bool
+isSimple = CountMap.isSimple
 
 foldl :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
 foldl = CountMap.foldl

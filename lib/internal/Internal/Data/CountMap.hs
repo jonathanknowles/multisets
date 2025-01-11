@@ -69,7 +69,10 @@ import Numeric.Natural
     ( Natural
     )
 import Prelude hiding
-    ( map
+    ( foldl'
+    , foldr
+    , map
+    , null
     , sum
     )
 
@@ -436,6 +439,19 @@ symmetricDifferenceAbsolute
     => p -> p -> q
 symmetricDifferenceAbsolute =
     unpacked2 $ MonoidMap.unionWith countSymmetricDifferenceAbsolute
+
+isRegular :: PackedCountMap p k c => Ord c => p -> Bool
+isRegular p =
+    -- TODO: Optimise this
+    numberOfUniqueCounts <= 1
+  where
+    numberOfUniqueCounts = Set.size $ Set.fromList $ fmap snd $ toList p
+
+isSimple :: PackedCountMap p k c => Ord c => p -> Bool
+isSimple p =
+    numberOfUniqueKeys <= 1
+  where
+    numberOfUniqueKeys = MonoidMap.nonNullCount (unpack p)
 
 -- Note: evaluation will terminate early if (and only if) the maps are
 -- incomparable.
