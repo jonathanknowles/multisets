@@ -26,6 +26,9 @@ import Data.Map.Strict
     ( Map
     )
 import Data.Map.Strict qualified as Map
+import Data.Maybe
+    ( isJust
+    )
 import Data.Monoid.Monus
     ( Monus
     )
@@ -200,6 +203,73 @@ member
     => Ord k
     => k -> p -> Bool
 member k = MonoidMap.nonNullKey k . unpack
+
+isRegular
+    :: PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord c
+    => Ord k
+    => p -> Bool
+isRegular = isJust . maybeRegular
+
+isSimple
+    :: PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord c
+    => Ord k
+    => p -> Bool
+isSimple = isJust . maybeSimple
+
+-- isPositive
+-- isNegative
+-- maybePositive
+-- maybeNegative
+
+maybeRegular
+    :: forall p k c
+     . PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord k
+    => Ord c
+    => p
+    -> Maybe (c, Set k)
+maybeRegular p =
+{- ORMOLU_DISABLE -}
+    -- TODO:
+    -- Optimise this function, so that instead of constructing the entire set
+    -- of unique counts and then testing its size, we terminate as soon as we
+    -- detect more than one unique count.
+    case Set.toList uniqueCounts of
+        [ ] -> Just (z, Set.empty)
+        [c] -> Just (c,   toSet p)
+        (_) -> Nothing
+  where
+    z :: c
+    z = coerce (mempty :: Count c)
+
+    uniqueCounts :: Set c
+    uniqueCounts = Set.fromList $ fmap snd $ toList p
+{- ORMOLU_ENABLE -}
+
+maybeSimple
+    :: forall p k c
+     . PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord k
+    => Ord c
+    => p
+    -> Maybe (c, k)
+maybeSimple p =
+    -- TODO:
+    -- Optimise this function, so that instead of constructing the entire set
+    -- of unique keys and then testing its size, we terminate as soon as we
+    -- detect more than one unique key.
+    case Set.toList uniqueKeys of
+        [k] -> Just (count k p, k)
+        (_) -> Nothing
+  where
+    uniqueKeys :: Set k
+    uniqueKeys = toSet p
 
 foldRoots
     :: PackedCountMap p k c
@@ -439,19 +509,6 @@ symmetricDifferenceAbsolute
     => p -> p -> q
 symmetricDifferenceAbsolute =
     unpacked2 $ MonoidMap.unionWith countSymmetricDifferenceAbsolute
-
-isRegular :: PackedCountMap p k c => Ord c => p -> Bool
-isRegular p =
-    -- TODO: Optimise this
-    numberOfUniqueCounts <= 1
-  where
-    numberOfUniqueCounts = Set.size $ Set.fromList $ fmap snd $ toList p
-
-isSimple :: PackedCountMap p k c => Ord c => p -> Bool
-isSimple p =
-    numberOfUniqueKeys <= 1
-  where
-    numberOfUniqueKeys = MonoidMap.nonNullCount (unpack p)
 
 -- Note: evaluation will terminate early if (and only if) the maps are
 -- incomparable.

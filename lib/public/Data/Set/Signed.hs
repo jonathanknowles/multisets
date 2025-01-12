@@ -130,17 +130,17 @@ count = CountMap.count
 member :: Ord a => a -> SignedSet a -> Bool
 member = CountMap.member
 
-isRegular :: SignedSet a -> Bool
+isRegular :: Ord a => SignedSet a -> Bool
 isRegular = CountMap.isRegular
 
-isSimple :: SignedSet a -> Bool
+isSimple :: Ord a => SignedSet a -> Bool
 isSimple = CountMap.isSimple
 
-maybeRegular :: SignedSet a -> Maybe (Sign, Set a)
-maybeRegular = undefined
+maybeRegular :: Ord a => SignedSet a -> Maybe (Sign, Set a)
+maybeRegular = CountMap.maybeRegular
 
-maybeSimple :: SignedSet a -> Maybe (Sign, a)
-maybeSimple = undefined
+maybeSimple :: Ord a => SignedSet a -> Maybe (Sign, a)
+maybeSimple = CountMap.maybeSimple
 
 foldl :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
 foldl = CountMap.foldl

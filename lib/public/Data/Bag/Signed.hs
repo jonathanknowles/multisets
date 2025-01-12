@@ -147,17 +147,17 @@ count = CountMap.count
 member :: Ord a => a -> SignedBag a -> Bool
 member = CountMap.member
 
-isRegular :: SignedBag a -> Bool
+isRegular :: Ord a => SignedBag a -> Bool
 isRegular = CountMap.isRegular
 
-isSimple :: SignedBag a -> Bool
+isSimple :: Ord a => SignedBag a -> Bool
 isSimple = CountMap.isSimple
 
-maybeRegular :: Bag a -> Maybe (Integer, Set a)
-maybeRegular = undefined
+maybeRegular :: Ord a => SignedBag a -> Maybe (Integer, Set a)
+maybeRegular = CountMap.maybeRegular
 
-maybeSimple :: Bag a -> Maybe (Integer, a)
-maybeSimple = undefined
+maybeSimple :: Ord a => SignedBag a -> Maybe (Integer, a)
+maybeSimple = CountMap.maybeSimple
 
 foldl :: (r -> a -> Integer -> r) -> r -> SignedBag a -> r
 foldl = CountMap.foldl
