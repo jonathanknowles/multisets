@@ -65,7 +65,7 @@ import Internal.Data.Packed
     , unpacked2
     )
 import Internal.Data.Sign
-    ( Sign
+    ( Sign (Z)
     , HasMagnitude (magnitude, Magnitude)
     , HasSign (signOf)
     )
@@ -309,6 +309,7 @@ maybeUnipolar
 maybeUnipolar p =
     case Set.toList uniqueSigns of
         [s] -> Just (s, fromMap $ Map.map magnitude $ toMap p)
+        [ ] -> Just (Z, fromMap $ Map.empty)
         (_) -> Nothing
   where
     uniqueSigns :: Set Sign
