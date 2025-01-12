@@ -222,6 +222,22 @@ isSimple
     => p -> Bool
 isSimple = isJust . maybeSimple
 
+isSingleton
+    :: PackedCountMap p k c
+    => Monoid (Count c)
+    => Enum c
+    => Eq c
+    => p -> Bool
+isSingleton = isJust . maybeSingleton
+
+isSingletonSigned
+    :: PackedCountMap p k c
+    => Monoid (Count c)
+    => Enum c
+    => Eq c
+    => p -> Bool
+isSingletonSigned = isJust . maybeSingletonSigned
+
 isBipolar
     :: forall p k c. ()
     => PackedCountMap p k c
@@ -305,6 +321,33 @@ maybeSimple p =
   where
     uniqueKeys :: Set k
     uniqueKeys = toSet p
+
+maybeSingleton
+    :: forall p k c . ()
+    => PackedCountMap p k c
+    => Monoid (Count c)
+    => Enum c
+    => Eq c
+    => p
+    -> Maybe k
+maybeSingleton p =
+    case MonoidMap.toList (unpack p) of
+        [(k, c)] | c == succ mempty -> Just k
+        _ -> Nothing
+
+maybeSingletonSigned
+    :: forall p k c . ()
+    => PackedCountMap p k c
+    => Monoid (Count c)
+    => Enum c
+    => Eq c
+    => p
+    -> Maybe (Sign, k)
+maybeSingletonSigned p =
+    case MonoidMap.toList (unpack p) of
+        [(k, c)] | c == succ mempty -> Just (Sign.P, k)
+        [(k, c)] | c == pred mempty -> Just (Sign.N, k)
+        _ -> Nothing
 
 maybeUnipolar
     :: forall p1 p2 k c1 c2. ()

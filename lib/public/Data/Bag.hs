@@ -23,10 +23,12 @@ module Data.Bag
       -- * Indication
     , isRegular
     , isSimple
+    , isSingleton
 
       -- * Projection
     , maybeRegular
     , maybeSimple
+    , maybeSingleton
 
       -- * Folding
     , foldl
@@ -141,11 +143,17 @@ isRegular = CountMap.isRegular
 isSimple :: Ord a => Bag a -> Bool
 isSimple = CountMap.isSimple
 
+isSingleton :: Bag a -> Bool
+isSingleton = CountMap.isSingleton
+
 maybeRegular :: Ord a => Bag a -> Maybe (Natural, Set a)
 maybeRegular = CountMap.maybeRegular
 
 maybeSimple :: Ord a => Bag a -> Maybe (Natural, a)
 maybeSimple = CountMap.maybeSimple
+
+maybeSingleton :: Ord a => Bag a -> Maybe a
+maybeSingleton = CountMap.maybeSingleton
 
 foldl :: (r -> a -> Natural -> r) -> r -> Bag a -> r
 foldl = CountMap.foldl

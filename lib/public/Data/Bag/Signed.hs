@@ -24,6 +24,8 @@ module Data.Bag.Signed
       -- * Indication
     , isRegular
     , isSimple
+    , isSingleton
+    , isSingletonSigned
     , isUnipolar
     , isBipolar
     , isNegative
@@ -32,6 +34,8 @@ module Data.Bag.Signed
       -- * Projection
     , maybeRegular
     , maybeSimple
+    , maybeSingleton
+    , maybeSingletonSigned
     , maybeUnipolar
     , maybeNegative
     , maybePositive
@@ -165,6 +169,12 @@ isRegular = CountMap.isRegular
 isSimple :: Ord a => SignedBag a -> Bool
 isSimple = CountMap.isSimple
 
+isSingleton :: SignedBag a -> Bool
+isSingleton = CountMap.isSingleton
+
+isSingletonSigned :: SignedBag a -> Bool
+isSingletonSigned = CountMap.isSingletonSigned
+
 isUnipolar :: SignedBag a -> Bool
 isUnipolar = CountMap.isUnipolar
 
@@ -182,6 +192,12 @@ maybeRegular = CountMap.maybeRegular
 
 maybeSimple :: Ord a => SignedBag a -> Maybe (Integer, a)
 maybeSimple = CountMap.maybeSimple
+
+maybeSingleton :: Ord a => SignedBag a -> Maybe a
+maybeSingleton = CountMap.maybeSingleton
+
+maybeSingletonSigned :: Ord a => SignedBag a -> Maybe (Sign, a)
+maybeSingletonSigned = CountMap.maybeSingletonSigned
 
 maybeUnipolar :: SignedBag a -> Maybe (Sign, Bag a)
 maybeUnipolar = CountMap.maybeUnipolar
