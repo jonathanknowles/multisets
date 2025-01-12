@@ -23,10 +23,14 @@ module Data.Set.Signed
       -- * Indication
     , isRegular
     , isSimple
+    , isUnipolar
     , isNegative
     , isPositive
+
+      -- * Projection
     , maybeRegular
     , maybeSimple
+    , maybeUnipolar
     , maybeNegative
     , maybePositive
 
@@ -140,6 +144,9 @@ isRegular = CountMap.isRegular
 isSimple :: Ord a => SignedSet a -> Bool
 isSimple = CountMap.isSimple
 
+isUnipolar :: SignedSet a -> Bool
+isUnipolar = CountMap.isUnipolar
+
 isNegative :: Ord a => SignedSet a -> Bool
 isNegative = CountMap.isNegative
 
@@ -151,6 +158,9 @@ maybeRegular = CountMap.maybeRegular
 
 maybeSimple :: Ord a => SignedSet a -> Maybe (Sign, a)
 maybeSimple = CountMap.maybeSimple
+
+maybeUnipolar :: SignedSet a -> Maybe (Sign, Set a)
+maybeUnipolar = CountMap.maybeUnipolar
 
 maybeNegative :: Ord a => SignedSet a -> Maybe (Set a)
 maybeNegative = CountMap.maybeNegative

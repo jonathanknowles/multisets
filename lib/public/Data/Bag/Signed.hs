@@ -24,10 +24,14 @@ module Data.Bag.Signed
       -- * Indication
     , isRegular
     , isSimple
+    , isUnipolar
     , isNegative
     , isPositive
+
+      -- * Projection
     , maybeRegular
     , maybeSimple
+    , maybeUnipolar
     , maybeNegative
     , maybePositive
 
@@ -90,6 +94,9 @@ import Data.Set
     ( Set
     )
 import Internal.Data.CountMap qualified as CountMap
+import Internal.Data.Sign
+    ( Sign
+    )
 import Internal.Shared
     ( Bag
     , SignedBag
@@ -157,6 +164,9 @@ isRegular = CountMap.isRegular
 isSimple :: Ord a => SignedBag a -> Bool
 isSimple = CountMap.isSimple
 
+isUnipolar :: SignedBag a -> Bool
+isUnipolar = CountMap.isUnipolar
+
 isNegative :: Ord a => SignedBag a -> Bool
 isNegative = CountMap.isNegative
 
@@ -168,6 +178,9 @@ maybeRegular = CountMap.maybeRegular
 
 maybeSimple :: Ord a => SignedBag a -> Maybe (Integer, a)
 maybeSimple = CountMap.maybeSimple
+
+maybeUnipolar :: SignedBag a -> Maybe (Sign, Bag a)
+maybeUnipolar = CountMap.maybeUnipolar
 
 maybeNegative :: Ord a => SignedBag a -> Maybe (Bag a)
 maybeNegative = CountMap.maybeNegative

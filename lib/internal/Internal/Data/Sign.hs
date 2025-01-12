@@ -160,6 +160,9 @@ class HasSign a where
 
 newtype HasSignNumEq a = HasSignNumEq a
 
+instance HasSign Sign where
+    signOf = id
+
 {- ORMOLU_DISABLE -}
 instance (Num a, Ord a) => HasSign (HasSignNumEq a) where
     signOf (HasSignNumEq a) = case signum a of

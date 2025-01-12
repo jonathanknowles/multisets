@@ -67,6 +67,7 @@ import Internal.Data.Packed
 import Internal.Data.Sign
     ( Sign
     , HasMagnitude (magnitude, Magnitude)
+    , HasSign (signOf)
     )
 import Internal.Data.Sign qualified as Sign
 import Numeric.Natural
@@ -221,7 +222,16 @@ isSimple
     => p -> Bool
 isSimple = isJust . maybeSimple
 
--- maybeSameSign
+isUnipolar
+    :: forall p k c. ()
+    => PackedCountMap p k c
+    => HasSign c
+    => p -> Bool
+isUnipolar p =
+    Set.size uniqueSigns == 1
+  where
+    uniqueSigns :: Set Sign
+    uniqueSigns = Set.fromList $ fmap (signOf . snd) $ toList p
 
 isNegative
     :: forall p k c. ()
@@ -284,6 +294,25 @@ maybeSimple p =
   where
     uniqueKeys :: Set k
     uniqueKeys = toSet p
+
+maybeUnipolar
+    :: forall p1 p2 k c1 c2. ()
+    => PackedCountMap p1 k c1
+    => PackedCountMap p2 k c2
+    => HasMagnitude c1
+    => HasSign c1
+    => Magnitude c1 ~ c2
+    => MonoidNull (Count c1)
+    => MonoidNull (Count c2)
+    => Ord c1
+    => p1 -> Maybe (Sign, p2)
+maybeUnipolar p =
+    case Set.toList uniqueSigns of
+        [s] -> Just (s, fromMap $ Map.map magnitude $ toMap p)
+        (_) -> Nothing
+  where
+    uniqueSigns :: Set Sign
+    uniqueSigns = Set.fromList $ fmap (signOf . snd) $ toList p
 
 maybeNegative
     :: forall p1 p2 k c1 c2. ()

@@ -23,6 +23,8 @@ module Data.Bag
       -- * Indication
     , isRegular
     , isSimple
+
+      -- * Projection
     , maybeRegular
     , maybeSimple
 
