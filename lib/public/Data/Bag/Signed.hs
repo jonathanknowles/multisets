@@ -24,8 +24,12 @@ module Data.Bag.Signed
       -- * Indication
     , isRegular
     , isSimple
+    , isNegative
+    , isPositive
     , maybeRegular
     , maybeSimple
+    , maybeNegative
+    , maybePositive
 
       -- * Folding
     , foldl
@@ -153,11 +157,23 @@ isRegular = CountMap.isRegular
 isSimple :: Ord a => SignedBag a -> Bool
 isSimple = CountMap.isSimple
 
+isNegative :: Ord a => SignedBag a -> Bool
+isNegative = CountMap.isNegative
+
+isPositive :: Ord a => SignedBag a -> Bool
+isPositive = CountMap.isPositive
+
 maybeRegular :: Ord a => SignedBag a -> Maybe (Integer, Set a)
 maybeRegular = CountMap.maybeRegular
 
 maybeSimple :: Ord a => SignedBag a -> Maybe (Integer, a)
 maybeSimple = CountMap.maybeSimple
+
+maybeNegative :: Ord a => SignedBag a -> Maybe (Bag a)
+maybeNegative = CountMap.maybeNegative
+
+maybePositive :: Ord a => SignedBag a -> Maybe (Bag a)
+maybePositive = CountMap.maybePositive
 
 foldl :: (r -> a -> Integer -> r) -> r -> SignedBag a -> r
 foldl = CountMap.foldl

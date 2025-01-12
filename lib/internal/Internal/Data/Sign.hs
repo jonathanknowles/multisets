@@ -206,6 +206,13 @@ class HasMagnitude i where
     type Magnitude i
     magnitude :: i -> Magnitude i
 
+instance HasMagnitude Sign where
+    type Magnitude Sign = Bool
+    magnitude = \case
+        N -> True
+        Z -> False
+        P -> True
+
 instance HasMagnitude Integer where
     type Magnitude Integer = Natural
     magnitude = magnitudeIntegralNum

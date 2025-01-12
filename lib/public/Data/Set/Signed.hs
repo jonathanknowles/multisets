@@ -23,8 +23,12 @@ module Data.Set.Signed
       -- * Indication
     , isRegular
     , isSimple
+    , isNegative
+    , isPositive
     , maybeRegular
     , maybeSimple
+    , maybeNegative
+    , maybePositive
 
       -- * Folding
     , foldl
@@ -136,11 +140,23 @@ isRegular = CountMap.isRegular
 isSimple :: Ord a => SignedSet a -> Bool
 isSimple = CountMap.isSimple
 
+isNegative :: Ord a => SignedSet a -> Bool
+isNegative = CountMap.isNegative
+
+isPositive :: Ord a => SignedSet a -> Bool
+isPositive = CountMap.isPositive
+
 maybeRegular :: Ord a => SignedSet a -> Maybe (Sign, Set a)
 maybeRegular = CountMap.maybeRegular
 
 maybeSimple :: Ord a => SignedSet a -> Maybe (Sign, a)
 maybeSimple = CountMap.maybeSimple
+
+maybeNegative :: Ord a => SignedSet a -> Maybe (Set a)
+maybeNegative = CountMap.maybeNegative
+
+maybePositive :: Ord a => SignedSet a -> Maybe (Set a)
+maybePositive = CountMap.maybePositive
 
 foldl :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
 foldl = CountMap.foldl

@@ -1,6 +1,11 @@
 {-# LANGUAGE DataKinds #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
+
 module Internal.Shared where
 
+import Control.DeepSeq
+    ( NFData
+    )
 import Data.Group
     ( Group
     )
@@ -8,13 +13,11 @@ import Data.Monoid.Monus
     ( Monus
     , OverlappingGCDMonoid
     )
-import Control.DeepSeq
-    ( NFData
-    )
 import Data.Monoid.Null
     ( MonoidNull
     , PositiveMonoid
     )
+import Data.MonoidMap qualified as MonoidMap
 import Data.Semigroup.Cancellative
     ( Cancellative
     , LeftCancellative
@@ -26,15 +29,21 @@ import Data.Semigroup.Cancellative
 import Data.Semigroup.Commutative
     ( Commutative
     )
+import Data.Set
+    ( Set
+    )
 import GHC.IsList
     ( IsList (..)
+    )
+import Internal.Data.Count
+    ( Count (Count)
     )
 import Internal.Data.CountMap
     ( CountMap
     )
 import Internal.Data.CountMap qualified as CountMap
 import Internal.Data.Packed
-    ( Packed (Unpacked)
+    ( Packed (Unpacked, pack, unpack)
     )
 import Internal.Data.Sign
     ( Sign
@@ -82,6 +91,19 @@ instance Packed (SignedBag a) where
 instance Packed (SignedSet a) where
     type Unpacked (SignedSet a) = CountMap a Sign
 
+-- TODO:
+--
+-- This instance allows us to treat a @Set a@ object as if it were a packed
+-- 'CountMap a Bool' object. However, packing and unpacking both have cost
+-- that increases (superlinearly) with the size of the set.
+
+-- We should think of a way to avoid defining this instance.
+--
+instance Packed (Set a) where
+    type Unpacked (Set a) = CountMap a Bool
+    unpack = MonoidMap.fromSet (const (Count True))
+    pack = MonoidMap.nonNullKeys
+
 instance Ord a => IsList (Bag a) where
     type Item (Bag a) = (a, Natural)
     fromList = CountMap.fromList
@@ -122,38 +144,3 @@ instance Show a => Show (SignedSet a) where
 -- Unary         - fold over all repetitions of each element (only for Bag)
 -- UnaryNegative - fold over all repetitions of each positive element
 -- UnaryPositive - fold over all repetitions of each negative element
-{-
-
-{- ORMOLU_DISABLE -}
-instance Foldable Bag where
-    fold     = CountMap.foldRoots
-    foldMap  = CountMap.foldMapRoots
-    foldMap' = CountMap.foldMapRoots'
-    foldr    = CountMap.foldrRoots
-    foldr'   = CountMap.foldrRoots'
-    foldl    = CountMap.foldlRoots
-    foldl'   = CountMap.foldlRoots'
-{- ORMOLU_ENABLE -}
-
-{- ORMOLU_DISABLE -}
-instance Foldable SignedBag where
-    fold     = CountMap.foldRoots
-    foldMap  = CountMap.foldMapRoots
-    foldMap' = CountMap.foldMapRoots'
-    foldr    = CountMap.foldrRoots
-    foldr'   = CountMap.foldrRoots'
-    foldl    = CountMap.foldlRoots
-    foldl'   = CountMap.foldlRoots'
-{- ORMOLU_ENABLE -}
-
-{- ORMOLU_DISABLE -}
-instance Foldable SignedSet where
-    fold     = CountMap.foldRoots
-    foldMap  = CountMap.foldMapRoots
-    foldMap' = CountMap.foldMapRoots'
-    foldr    = CountMap.foldrRoots
-    foldr'   = CountMap.foldrRoots'
-    foldl    = CountMap.foldlRoots
-    foldl'   = CountMap.foldlRoots'
-{- ORMOLU_ENABLE -}
--}

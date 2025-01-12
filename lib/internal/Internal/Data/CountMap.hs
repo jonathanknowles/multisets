@@ -66,6 +66,7 @@ import Internal.Data.Packed
     )
 import Internal.Data.Sign
     ( Sign
+    , HasMagnitude (magnitude, Magnitude)
     )
 import Internal.Data.Sign qualified as Sign
 import Numeric.Natural
@@ -220,10 +221,23 @@ isSimple
     => p -> Bool
 isSimple = isJust . maybeSimple
 
--- isPositive
--- isNegative
--- maybePositive
--- maybeNegative
+-- maybeSameSign
+
+isNegative
+    :: forall p k c. ()
+    => PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord c
+    => p -> Bool
+isNegative p = Foldable.all (<= mempty) (unpack p)
+
+isPositive
+    :: forall p k c. ()
+    => PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord c
+    => p -> Bool
+isPositive p = Foldable.all (>= mempty) (unpack p)
 
 maybeRegular
     :: forall p k c
@@ -252,8 +266,8 @@ maybeRegular p =
 {- ORMOLU_ENABLE -}
 
 maybeSimple
-    :: forall p k c
-     . PackedCountMap p k c
+    :: forall p k c . ()
+    => PackedCountMap p k c
     => Monoid (Count c)
     => Ord k
     => Ord c
@@ -270,6 +284,36 @@ maybeSimple p =
   where
     uniqueKeys :: Set k
     uniqueKeys = toSet p
+
+maybeNegative
+    :: forall p1 p2 k c1 c2. ()
+    => PackedCountMap p1 k c1
+    => PackedCountMap p2 k c2
+    => HasMagnitude c1
+    => Magnitude c1 ~ c2
+    => MonoidNull (Count c1)
+    => MonoidNull (Count c2)
+    => Ord c1
+    => p1 -> Maybe p2
+maybeNegative p =
+    if Foldable.all (<= mempty) (unpack p)
+    then Just $ fromMap $ Map.map magnitude $ toMap p
+    else Nothing
+
+maybePositive
+    :: forall p1 p2 k c1 c2. ()
+    => PackedCountMap p1 k c1
+    => PackedCountMap p2 k c2
+    => HasMagnitude c1
+    => Magnitude c1 ~ c2
+    => MonoidNull (Count c1)
+    => MonoidNull (Count c2)
+    => Ord c1
+    => p1 -> Maybe p2
+maybePositive p =
+    if Foldable.all (>= mempty) (unpack p)
+    then Just $ fromMap $ Map.map magnitude $ toMap p
+    else Nothing
 
 foldRoots
     :: PackedCountMap p k c

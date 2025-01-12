@@ -6,6 +6,9 @@ import Control.DeepSeq
 import Data.Group
     ( Group
     )
+import Data.Monoid
+    ( Any
+    )
 import Data.Monoid qualified as Monoid
 import Data.Monoid.Monus
     ( Monus
@@ -50,6 +53,14 @@ newtype Count a = Count a
 
 instance Packed (Count a) where
     type Unpacked (Count a) = a
+
+-- TODO:
+-- Think of a way to avoid creating instances for `Count Bool`.
+{- ORMOLU_DISABLE -}
+deriving via Any instance Semigroup  (Count Bool)
+deriving via Any instance Monoid     (Count Bool)
+deriving via Any instance MonoidNull (Count Bool)
+{- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
 deriving via Sum Sign instance Semigroup   (Count Sign)
