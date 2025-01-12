@@ -24,6 +24,7 @@ module Data.Set.Signed
     , isRegular
     , isSimple
     , isUnipolar
+    , isBipolar
     , isNegative
     , isPositive
 
@@ -146,6 +147,9 @@ isSimple = CountMap.isSimple
 
 isUnipolar :: SignedSet a -> Bool
 isUnipolar = CountMap.isUnipolar
+
+isBipolar :: SignedSet a -> Bool
+isBipolar = CountMap.isBipolar
 
 isNegative :: Ord a => SignedSet a -> Bool
 isNegative = CountMap.isNegative

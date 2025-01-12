@@ -222,6 +222,17 @@ isSimple
     => p -> Bool
 isSimple = isJust . maybeSimple
 
+isBipolar
+    :: forall p k c. ()
+    => PackedCountMap p k c
+    => HasSign c
+    => p -> Bool
+isBipolar p =
+    Set.size uniqueSigns == 2
+  where
+    uniqueSigns :: Set Sign
+    uniqueSigns = Set.fromList $ fmap (signOf . snd) $ toList p
+
 isUnipolar
     :: forall p k c. ()
     => PackedCountMap p k c

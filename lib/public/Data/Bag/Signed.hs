@@ -25,6 +25,7 @@ module Data.Bag.Signed
     , isRegular
     , isSimple
     , isUnipolar
+    , isBipolar
     , isNegative
     , isPositive
 
@@ -166,6 +167,9 @@ isSimple = CountMap.isSimple
 
 isUnipolar :: SignedBag a -> Bool
 isUnipolar = CountMap.isUnipolar
+
+isBipolar :: SignedBag a -> Bool
+isBipolar = CountMap.isBipolar
 
 isNegative :: Ord a => SignedBag a -> Bool
 isNegative = CountMap.isNegative
