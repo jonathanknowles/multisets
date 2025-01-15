@@ -6,6 +6,7 @@
 
 module Internal.Data.Sign.New
     ( Sign (..)
+    , Zero (..)
     , SignZ (..)
     , HasSign (..)
     , HasMagnitude (..)

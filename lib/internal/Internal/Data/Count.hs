@@ -40,7 +40,9 @@ import Internal.Data.Packed
     )
 import Internal.Data.Sign qualified as SignOld
 import Internal.Data.Sign.New
-    ( SignZ
+    ( Sign (N, P)
+    , SignZ (Sign, Zero)
+    , Zero (Z)
     )
 import Numeric.Natural
     ( Natural
@@ -128,6 +130,18 @@ instance CountMagnitude SignOld.Sign where
         SignOld.N ->  1
         SignOld.Z ->  0
         SignOld.P ->  1
+{- ORMOLU_ENABLE -}
+
+{- ORMOLU_DISABLE -}
+instance CountMagnitude SignZ where
+    countToInteger (Count s) = case s of
+        Sign N -> -1
+        Zero Z ->  0
+        Sign P ->  1
+    countToNatural (Count s) = case s of
+        Sign N ->  1
+        Zero Z ->  0
+        Sign P ->  1
 {- ORMOLU_ENABLE -}
 
 class CountSymmetricDifference c where
