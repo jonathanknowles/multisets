@@ -38,10 +38,7 @@ import Internal.Data.Monoid
 import Internal.Data.Packed
     ( Packed (Unpacked)
     )
-import Internal.Data.Sign
-    ( Sign
-    )
-import Internal.Data.Sign qualified as Sign
+import Internal.Data.Sign qualified as SignOld
 import Internal.Data.Sign.New
     ( SignZ
     )
@@ -66,11 +63,11 @@ deriving via Any instance MonoidNull (Count Bool)
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
-deriving via Sum Sign instance Semigroup   (Count Sign)
-deriving via Sum Sign instance Commutative (Count Sign)
-deriving via Sum Sign instance Monoid      (Count Sign)
-deriving via Sum Sign instance MonoidNull  (Count Sign)
-deriving via Sum Sign instance Group       (Count Sign)
+deriving via Sum SignOld.Sign instance Semigroup   (Count SignOld.Sign)
+deriving via Sum SignOld.Sign instance Commutative (Count SignOld.Sign)
+deriving via Sum SignOld.Sign instance Monoid      (Count SignOld.Sign)
+deriving via Sum SignOld.Sign instance MonoidNull  (Count SignOld.Sign)
+deriving via Sum SignOld.Sign instance Group       (Count SignOld.Sign)
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
@@ -122,15 +119,15 @@ instance CountMagnitude Natural where
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
-instance CountMagnitude Sign where
+instance CountMagnitude SignOld.Sign where
     countToInteger (Count s) = case s of
-        Sign.N -> -1
-        Sign.Z ->  0
-        Sign.P ->  1
+        SignOld.N -> -1
+        SignOld.Z ->  0
+        SignOld.P ->  1
     countToNatural (Count s) = case s of
-        Sign.N ->  1
-        Sign.Z ->  0
-        Sign.P ->  1
+        SignOld.N ->  1
+        SignOld.Z ->  0
+        SignOld.P ->  1
 {- ORMOLU_ENABLE -}
 
 class CountSymmetricDifference c where
