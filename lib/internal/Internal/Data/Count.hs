@@ -42,6 +42,9 @@ import Internal.Data.Sign
     ( Sign
     )
 import Internal.Data.Sign qualified as Sign
+import Internal.Data.Sign.New
+    ( SignZ
+    )
 import Numeric.Natural
     ( Natural
     )
@@ -68,6 +71,14 @@ deriving via Sum Sign instance Commutative (Count Sign)
 deriving via Sum Sign instance Monoid      (Count Sign)
 deriving via Sum Sign instance MonoidNull  (Count Sign)
 deriving via Sum Sign instance Group       (Count Sign)
+{- ORMOLU_ENABLE -}
+
+{- ORMOLU_DISABLE -}
+deriving via Sum SignZ instance Semigroup   (Count SignZ)
+deriving via Sum SignZ instance Commutative (Count SignZ)
+deriving via Sum SignZ instance Monoid      (Count SignZ)
+deriving via Sum SignZ instance MonoidNull  (Count SignZ)
+deriving via Sum SignZ instance Group       (Count SignZ)
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
