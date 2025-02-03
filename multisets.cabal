@@ -112,7 +112,6 @@ library internal
         Internal.Data.Packed
         Internal.Data.Sign
         Internal.Data.Sign.Model
-        Internal.Data.Sign.New
         Internal.Data.Sign.NonZero
         Internal.Shared
     default-language:
