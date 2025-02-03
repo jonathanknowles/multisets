@@ -10,17 +10,17 @@ null :: Sign -> Bool
 null s = signToIntegral @Int s == 0
 
 invert :: Sign -> Sign
-invert s = Sign.fromNum @Int $ negate $ signToIntegral s
+invert s = Sign.signOf @Int $ negate $ signToIntegral s
 
 add :: Sign -> Sign -> Sign
 add s1 s2 =
-    Sign.fromNum @Int $
+    Sign.signOf @Int $
         (`moduloInclusiveRange` (-1, 1)) $
             signToIntegral s1 + signToIntegral s2
 
 multiply :: Sign -> Sign -> Sign
 multiply s1 s2 =
-    Sign.fromNum @Int $
+    Sign.signOf @Int $
         signToIntegral s1 * signToIntegral s2
 
 --------------------------------------------------------------------------------

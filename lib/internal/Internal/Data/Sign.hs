@@ -4,7 +4,6 @@
 
 module Internal.Data.Sign
     ( Sign (..)
-    , fromNum
     , HasSign (..)
     , HasMagnitude (..)
     , toNonZero
@@ -136,14 +135,6 @@ fromNonZero = \case
 --------------------------------------------------------------------------------
 -- Functions
 --------------------------------------------------------------------------------
-
-{- ORMOLU_DISABLE -}
-fromNum :: (Num n, Ord n) => n -> Sign
-fromNum n
-    | n < 0     = N
-    | n > 0     = P
-    | otherwise = Z
-{- ORMOLU_ENABLE -}
 
 null :: Sign -> Bool
 null Z = True

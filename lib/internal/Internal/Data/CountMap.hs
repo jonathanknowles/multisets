@@ -177,10 +177,11 @@ toSet p = MonoidMap.nonNullKeys (unpack p)
 toSetSigned
     :: PackedCountMap p1 k c1
     => PackedCountMap p2 k Sign
+    => HasSign c1
     => Num c1
     => Ord c1
     => p1 -> p2
-toSetSigned = fromMap . Map.map Sign.fromNum . toMap
+toSetSigned = fromMap . Map.map Sign.signOf . toMap
 
 fromSet
     :: PackedCountMap p k c
