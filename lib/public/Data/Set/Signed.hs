@@ -1,7 +1,6 @@
 module Data.Set.Signed
     ( -- * Types
-      Sign (..)
-    , SignedSet
+      SignedSet
 
       -- * Construction
     , empty
@@ -93,7 +92,7 @@ import Data.Set
     )
 import Internal.Data.CountMap qualified as CountMap
 import Internal.Data.Sign
-    ( Sign (..)
+    ( NumSign (..)
     )
 import Internal.Shared
     ( SignedSet
@@ -116,19 +115,23 @@ empty = CountMap.empty
 singleton :: Ord a => a -> SignedSet a
 singleton = CountMap.singleton
 
-fromListWith :: Ord a => (Sign -> Sign -> Sign) -> [(a, Sign)] -> SignedSet a
+fromListWith
+    :: Ord a
+    => (NumSign -> NumSign -> NumSign)
+    -> [(a, NumSign)]
+    -> SignedSet a
 fromListWith = CountMap.fromListWith
 
-fromMap :: Map a Sign -> SignedSet a
+fromMap :: Map a NumSign -> SignedSet a
 fromMap = CountMap.fromMap
 
-fromSet :: (a -> Sign) -> Set a -> SignedSet a
+fromSet :: (a -> NumSign) -> Set a -> SignedSet a
 fromSet = CountMap.fromSet
 
-toList :: SignedSet a -> [(a, Sign)]
+toList :: SignedSet a -> [(a, NumSign)]
 toList = CountMap.toList
 
-toMap :: SignedSet a -> Map a Sign
+toMap :: SignedSet a -> Map a NumSign
 toMap = CountMap.toMap
 
 toSet :: SignedSet a -> Set a
@@ -137,7 +140,7 @@ toSet = CountMap.toSet
 null :: SignedSet a -> Bool
 null = CountMap.null
 
-count :: Ord a => a -> SignedSet a -> Sign
+count :: Ord a => a -> SignedSet a -> NumSign
 count = CountMap.count
 
 member :: Ord a => a -> SignedSet a -> Bool
@@ -167,19 +170,19 @@ isNegative = CountMap.isNegative
 isPositive :: Ord a => SignedSet a -> Bool
 isPositive = CountMap.isPositive
 
-maybeRegular :: Ord a => SignedSet a -> Maybe (Sign, Set a)
+maybeRegular :: Ord a => SignedSet a -> Maybe (NumSign, Set a)
 maybeRegular = CountMap.maybeRegular
 
-maybeSimple :: Ord a => SignedSet a -> Maybe (Sign, a)
+maybeSimple :: Ord a => SignedSet a -> Maybe (NumSign, a)
 maybeSimple = CountMap.maybeSimple
 
 maybeSingleton :: Ord a => SignedSet a -> Maybe a
 maybeSingleton = CountMap.maybeSingleton
 
-maybeSingletonSigned :: Ord a => SignedSet a -> Maybe (Sign, a)
+maybeSingletonSigned :: Ord a => SignedSet a -> Maybe (NumSign, a)
 maybeSingletonSigned = CountMap.maybeSingletonSigned
 
-maybeUnipolar :: SignedSet a -> Maybe (Sign, Set a)
+maybeUnipolar :: SignedSet a -> Maybe (NumSign, Set a)
 maybeUnipolar = CountMap.maybeUnipolar
 
 maybeNegative :: Ord a => SignedSet a -> Maybe (Set a)
@@ -188,33 +191,33 @@ maybeNegative = CountMap.maybeNegative
 maybePositive :: Ord a => SignedSet a -> Maybe (Set a)
 maybePositive = CountMap.maybePositive
 
-foldl :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
+foldl :: (r -> a -> NumSign -> r) -> r -> SignedSet a -> r
 foldl = CountMap.foldl
 
-foldl' :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
+foldl' :: (r -> a -> NumSign -> r) -> r -> SignedSet a -> r
 foldl' = CountMap.foldl'
 
-foldr :: (a -> Sign -> r -> r) -> r -> SignedSet a -> r
+foldr :: (a -> NumSign -> r -> r) -> r -> SignedSet a -> r
 foldr = CountMap.foldr
 
-foldr' :: (a -> Sign -> r -> r) -> r -> SignedSet a -> r
+foldr' :: (a -> NumSign -> r -> r) -> r -> SignedSet a -> r
 foldr' = CountMap.foldr'
 
-foldMap :: Monoid m => (a -> Sign -> m) -> SignedSet a -> m
+foldMap :: Monoid m => (a -> NumSign -> m) -> SignedSet a -> m
 foldMap = CountMap.foldMap
 
-foldMap' :: Monoid m => (a -> Sign -> m) -> SignedSet a -> m
+foldMap' :: Monoid m => (a -> NumSign -> m) -> SignedSet a -> m
 foldMap' = CountMap.foldMap'
 
 mapWith
     :: Ord b
-    => (Sign -> Sign -> Sign)
+    => (NumSign -> NumSign -> NumSign)
     -> (a -> b)
     -> SignedSet a
     -> SignedSet b
 mapWith = CountMap.mapWith
 
-mapSigns :: (Sign -> Sign) -> SignedSet a -> SignedSet a
+mapSigns :: (NumSign -> NumSign) -> SignedSet a -> SignedSet a
 mapSigns = CountMap.mapCounts
 
 invert :: SignedSet a -> SignedSet a

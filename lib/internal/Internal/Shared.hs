@@ -46,7 +46,7 @@ import Internal.Data.Packed
     ( Packed (Unpacked, pack, unpack)
     )
 import Internal.Data.Sign
-    ( Sign
+    ( NumSign
     )
 import Numeric.Natural
     ( Natural
@@ -65,7 +65,7 @@ newtype SignedBag a = SignedBag (CountMap a Integer)
     deriving newtype (Semigroup, Monoid, MonoidNull)
     deriving newtype (Commutative, Group)
 
-newtype SignedSet a = SignedSet (CountMap a Sign)
+newtype SignedSet a = SignedSet (CountMap a NumSign)
     deriving newtype (Eq, NFData)
     deriving newtype (Semigroup, Monoid, MonoidNull)
     deriving newtype (Commutative, Group)
@@ -89,7 +89,7 @@ instance Packed (SignedBag a) where
     type Unpacked (SignedBag a) = CountMap a Integer
 
 instance Packed (SignedSet a) where
-    type Unpacked (SignedSet a) = CountMap a Sign
+    type Unpacked (SignedSet a) = CountMap a NumSign
 
 -- TODO:
 --
@@ -115,7 +115,7 @@ instance Ord a => IsList (SignedBag a) where
     toList = CountMap.toList
 
 instance Ord a => IsList (SignedSet a) where
-    type Item (SignedSet a) = (a, Sign)
+    type Item (SignedSet a) = (a, NumSign)
     fromList = CountMap.fromList
     toList = CountMap.toList
 

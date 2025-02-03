@@ -1,26 +1,26 @@
 module Internal.Data.Sign.Model where
 
 import Internal.Data.Sign
-    ( Sign (..)
+    ( NumSign (..)
     )
-import Internal.Data.Sign qualified as Sign
+import Internal.Data.Sign qualified as NumSign
 import Prelude
 
-null :: Sign -> Bool
+null :: NumSign -> Bool
 null s = signToIntegral @Int s == 0
 
-invert :: Sign -> Sign
-invert s = Sign.signOf @Int $ negate $ signToIntegral s
+invert :: NumSign -> NumSign
+invert s = NumSign.signOf @Int $ negate $ signToIntegral s
 
-add :: Sign -> Sign -> Sign
+add :: NumSign -> NumSign -> NumSign
 add s1 s2 =
-    Sign.signOf @Int $
+    NumSign.signOf @Int $
         (`moduloInclusiveRange` (-1, 1)) $
             signToIntegral s1 + signToIntegral s2
 
-multiply :: Sign -> Sign -> Sign
+multiply :: NumSign -> NumSign -> NumSign
 multiply s1 s2 =
-    Sign.signOf @Int $
+    NumSign.signOf @Int $
         signToIntegral s1 * signToIntegral s2
 
 --------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ multiply s1 s2 =
 moduloInclusiveRange :: Integral i => i -> (i, i) -> i
 moduloInclusiveRange i (lo, hi) = ((i - lo) `mod` (hi - lo + 1)) + lo
 
-signToIntegral :: Integral i => Sign -> i
+signToIntegral :: Integral i => NumSign -> i
 signToIntegral = \case
     N -> -1
     Z -> 0

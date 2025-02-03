@@ -3,7 +3,7 @@
 module Data.SignSpec where
 
 import Data.Sign
-    ( Sign
+    ( NumSign
     )
 import Internal.Data.Monoid
     ( Max (..)
@@ -43,39 +43,39 @@ import Prelude
 
 spec :: Spec
 spec = describe "Class laws" $ do
-    testLawsMany @Sign
+    testLawsMany @NumSign
         [ semiringLaws
         , ringLaws
         ]
-    testLawsMany @(Min Sign)
+    testLawsMany @(Min NumSign)
         [ semigroupLaws
         , monoidLaws
         ]
-    testLawsMany @(Max Sign)
+    testLawsMany @(Max NumSign)
         [ semigroupLaws
         , monoidLaws
         ]
-    testLawsMany @(Sum Sign)
+    testLawsMany @(Sum NumSign)
         [ semigroupLaws
         , monoidLaws
         , groupLaws
         ]
-    testLawsMany @(Product Sign)
+    testLawsMany @(Product NumSign)
         [ semigroupLaws
         , monoidLaws
         ]
 
-instance Arbitrary Sign where
+instance Arbitrary NumSign where
     arbitrary = arbitraryBoundedEnum
     shrink = shrinkBoundedEnum
 
-deriving newtype instance Arbitrary (Min Sign)
+deriving newtype instance Arbitrary (Min NumSign)
 
-deriving newtype instance Arbitrary (Max Sign)
+deriving newtype instance Arbitrary (Max NumSign)
 
-deriving newtype instance Arbitrary (Sum Sign)
+deriving newtype instance Arbitrary (Sum NumSign)
 
-deriving newtype instance Arbitrary (Product Sign)
+deriving newtype instance Arbitrary (Product NumSign)
 
 --------------------------------------------------------------------------------
 -- Coverage checks

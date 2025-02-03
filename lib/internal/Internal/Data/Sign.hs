@@ -3,7 +3,7 @@
 {-# LANGUAGE FunctionalDependencies #-}
 
 module Internal.Data.Sign
-    ( Sign (..)
+    ( NumSign (..)
     , HasSign (..)
     , toNonZero
     , fromNonZero
@@ -57,7 +57,7 @@ import Prelude hiding
     ( null
     )
 
-data Sign
+data NumSign
     = -- | Negative
       N
     | -- | Zero
@@ -67,57 +67,57 @@ data Sign
     deriving stock (Bounded, Enum, Eq, Generic, Ord, Read, Show)
     deriving anyclass (NFData)
 
-instance Semiring Sign where
+instance Semiring NumSign where
     zero = Z
     one = P
     plus = add
     times = multiply
 
-instance Ring Sign where
+instance Ring NumSign where
     negate = invert
 
 --------------------------------------------------------------------------------
 -- Sum
 --------------------------------------------------------------------------------
 
-instance Semigroup (Sum Sign) where
+instance Semigroup (Sum NumSign) where
     (<>) = coerce add
 
-instance Monoid (Sum Sign) where
+instance Monoid (Sum NumSign) where
     mempty = coerce Z
 
-instance MonoidNull (Sum Sign) where
+instance MonoidNull (Sum NumSign) where
     null = coerce null
 
-instance Group (Sum Sign) where
+instance Group (Sum NumSign) where
     invert = coerce invert
 
-instance Abelian (Sum Sign)
+instance Abelian (Sum NumSign)
 
-instance Cyclic (Sum Sign) where
+instance Cyclic (Sum NumSign) where
     generator = coerce P
 
 --------------------------------------------------------------------------------
 -- Product
 --------------------------------------------------------------------------------
 
-instance Semigroup (Product Sign) where
+instance Semigroup (Product NumSign) where
     (<>) = coerce multiply
 
-instance Monoid (Product Sign) where
+instance Monoid (Product NumSign) where
     mempty = coerce P
 
 --------------------------------------------------------------------------------
 -- Conversions
 --------------------------------------------------------------------------------
 
-toNonZero :: Sign -> Maybe NonZero.Sign
+toNonZero :: NumSign -> Maybe NonZero.Sign
 toNonZero = \case
     N -> Just NonZero.N
     P -> Just NonZero.P
     Z -> Nothing
 
-fromNonZero :: NonZero.Sign -> Sign
+fromNonZero :: NonZero.Sign -> NumSign
 fromNonZero = \case
     NonZero.N -> N
     NonZero.P -> P
@@ -126,16 +126,16 @@ fromNonZero = \case
 -- Functions
 --------------------------------------------------------------------------------
 
-null :: Sign -> Bool
+null :: NumSign -> Bool
 null Z = True
 null _ = False
 
-invert :: Sign -> Sign
+invert :: NumSign -> NumSign
 invert N = P
 invert Z = Z
 invert P = N
 
-add :: Sign -> Sign -> Sign
+add :: NumSign -> NumSign -> NumSign
 add Z x = x
 add x Z = x
 add N P = Z
@@ -143,7 +143,7 @@ add P N = Z
 add N N = P
 add P P = N
 
-multiply :: Sign -> Sign -> Sign
+multiply :: NumSign -> NumSign -> NumSign
 multiply Z _ = Z
 multiply _ Z = Z
 multiply P x = x
@@ -155,11 +155,11 @@ multiply N N = P
 --------------------------------------------------------------------------------
 
 class HasSign a where
-    signOf :: a -> Sign
+    signOf :: a -> NumSign
 
 newtype HasSignNumEq a = HasSignNumEq a
 
-instance HasSign Sign where
+instance HasSign NumSign where
     signOf = id
 
 {- ORMOLU_DISABLE -}
