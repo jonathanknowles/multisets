@@ -7,6 +7,8 @@ module Internal.Data.Sign
     , fromNum
     , HasSign (..)
     , HasMagnitude (..)
+    , toNonZero
+    , fromNonZero
     )
 where
 
@@ -58,6 +60,7 @@ import Internal.Data.Monoid
     ( Product (..)
     , Sum (..)
     )
+import Internal.Data.Sign.NonZero qualified as NonZero
 import Numeric.Natural
     ( Natural
     )
@@ -114,6 +117,21 @@ instance Semigroup (Product Sign) where
 
 instance Monoid (Product Sign) where
     mempty = coerce P
+
+--------------------------------------------------------------------------------
+-- Conversions
+--------------------------------------------------------------------------------
+
+toNonZero :: Sign -> Maybe NonZero.Sign
+toNonZero = \case
+    N -> Just NonZero.N
+    P -> Just NonZero.P
+    Z -> Nothing
+
+fromNonZero :: NonZero.Sign -> Sign
+fromNonZero = \case
+    NonZero.N -> N
+    NonZero.P -> P
 
 --------------------------------------------------------------------------------
 -- Functions
