@@ -108,6 +108,7 @@ library internal
     exposed-modules:
         Internal.Data.Count
         Internal.Data.CountMap
+        Internal.Data.Magnitude
         Internal.Data.Monoid
         Internal.Data.Packed
         Internal.Data.Sign

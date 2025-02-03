@@ -5,7 +5,6 @@
 module Internal.Data.Sign
     ( Sign (..)
     , HasSign (..)
-    , HasMagnitude (..)
     , toNonZero
     , fromNonZero
     )
@@ -46,12 +45,6 @@ import Data.Semiring
     ( Ring (..)
     , Semiring (..)
     )
-import Data.Word
-    ( Word16
-    , Word32
-    , Word64
-    , Word8
-    )
 import GHC.Generics
     ( Generic
     )
@@ -60,9 +53,6 @@ import Internal.Data.Monoid
     , Sum (..)
     )
 import Internal.Data.Sign.NonZero qualified as NonZero
-import Numeric.Natural
-    ( Natural
-    )
 import Prelude hiding
     ( null
     )
@@ -209,45 +199,3 @@ deriving newtype instance HasSign a => HasSign (Identity a)
 deriving newtype instance HasSign a => HasSign (Max a)
 deriving newtype instance HasSign a => HasSign (Min a)
 {- ORMOLU_ENABLE -}
-
---------------------------------------------------------------------------------
--- Magnitude
---------------------------------------------------------------------------------
-
-class HasMagnitude i where
-    type Magnitude i
-    magnitude :: i -> Magnitude i
-
-instance HasMagnitude Sign where
-    type Magnitude Sign = Bool
-    magnitude = \case
-        N -> True
-        Z -> False
-        P -> True
-
-instance HasMagnitude Integer where
-    type Magnitude Integer = Natural
-    magnitude = magnitudeIntegralNum
-
-instance HasMagnitude Int where
-    type Magnitude Int = Word
-    magnitude = magnitudeIntegralNum
-
-instance HasMagnitude Int8 where
-    type Magnitude Int8 = Word8
-    magnitude = magnitudeIntegralNum
-
-instance HasMagnitude Int16 where
-    type Magnitude Int16 = Word16
-    magnitude = magnitudeIntegralNum
-
-instance HasMagnitude Int32 where
-    type Magnitude Int32 = Word32
-    magnitude = magnitudeIntegralNum
-
-instance HasMagnitude Int64 where
-    type Magnitude Int64 = Word64
-    magnitude = magnitudeIntegralNum
-
-magnitudeIntegralNum :: (Integral a, Num b) => a -> b
-magnitudeIntegralNum i = fromIntegral $ abs i

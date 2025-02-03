@@ -66,8 +66,10 @@ import Internal.Data.Packed
     )
 import Internal.Data.Sign
     ( Sign (Z)
-    , HasMagnitude (magnitude, Magnitude)
     , HasSign (signOf)
+    )
+import Internal.Data.Magnitude
+    ( HasMagnitude (magnitude, Magnitude)
     )
 import Internal.Data.Sign qualified as Sign
 import Numeric.Natural
