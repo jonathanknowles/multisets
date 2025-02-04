@@ -1,6 +1,7 @@
 module Data.Set.Signed
     ( -- * Types
       SignedSet
+    , Sign (N, P)
 
       -- * Construction
     , empty
