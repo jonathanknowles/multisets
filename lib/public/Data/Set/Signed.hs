@@ -19,6 +19,7 @@ module Data.Set.Signed
     , lookup
     , member
     , null
+    , signs
 
       -- * Indication
     , isRegular
@@ -127,10 +128,9 @@ singleton :: Ord a => a -> SignedSet a
 singleton = CountMap.singleton
 
 fromListWith :: Ord a => (Sign -> Sign -> Sign) -> [(a, Sign)] -> SignedSet a
-fromListWith f as =
-    CountMap.fromListWith
-        (unsafeSignToNumSign3 f)
-        (fmap NumSign.fromSign <$> as)
+fromListWith f =
+    CountMap.fromListWith (unsafeSignToNumSign3 f)
+        . fmap (fmap NumSign.fromSign)
 
 fromMap :: Map a Sign -> SignedSet a
 fromMap = CountMap.fromMap . Map.map NumSign.fromSign
@@ -155,6 +155,9 @@ lookup a = NumSign.toSign . CountMap.lookup a
 
 member :: Ord a => a -> SignedSet a -> Bool
 member = CountMap.member
+
+signs :: SignedSet a -> Set Sign
+signs = CountMap.signs
 
 isRegular :: Ord a => SignedSet a -> Bool
 isRegular = CountMap.isRegular

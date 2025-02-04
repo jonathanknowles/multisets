@@ -20,6 +20,7 @@ module Data.Bag.Signed
     , lookup
     , member
     , null
+    , signs
 
       -- * Indication
     , isRegular
@@ -163,6 +164,9 @@ lookup = CountMap.lookup
 
 member :: Ord a => a -> SignedBag a -> Bool
 member = CountMap.member
+
+signs :: SignedBag a -> Set Sign
+signs = CountMap.signs
 
 isRegular :: Ord a => SignedBag a -> Bool
 isRegular = CountMap.isRegular

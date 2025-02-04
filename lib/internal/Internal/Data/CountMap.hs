@@ -215,6 +215,15 @@ member
     => k -> p -> Bool
 member k = MonoidMap.nonNullKey k . unpack
 
+signs
+    :: PackedCountMap p k c
+    => SignNum c
+    => p -> Set Sign
+signs =
+    Set.fromList
+        . mapMaybe (NumSign.toSign . signNum . snd)
+        . toList
+
 isRegular
     :: PackedCountMap p k c
     => Monoid (Count c)
@@ -253,11 +262,7 @@ isBipolar
     => PackedCountMap p k c
     => SignNum c
     => p -> Bool
-isBipolar p =
-    Set.size uniqueSigns == 2
-  where
-    uniqueSigns :: Set NumSign
-    uniqueSigns = Set.fromList $ fmap (signNum . snd) $ toList p
+isBipolar p = Set.size (signs p) == 2
 
 isUnipolar
     :: forall p k c
@@ -265,11 +270,7 @@ isUnipolar
     => PackedCountMap p k c
     => SignNum c
     => p -> Bool
-isUnipolar p =
-    Set.size uniqueSigns == 1
-  where
-    uniqueSigns :: Set NumSign
-    uniqueSigns = Set.fromList $ fmap (signNum . snd) $ toList p
+isUnipolar p = Set.size (signs p) == 1
 
 isNegative
     :: forall p k c
@@ -304,6 +305,7 @@ maybeRegular p =
     -- of unique counts and then testing its size, we terminate as soon as we
     -- detect more than one unique count.
     case Set.toList uniqueCounts of
+        -- TODO: Consider whether or not to return 'Nothing' here:
         [ ] -> Just (z, Set.empty)
         [c] -> Just (c,   toSet p)
         (_) -> Nothing
@@ -379,15 +381,9 @@ maybeUnipolar
     => p1 -> Maybe (Sign, p2)
 {- ORMOLU_DISABLE -}
 maybeUnipolar p =
-    case Set.toList uniqueSigns of
+    case Set.toList (signs p) of
         [s] -> Just (s, fromMap $ Map.map magnitude $ toMap p)
         (_) -> Nothing
-  where
-    uniqueSigns :: Set Sign
-    uniqueSigns
-        = Set.fromList
-        $ mapMaybe (NumSign.toSign . signNum . snd)
-        $ toList p
 {- ORMOLU_ENABLE -}
 
 maybeNegative
