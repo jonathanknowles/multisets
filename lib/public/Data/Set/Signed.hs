@@ -1,5 +1,5 @@
 module Data.Set.Signed
-    ( -- * Types
+    ( -- * Type
       SignedSet
 
       -- * Construction
