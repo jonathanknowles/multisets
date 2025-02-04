@@ -71,7 +71,7 @@ import Internal.Data.Sign.Num
 import Internal.Data.Magnitude
     ( HasMagnitude (magnitude, Magnitude)
     )
-import Internal.Data.Sign.Num qualified as Sign
+import Internal.Data.Sign.Num qualified as NumSign
 import Numeric.Natural
     ( Natural
     )
@@ -348,8 +348,8 @@ maybeSingletonSigned
     -> Maybe (NumSign, k)
 maybeSingletonSigned p =
     case MonoidMap.toList (unpack p) of
-        [(k, c)] | c == succ mempty -> Just (Sign.P, k)
-        [(k, c)] | c == pred mempty -> Just (Sign.N, k)
+        [(k, c)] | c == succ mempty -> Just (NumSign.P, k)
+        [(k, c)] | c == pred mempty -> Just (NumSign.N, k)
         _ -> Nothing
 
 maybeUnipolar
