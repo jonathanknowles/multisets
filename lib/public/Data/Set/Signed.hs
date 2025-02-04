@@ -15,9 +15,9 @@ module Data.Set.Signed
     , toSet
 
       -- * Membership
-    , null
-    , count
+    , lookup
     , member
+    , null
 
       -- * Indication
     , isRegular
@@ -108,6 +108,7 @@ import Prelude hiding
     , foldl
     , foldl'
     , foldr
+    , lookup
     , map
     , null
     )
@@ -143,8 +144,8 @@ toSet = CountMap.toSet
 null :: SignedSet a -> Bool
 null = CountMap.null
 
-count :: Ord a => a -> SignedSet a -> NumSign
-count = CountMap.count
+lookup :: Ord a => a -> SignedSet a -> NumSign
+lookup = CountMap.lookup
 
 member :: Ord a => a -> SignedSet a -> Bool
 member = CountMap.member

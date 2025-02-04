@@ -17,9 +17,9 @@ module Data.Bag.Signed
     , toSetSigned
 
       -- * Membership
-    , null
-    , count
+    , lookup
     , member
+    , null
 
       -- * Indication
     , isRegular
@@ -115,6 +115,7 @@ import Prelude hiding
     , foldl
     , foldl'
     , foldr
+    , lookup
     , map
     , null
     , sum
@@ -157,8 +158,8 @@ toSetSigned = CountMap.toSetSigned
 null :: SignedBag a -> Bool
 null = CountMap.null
 
-count :: Ord a => a -> SignedBag a -> Integer
-count = CountMap.count
+lookup :: Ord a => a -> SignedBag a -> Integer
+lookup = CountMap.lookup
 
 member :: Ord a => a -> SignedBag a -> Bool
 member = CountMap.member

@@ -83,6 +83,7 @@ import Numeric.Natural
 import Prelude hiding
     ( foldl'
     , foldr
+    , lookup
     , map
     , null
     , sum
@@ -201,12 +202,12 @@ fromSet f s = pack $ MonoidMap.fromSet (coerce f) s
 null :: PackedCountMap p k c => p -> Bool
 null = MonoidMap.null . unpack
 
-count
+lookup
     :: PackedCountMap p k c
     => Ord k
     => Monoid (Count c)
     => k -> p -> c
-count k = unpack . MonoidMap.get k . unpack
+lookup k = unpack . MonoidMap.get k . unpack
 
 member
     :: PackedCountMap p k c
@@ -329,7 +330,7 @@ maybeSimple p =
     -- of unique keys and then testing its size, we terminate as soon as we
     -- detect more than one unique key.
     case Set.toList uniqueKeys of
-        [k] -> Just (count k p, k)
+        [k] -> Just (lookup k p, k)
         (_) -> Nothing
   where
     uniqueKeys :: Set k
