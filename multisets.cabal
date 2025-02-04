@@ -111,8 +111,8 @@ library internal
         Internal.Data.Magnitude
         Internal.Data.Monoid
         Internal.Data.Packed
+        Internal.Data.Sign
         Internal.Data.Sign.Model
-        Internal.Data.Sign.NonZero
         Internal.Data.Sign.Num
         Internal.Shared
     default-language:

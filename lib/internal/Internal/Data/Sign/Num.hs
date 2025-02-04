@@ -5,8 +5,8 @@
 module Internal.Data.Sign.Num
     ( NumSign (..)
     , HasSign (..)
-    , toNonZero
-    , fromNonZero
+    , toSign
+    , fromSign
     )
 where
 
@@ -52,10 +52,11 @@ import Internal.Data.Monoid
     ( Product (..)
     , Sum (..)
     )
-import Internal.Data.Sign.NonZero qualified as NonZero
+import Internal.Data.Sign qualified as Sign
 import Prelude hiding
     ( null
     )
+import Internal.Data.Sign (Sign)
 
 data NumSign
     = -- | Negative
@@ -111,16 +112,16 @@ instance Monoid (Product NumSign) where
 -- Conversions
 --------------------------------------------------------------------------------
 
-toNonZero :: NumSign -> Maybe NonZero.Sign
-toNonZero = \case
-    N -> Just NonZero.N
-    P -> Just NonZero.P
+toSign :: NumSign -> Maybe Sign
+toSign = \case
+    N -> Just Sign.N
+    P -> Just Sign.P
     Z -> Nothing
 
-fromNonZero :: NonZero.Sign -> NumSign
-fromNonZero = \case
-    NonZero.N -> N
-    NonZero.P -> P
+fromSign :: Sign -> NumSign
+fromSign = \case
+    Sign.N -> N
+    Sign.P -> P
 
 --------------------------------------------------------------------------------
 -- Functions

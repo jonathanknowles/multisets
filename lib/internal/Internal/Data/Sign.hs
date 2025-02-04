@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 
-module Internal.Data.Sign.NonZero where
+module Internal.Data.Sign where
 
 import Control.DeepSeq
     ( NFData
