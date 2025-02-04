@@ -185,7 +185,7 @@ maybeSingleton = CountMap.maybeSingleton
 maybeSingletonSigned :: Ord a => SignedSet a -> Maybe (Sign, a)
 maybeSingletonSigned = CountMap.maybeSingletonSigned
 
-maybeUnipolar :: SignedSet a -> Maybe (NumSign, Set a)
+maybeUnipolar :: SignedSet a -> Maybe (Sign, Set a)
 maybeUnipolar = CountMap.maybeUnipolar
 
 maybeNegative :: Ord a => SignedSet a -> Maybe (Set a)

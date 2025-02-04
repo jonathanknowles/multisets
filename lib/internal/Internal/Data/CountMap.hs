@@ -28,6 +28,7 @@ import Data.Map.Strict
 import Data.Map.Strict qualified as Map
 import Data.Maybe
     ( isJust
+    , mapMaybe
     )
 import Data.Monoid.Monus
     ( Monus
@@ -72,9 +73,10 @@ import Internal.Data.Sign
     )
 import Internal.Data.Sign qualified as Sign
 import Internal.Data.Sign.Num
-    ( NumSign (Z)
+    ( NumSign
     , SignNum (signNum)
     )
+import Internal.Data.Sign.Num qualified as NumSign
 import Numeric.Natural
     ( Natural
     )
@@ -373,16 +375,18 @@ maybeUnipolar
     => MonoidNull (Count c1)
     => MonoidNull (Count c2)
     => Ord c1
-    => p1 -> Maybe (NumSign, p2)
+    => p1 -> Maybe (Sign, p2)
 {- ORMOLU_DISABLE -}
 maybeUnipolar p =
     case Set.toList uniqueSigns of
         [s] -> Just (s, fromMap $ Map.map magnitude $ toMap p)
-        [ ] -> Just (Z, fromMap $ Map.empty)
         (_) -> Nothing
   where
-    uniqueSigns :: Set NumSign
-    uniqueSigns = Set.fromList $ fmap (signNum . snd) $ toList p
+    uniqueSigns :: Set Sign
+    uniqueSigns
+        = Set.fromList
+        $ mapMaybe (NumSign.toSign . signNum . snd)
+        $ toList p
 {- ORMOLU_ENABLE -}
 
 maybeNegative

@@ -102,9 +102,6 @@ import Internal.Data.CountMap qualified as CountMap
 import Internal.Data.Sign
     ( Sign
     )
-import Internal.Data.Sign.Num
-    ( NumSign
-    )
 import Internal.Shared
     ( Bag
     , SignedBag
@@ -202,7 +199,7 @@ maybeSingleton = CountMap.maybeSingleton
 maybeSingletonSigned :: Ord a => SignedBag a -> Maybe (Sign, a)
 maybeSingletonSigned = CountMap.maybeSingletonSigned
 
-maybeUnipolar :: SignedBag a -> Maybe (NumSign, Bag a)
+maybeUnipolar :: SignedBag a -> Maybe (Sign, Bag a)
 maybeUnipolar = CountMap.maybeUnipolar
 
 maybeNegative :: Ord a => SignedBag a -> Maybe (Bag a)
