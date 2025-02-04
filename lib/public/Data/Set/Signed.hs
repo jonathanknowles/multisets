@@ -85,9 +85,6 @@ where
 import Data.Foldable1
     ( Foldable1
     )
-import Data.Function
-    ( on
-    )
 import Data.Map.Strict
     ( Map
     )
@@ -130,10 +127,10 @@ singleton :: Ord a => a -> SignedSet a
 singleton = CountMap.singleton
 
 fromListWith :: Ord a => (Sign -> Sign -> Sign) -> [(a, Sign)] -> SignedSet a
-fromListWith f as = CountMap.fromListWith g bs
-  where
-    g = unsafeSignToNumSign3 f
-    bs = fmap NumSign.fromSign <$> as
+fromListWith f as =
+    CountMap.fromListWith
+        (unsafeSignToNumSign3 f)
+        (fmap NumSign.fromSign <$> as)
 
 fromMap :: Map a Sign -> SignedSet a
 fromMap = CountMap.fromMap . Map.map NumSign.fromSign
@@ -210,23 +207,23 @@ maybeNegative = CountMap.maybeNegative
 maybePositive :: Ord a => SignedSet a -> Maybe (Set a)
 maybePositive = CountMap.maybePositive
 
-foldl :: (r -> a -> NumSign -> r) -> r -> SignedSet a -> r
-foldl = CountMap.foldl
+foldl :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
+foldl f = CountMap.foldl (\r a -> f r a . unsafeNumSignToSign)
 
-foldl' :: (r -> a -> NumSign -> r) -> r -> SignedSet a -> r
-foldl' = CountMap.foldl'
+foldl' :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
+foldl' f = CountMap.foldl' (\r a -> f r a . unsafeNumSignToSign)
 
-foldr :: (a -> NumSign -> r -> r) -> r -> SignedSet a -> r
-foldr = CountMap.foldr
+foldr :: (a -> Sign -> r -> r) -> r -> SignedSet a -> r
+foldr f = CountMap.foldr (\a -> f a . unsafeNumSignToSign)
 
-foldr' :: (a -> NumSign -> r -> r) -> r -> SignedSet a -> r
-foldr' = CountMap.foldr'
+foldr' :: (a -> Sign -> r -> r) -> r -> SignedSet a -> r
+foldr' f = CountMap.foldr' (\a -> f a . unsafeNumSignToSign)
 
-foldMap :: Monoid m => (a -> NumSign -> m) -> SignedSet a -> m
-foldMap = CountMap.foldMap
+foldMap :: Monoid m => (a -> Sign -> m) -> SignedSet a -> m
+foldMap f = CountMap.foldMap (\a -> f a . unsafeNumSignToSign)
 
-foldMap' :: Monoid m => (a -> NumSign -> m) -> SignedSet a -> m
-foldMap' = CountMap.foldMap'
+foldMap' :: Monoid m => (a -> Sign -> m) -> SignedSet a -> m
+foldMap' f = CountMap.foldMap' (\a -> f a . unsafeNumSignToSign)
 
 mapWith
     :: Ord b
@@ -312,16 +309,16 @@ unsafeNumSignToSign = \case
     NumSign.P -> Sign.P
     NumSign.Z -> error "unsafeNumSignToSign"
 
-{- ORMOLU_DISABLE -}
 unsafeSignToNumSign2
-    :: (   Sign ->    Sign)
-    -> (NumSign -> NumSign)
-unsafeSignToNumSign2 f = NumSign.fromSign . f . unsafeNumSignToSign
-{- ORMOLU_ENABLE -}
+    :: (Sign -> Sign) -> (NumSign -> NumSign)
+unsafeSignToNumSign2 f ns =
+    NumSign.fromSign $
+        f (unsafeNumSignToSign ns)
 
-{- ORMOLU_DISABLE -}
 unsafeSignToNumSign3
-    :: (   Sign ->    Sign ->    Sign)
-    -> (NumSign -> NumSign -> NumSign)
-unsafeSignToNumSign3 f = fmap NumSign.fromSign <$> f `on` unsafeNumSignToSign
-{- ORMOLU_ENABLE -}
+    :: (Sign -> Sign -> Sign) -> (NumSign -> NumSign -> NumSign)
+unsafeSignToNumSign3 f ns1 ns2 =
+    NumSign.fromSign $
+        f
+            (unsafeNumSignToSign ns1)
+            (unsafeNumSignToSign ns2)
