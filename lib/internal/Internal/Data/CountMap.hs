@@ -59,19 +59,22 @@ import Internal.Data.Count
         , countSymmetricDifferenceAbsolute
         )
     )
+import Internal.Data.Magnitude
+    ( HasMagnitude (Magnitude, magnitude)
+    )
 import Internal.Data.Packed
     ( Packed (Unpacked, pack, unpack)
     , unpacked
     , unpacked2
     )
+import Internal.Data.Sign
+    ( Sign
+    )
+import Internal.Data.Sign qualified as Sign
 import Internal.Data.Sign.Num
     ( NumSign (Z)
     , SignNum (signNum)
     )
-import Internal.Data.Magnitude
-    ( HasMagnitude (magnitude, Magnitude)
-    )
-import Internal.Data.Sign.Num qualified as NumSign
 import Numeric.Natural
     ( Natural
     )
@@ -242,7 +245,8 @@ isSingletonSigned
 isSingletonSigned = isJust . maybeSingletonSigned
 
 isBipolar
-    :: forall p k c. ()
+    :: forall p k c
+     . ()
     => PackedCountMap p k c
     => SignNum c
     => p -> Bool
@@ -253,7 +257,8 @@ isBipolar p =
     uniqueSigns = Set.fromList $ fmap (signNum . snd) $ toList p
 
 isUnipolar
-    :: forall p k c. ()
+    :: forall p k c
+     . ()
     => PackedCountMap p k c
     => SignNum c
     => p -> Bool
@@ -264,7 +269,8 @@ isUnipolar p =
     uniqueSigns = Set.fromList $ fmap (signNum . snd) $ toList p
 
 isNegative
-    :: forall p k c. ()
+    :: forall p k c
+     . ()
     => PackedCountMap p k c
     => Monoid (Count c)
     => Ord c
@@ -272,7 +278,8 @@ isNegative
 isNegative p = Foldable.all (<= mempty) (unpack p)
 
 isPositive
-    :: forall p k c. ()
+    :: forall p k c
+     . ()
     => PackedCountMap p k c
     => Monoid (Count c)
     => Ord c
@@ -287,8 +294,8 @@ maybeRegular
     => Ord c
     => p
     -> Maybe (c, Set k)
-maybeRegular p =
 {- ORMOLU_DISABLE -}
+maybeRegular p =
     -- TODO:
     -- Optimise this function, so that instead of constructing the entire set
     -- of unique counts and then testing its size, we terminate as soon as we
@@ -306,7 +313,8 @@ maybeRegular p =
 {- ORMOLU_ENABLE -}
 
 maybeSimple
-    :: forall p k c . ()
+    :: forall p k c
+     . ()
     => PackedCountMap p k c
     => Monoid (Count c)
     => Ord k
@@ -326,7 +334,8 @@ maybeSimple p =
     uniqueKeys = toSet p
 
 maybeSingleton
-    :: forall p k c . ()
+    :: forall p k c
+     . ()
     => PackedCountMap p k c
     => Monoid (Count c)
     => Enum c
@@ -339,21 +348,23 @@ maybeSingleton p =
         _ -> Nothing
 
 maybeSingletonSigned
-    :: forall p k c . ()
+    :: forall p k c
+     . ()
     => PackedCountMap p k c
     => Monoid (Count c)
     => Enum c
     => Eq c
     => p
-    -> Maybe (NumSign, k)
+    -> Maybe (Sign, k)
 maybeSingletonSigned p =
     case MonoidMap.toList (unpack p) of
-        [(k, c)] | c == succ mempty -> Just (NumSign.P, k)
-        [(k, c)] | c == pred mempty -> Just (NumSign.N, k)
+        [(k, c)] | c == succ mempty -> Just (Sign.P, k)
+        [(k, c)] | c == pred mempty -> Just (Sign.N, k)
         _ -> Nothing
 
 maybeUnipolar
-    :: forall p1 p2 k c1 c2. ()
+    :: forall p1 p2 k c1 c2
+     . ()
     => PackedCountMap p1 k c1
     => PackedCountMap p2 k c2
     => HasMagnitude c1
@@ -363,6 +374,7 @@ maybeUnipolar
     => MonoidNull (Count c2)
     => Ord c1
     => p1 -> Maybe (NumSign, p2)
+{- ORMOLU_DISABLE -}
 maybeUnipolar p =
     case Set.toList uniqueSigns of
         [s] -> Just (s, fromMap $ Map.map magnitude $ toMap p)
@@ -371,9 +383,11 @@ maybeUnipolar p =
   where
     uniqueSigns :: Set NumSign
     uniqueSigns = Set.fromList $ fmap (signNum . snd) $ toList p
+{- ORMOLU_ENABLE -}
 
 maybeNegative
-    :: forall p1 p2 k c1 c2. ()
+    :: forall p1 p2 k c1 c2
+     . ()
     => PackedCountMap p1 k c1
     => PackedCountMap p2 k c2
     => HasMagnitude c1
@@ -384,11 +398,12 @@ maybeNegative
     => p1 -> Maybe p2
 maybeNegative p =
     if Foldable.all (<= mempty) (unpack p)
-    then Just $ fromMap $ Map.map magnitude $ toMap p
-    else Nothing
+        then Just $ fromMap $ Map.map magnitude $ toMap p
+        else Nothing
 
 maybePositive
-    :: forall p1 p2 k c1 c2. ()
+    :: forall p1 p2 k c1 c2
+     . ()
     => PackedCountMap p1 k c1
     => PackedCountMap p2 k c2
     => HasMagnitude c1
@@ -399,8 +414,8 @@ maybePositive
     => p1 -> Maybe p2
 maybePositive p =
     if Foldable.all (>= mempty) (unpack p)
-    then Just $ fromMap $ Map.map magnitude $ toMap p
-    else Nothing
+        then Just $ fromMap $ Map.map magnitude $ toMap p
+        else Nothing
 
 foldRoots
     :: PackedCountMap p k c
