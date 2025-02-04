@@ -66,7 +66,7 @@ import Internal.Data.Packed
     )
 import Internal.Data.Sign.Num
     ( NumSign (Z)
-    , HasSign (signOf)
+    , SignNum (signNum)
     )
 import Internal.Data.Magnitude
     ( HasMagnitude (magnitude, Magnitude)
@@ -179,11 +179,11 @@ toSet p = MonoidMap.nonNullKeys (unpack p)
 toSetSigned
     :: PackedCountMap p1 k c1
     => PackedCountMap p2 k NumSign
-    => HasSign c1
+    => SignNum c1
     => Num c1
     => Ord c1
     => p1 -> p2
-toSetSigned = fromMap . Map.map Sign.signOf . toMap
+toSetSigned = fromMap . Map.map signNum . toMap
 
 fromSet
     :: PackedCountMap p k c
@@ -244,24 +244,24 @@ isSingletonSigned = isJust . maybeSingletonSigned
 isBipolar
     :: forall p k c. ()
     => PackedCountMap p k c
-    => HasSign c
+    => SignNum c
     => p -> Bool
 isBipolar p =
     Set.size uniqueSigns == 2
   where
     uniqueSigns :: Set NumSign
-    uniqueSigns = Set.fromList $ fmap (signOf . snd) $ toList p
+    uniqueSigns = Set.fromList $ fmap (signNum . snd) $ toList p
 
 isUnipolar
     :: forall p k c. ()
     => PackedCountMap p k c
-    => HasSign c
+    => SignNum c
     => p -> Bool
 isUnipolar p =
     Set.size uniqueSigns == 1
   where
     uniqueSigns :: Set NumSign
-    uniqueSigns = Set.fromList $ fmap (signOf . snd) $ toList p
+    uniqueSigns = Set.fromList $ fmap (signNum . snd) $ toList p
 
 isNegative
     :: forall p k c. ()
@@ -357,7 +357,7 @@ maybeUnipolar
     => PackedCountMap p1 k c1
     => PackedCountMap p2 k c2
     => HasMagnitude c1
-    => HasSign c1
+    => SignNum c1
     => Magnitude c1 ~ c2
     => MonoidNull (Count c1)
     => MonoidNull (Count c2)
@@ -370,7 +370,7 @@ maybeUnipolar p =
         (_) -> Nothing
   where
     uniqueSigns :: Set NumSign
-    uniqueSigns = Set.fromList $ fmap (signOf . snd) $ toList p
+    uniqueSigns = Set.fromList $ fmap (signNum . snd) $ toList p
 
 maybeNegative
     :: forall p1 p2 k c1 c2. ()

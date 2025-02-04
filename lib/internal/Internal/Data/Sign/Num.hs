@@ -4,7 +4,7 @@
 
 module Internal.Data.Sign.Num
     ( NumSign (..)
-    , HasSign (..)
+    , SignNum (..)
     , toSign
     , fromSign
     )
@@ -154,31 +154,31 @@ multiply x P = x
 multiply N N = P
 
 --------------------------------------------------------------------------------
--- HasSign
+-- SignNum
 --------------------------------------------------------------------------------
 
-class HasSign a where
-    signOf :: a -> NumSign
+class SignNum a where
+    signNum :: a -> NumSign
 
-newtype HasSignNumEq a = HasSignNumEq a
+newtype SignNumEq a = SignNumEq a
 
-instance HasSign NumSign where
-    signOf = id
+instance SignNum NumSign where
+    signNum = id
 
 {- ORMOLU_DISABLE -}
-instance (Num a, Ord a) => HasSign (HasSignNumEq a) where
-    signOf (HasSignNumEq a) = case signum a of
+instance (Num a, Ord a) => SignNum (SignNumEq a) where
+    signNum (SignNumEq a) = case signum a of
         (-1) -> N
         ( 0) -> Z
         ( 1) -> P
-        ( _) -> error "HasSignNumEq: signnum post-condition violated"
+        ( _) -> error "SignNumEq: signnum post-condition violated"
 {- ORMOLU_ENABLE -}
 
-newtype HasSignNumOrd a = HasSignNumOrd a
+newtype SignNumOrd a = SignNumOrd a
 
 {- ORMOLU_DISABLE -}
-instance (Num a, Ord a) => HasSign (HasSignNumOrd a) where
-    signOf (HasSignNumOrd a)
+instance (Num a, Ord a) => SignNum (SignNumOrd a) where
+    signNum (SignNumOrd a)
         | i < 0     = N
         | i > 0     = P
         | otherwise = Z
@@ -187,18 +187,18 @@ instance (Num a, Ord a) => HasSign (HasSignNumOrd a) where
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
-deriving via HasSignNumEq  Integer instance HasSign Integer
-deriving via HasSignNumEq  Int     instance HasSign Int
-deriving via HasSignNumEq  Int8    instance HasSign Int8
-deriving via HasSignNumEq  Int16   instance HasSign Int16
-deriving via HasSignNumEq  Int32   instance HasSign Int32
-deriving via HasSignNumEq  Int64   instance HasSign Int64
-deriving via HasSignNumOrd Float   instance HasSign Float
-deriving via HasSignNumOrd Double  instance HasSign Double
+deriving via SignNumEq  Integer instance SignNum Integer
+deriving via SignNumEq  Int     instance SignNum Int
+deriving via SignNumEq  Int8    instance SignNum Int8
+deriving via SignNumEq  Int16   instance SignNum Int16
+deriving via SignNumEq  Int32   instance SignNum Int32
+deriving via SignNumEq  Int64   instance SignNum Int64
+deriving via SignNumOrd Float   instance SignNum Float
+deriving via SignNumOrd Double  instance SignNum Double
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
-deriving newtype instance HasSign a => HasSign (Identity a)
-deriving newtype instance HasSign a => HasSign (Max a)
-deriving newtype instance HasSign a => HasSign (Min a)
+deriving newtype instance SignNum a => SignNum (Identity a)
+deriving newtype instance SignNum a => SignNum (Max a)
+deriving newtype instance SignNum a => SignNum (Min a)
 {- ORMOLU_ENABLE -}
