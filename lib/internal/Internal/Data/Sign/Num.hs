@@ -52,11 +52,13 @@ import Internal.Data.Monoid
     ( Product (..)
     , Sum (..)
     )
+import Internal.Data.Sign
+    ( Sign
+    )
 import Internal.Data.Sign qualified as Sign
 import Prelude hiding
     ( null
     )
-import Internal.Data.Sign (Sign)
 
 data NumSign
     = -- | Negative
