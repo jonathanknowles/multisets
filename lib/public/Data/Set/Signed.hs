@@ -84,8 +84,15 @@ where
 import Data.Foldable1
     ( Foldable1
     )
+import Data.Function
+    ( on
+    )
 import Data.Map.Strict
     ( Map
+    )
+import Data.Map.Strict qualified as Map
+import Data.Maybe
+    ( mapMaybe
     )
 import Data.Set
     ( Set
@@ -94,9 +101,11 @@ import Internal.Data.CountMap qualified as CountMap
 import Internal.Data.Sign
     ( Sign
     )
+import Internal.Data.Sign qualified as Sign
 import Internal.Data.Sign.Num
-    ( NumSign (..)
+    ( NumSign
     )
+import Internal.Data.Sign.Num qualified as NumSign
 import Internal.Shared
     ( SignedSet
     )
@@ -119,24 +128,23 @@ empty = CountMap.empty
 singleton :: Ord a => a -> SignedSet a
 singleton = CountMap.singleton
 
-fromListWith
-    :: Ord a
-    => (NumSign -> NumSign -> NumSign)
-    -> [(a, NumSign)]
-    -> SignedSet a
-fromListWith = CountMap.fromListWith
+fromListWith :: Ord a => (Sign -> Sign -> Sign) -> [(a, Sign)] -> SignedSet a
+fromListWith f as = CountMap.fromListWith g bs
+  where
+    g = unsafeSignToNumSign3 f
+    bs = fmap NumSign.fromSign <$> as
 
-fromMap :: Map a NumSign -> SignedSet a
-fromMap = CountMap.fromMap
+fromMap :: Map a Sign -> SignedSet a
+fromMap = CountMap.fromMap . Map.map NumSign.fromSign
 
-fromSet :: (a -> NumSign) -> Set a -> SignedSet a
-fromSet = CountMap.fromSet
+fromSet :: (a -> Sign) -> Set a -> SignedSet a
+fromSet = CountMap.fromSet . fmap NumSign.fromSign
 
-toList :: SignedSet a -> [(a, NumSign)]
-toList = CountMap.toList
+toList :: SignedSet a -> [(a, Sign)]
+toList = mapMaybe (traverse NumSign.toSign) . CountMap.toList
 
-toMap :: SignedSet a -> Map a NumSign
-toMap = CountMap.toMap
+toMap :: SignedSet a -> Map a Sign
+toMap = Map.mapMaybe NumSign.toSign . CountMap.toMap
 
 toSet :: SignedSet a -> Set a
 toSet = CountMap.toSet
@@ -144,8 +152,8 @@ toSet = CountMap.toSet
 null :: SignedSet a -> Bool
 null = CountMap.null
 
-lookup :: Ord a => a -> SignedSet a -> NumSign
-lookup = CountMap.lookup
+lookup :: Ord a => a -> SignedSet a -> Maybe Sign
+lookup a = NumSign.toSign . CountMap.lookup a
 
 member :: Ord a => a -> SignedSet a -> Bool
 member = CountMap.member
@@ -174,11 +182,17 @@ isNegative = CountMap.isNegative
 isPositive :: Ord a => SignedSet a -> Bool
 isPositive = CountMap.isPositive
 
-maybeRegular :: Ord a => SignedSet a -> Maybe (NumSign, Set a)
-maybeRegular = CountMap.maybeRegular
+maybeRegular :: Ord a => SignedSet a -> Maybe (Sign, Set a)
+maybeRegular s = do
+    (numSign, regularSet) <- CountMap.maybeRegular s
+    sign <- NumSign.toSign numSign
+    pure (sign, regularSet)
 
-maybeSimple :: Ord a => SignedSet a -> Maybe (NumSign, a)
-maybeSimple = CountMap.maybeSimple
+maybeSimple :: Ord a => SignedSet a -> Maybe (Sign, a)
+maybeSimple s = do
+    (numSign, a) <- CountMap.maybeSimple s
+    sign <- NumSign.toSign numSign
+    pure (sign, a)
 
 maybeSingleton :: Ord a => SignedSet a -> Maybe a
 maybeSingleton = CountMap.maybeSingleton
@@ -215,14 +229,14 @@ foldMap' = CountMap.foldMap'
 
 mapWith
     :: Ord b
-    => (NumSign -> NumSign -> NumSign)
+    => (Sign -> Sign -> Sign)
     -> (a -> b)
     -> SignedSet a
     -> SignedSet b
-mapWith = CountMap.mapWith
+mapWith = CountMap.mapWith . unsafeSignToNumSign3
 
-mapSigns :: (NumSign -> NumSign) -> SignedSet a -> SignedSet a
-mapSigns = CountMap.mapCounts
+mapSigns :: (Sign -> Sign) -> SignedSet a -> SignedSet a
+mapSigns = CountMap.mapCounts . unsafeSignToNumSign2
 
 invert :: SignedSet a -> SignedSet a
 invert = CountMap.invert
@@ -286,3 +300,27 @@ symmetricPowersetElements = CountMap.symmetricPowersetElements
 
 symmetricPowersetSize :: Ord a => SignedSet a -> Natural
 symmetricPowersetSize = CountMap.symmetricPowersetSize
+
+--------------------------------------------------------------------------------
+-- Utilities
+--------------------------------------------------------------------------------
+
+unsafeNumSignToSign :: NumSign -> Sign
+unsafeNumSignToSign = \case
+    NumSign.N -> Sign.N
+    NumSign.P -> Sign.P
+    NumSign.Z -> error "unsafeNumSignToSign"
+
+{- ORMOLU_DISABLE -}
+unsafeSignToNumSign2
+    :: (   Sign ->    Sign)
+    -> (NumSign -> NumSign)
+unsafeSignToNumSign2 f = NumSign.fromSign . f . unsafeNumSignToSign
+{- ORMOLU_ENABLE -}
+
+{- ORMOLU_DISABLE -}
+unsafeSignToNumSign3
+    :: (   Sign ->    Sign ->    Sign)
+    -> (NumSign -> NumSign -> NumSign)
+unsafeSignToNumSign3 f = fmap NumSign.fromSign <$> f `on` unsafeNumSignToSign
+{- ORMOLU_ENABLE -}
