@@ -1,8 +1,8 @@
 module Data.Sign
-    ( NumSign (..)
+    ( Sign (..)
     )
     where
 
-import Internal.Data.Sign.Num
-    ( NumSign (..)
+import Internal.Data.Sign
+    ( Sign (..)
     )

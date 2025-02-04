@@ -2,7 +2,7 @@
 
 module Data.SignSpec where
 
-import Data.Sign
+import Internal.Data.Sign.Num
     ( NumSign
     )
 import Internal.Data.Monoid
