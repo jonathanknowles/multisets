@@ -112,8 +112,8 @@ library internal
         Internal.Data.Monoid
         Internal.Data.Packed
         Internal.Data.Sign
-        Internal.Data.Sign.Model
         Internal.Data.Sign.Num
+        Internal.Data.Sign.Num.Model
         Internal.Shared
     default-language:
         Haskell2010

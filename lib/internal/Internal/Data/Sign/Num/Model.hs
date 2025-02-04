@@ -1,4 +1,4 @@
-module Internal.Data.Sign.Model where
+module Internal.Data.Sign.Num.Model where
 
 import Internal.Data.Sign.Num
     ( NumSign (N, P, Z)
