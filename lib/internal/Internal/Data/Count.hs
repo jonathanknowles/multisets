@@ -38,10 +38,10 @@ import Internal.Data.Monoid
 import Internal.Data.Packed
     ( Packed (Unpacked)
     )
-import Internal.Data.Sign
+import Internal.Data.Sign.Num
     ( NumSign
     )
-import Internal.Data.Sign qualified as NumSign
+import Internal.Data.Sign.Num qualified as NumSign
 import Numeric.Natural
     ( Natural
     )

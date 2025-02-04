@@ -2,7 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FunctionalDependencies #-}
 
-module Internal.Data.Sign
+module Internal.Data.Sign.Num
     ( NumSign (..)
     , HasSign (..)
     , toNonZero

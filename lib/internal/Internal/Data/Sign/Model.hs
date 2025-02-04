@@ -1,9 +1,9 @@
 module Internal.Data.Sign.Model where
 
-import Internal.Data.Sign
+import Internal.Data.Sign.Num
     ( NumSign (..)
     )
-import Internal.Data.Sign qualified as NumSign
+import Internal.Data.Sign.Num qualified as NumSign
 import Prelude
 
 null :: NumSign -> Bool

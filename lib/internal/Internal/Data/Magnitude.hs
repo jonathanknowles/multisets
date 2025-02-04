@@ -12,7 +12,7 @@ import Data.Word
     , Word64
     , Word8
     )
-import Internal.Data.Sign
+import Internal.Data.Sign.Num
     ( NumSign (..)
     )
 import Numeric.Natural

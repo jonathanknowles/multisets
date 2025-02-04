@@ -99,7 +99,7 @@ import Data.Set
     ( Set
     )
 import Internal.Data.CountMap qualified as CountMap
-import Internal.Data.Sign
+import Internal.Data.Sign.Num
     ( NumSign
     )
 import Internal.Shared

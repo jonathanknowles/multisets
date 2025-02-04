@@ -64,14 +64,14 @@ import Internal.Data.Packed
     , unpacked
     , unpacked2
     )
-import Internal.Data.Sign
+import Internal.Data.Sign.Num
     ( NumSign (Z)
     , HasSign (signOf)
     )
 import Internal.Data.Magnitude
     ( HasMagnitude (magnitude, Magnitude)
     )
-import Internal.Data.Sign qualified as Sign
+import Internal.Data.Sign.Num qualified as Sign
 import Numeric.Natural
     ( Natural
     )

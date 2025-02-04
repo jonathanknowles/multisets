@@ -45,7 +45,7 @@ import Internal.Data.CountMap qualified as CountMap
 import Internal.Data.Packed
     ( Packed (Unpacked, pack, unpack)
     )
-import Internal.Data.Sign
+import Internal.Data.Sign.Num
     ( NumSign
     )
 import Numeric.Natural

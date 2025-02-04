@@ -3,6 +3,6 @@ module Data.Sign
     )
     where
 
-import Internal.Data.Sign
+import Internal.Data.Sign.Num
     ( NumSign (..)
     )
