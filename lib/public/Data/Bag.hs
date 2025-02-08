@@ -52,10 +52,10 @@ module Data.Bag
     , maxMany
     , min
     , minMany1
-    , union
-    , unionMany
-    , intersection
-    , intersectionMany1
+    , supportiveUnion
+    , supportiveUnionMany
+    , supportiveIntersection
+    , supportiveIntersectionMany1
     , difference
     , symmetricDifference
 
@@ -220,17 +220,17 @@ max = CountMap.max
 maxMany :: Foldable f => Ord a => f (Bag a) -> Bag a
 maxMany = CountMap.maxMany
 
-union :: Ord a => Bag a -> Bag a -> Bag a
-union = CountMap.union
+supportiveUnion :: Ord a => Bag a -> Bag a -> Bag a
+supportiveUnion = CountMap.supportiveUnion
 
-unionMany :: Foldable f => Ord a => f (Bag a) -> Bag a
-unionMany = CountMap.unionMany
+supportiveUnionMany :: Foldable f => Ord a => f (Bag a) -> Bag a
+supportiveUnionMany = CountMap.supportiveUnionMany
 
-intersection :: Ord a => Bag a -> Bag a -> Bag a
-intersection = CountMap.intersection
+supportiveIntersection :: Ord a => Bag a -> Bag a -> Bag a
+supportiveIntersection = CountMap.supportiveIntersection
 
-intersectionMany1 :: Foldable1 f => Ord a => f (Bag a) -> Bag a
-intersectionMany1 = CountMap.intersectionMany1
+supportiveIntersectionMany1 :: Foldable1 f => Ord a => f (Bag a) -> Bag a
+supportiveIntersectionMany1 = CountMap.supportiveIntersectionMany1
 
 difference :: Ord a => Bag a -> Bag a -> Bag a
 difference = CountMap.monus

@@ -63,10 +63,10 @@ module Data.Set.Signed
     , maxMany1
     , min
     , minMany1
-    , union
-    , unionMany1
-    , intersection
-    , intersectionMany1
+    , supportiveUnion
+    , supportiveUnionMany1
+    , supportiveIntersection
+    , supportiveIntersectionMany1
 
       -- * Comparison
     , compareLexically
@@ -275,17 +275,21 @@ max = CountMap.max
 maxMany1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
 maxMany1 = CountMap.maxMany1
 
-union :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
-union = CountMap.union
+supportiveUnion :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
+supportiveUnion = CountMap.supportiveUnion
 
-unionMany1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
-unionMany1 = CountMap.unionMany1
+supportiveUnionMany1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
+supportiveUnionMany1 = CountMap.supportiveUnionMany1
 
-intersection :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
-intersection = CountMap.intersection
+supportiveIntersection :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
+supportiveIntersection = CountMap.supportiveIntersection
 
-intersectionMany1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
-intersectionMany1 = CountMap.intersectionMany1
+supportiveIntersectionMany1
+    :: Foldable1 f
+    => Ord a
+    => f (SignedSet a)
+    -> SignedSet a
+supportiveIntersectionMany1 = CountMap.supportiveIntersectionMany1
 
 compareLexically :: Ord a => SignedSet a -> SignedSet a -> Ordering
 compareLexically = CountMap.compareLexically

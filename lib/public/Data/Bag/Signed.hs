@@ -66,10 +66,10 @@ module Data.Bag.Signed
     , maxMany1
     , min
     , minMany1
-    , union
-    , unionMany1
-    , intersection
-    , intersectionMany1
+    , supportiveUnion
+    , supportiveUnionMany1
+    , supportiveIntersection
+    , supportiveIntersectionMany1
     , difference
     , symmetricDifference
     , symmetricDifferenceUnsigned
@@ -280,17 +280,21 @@ max = CountMap.max
 maxMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
 maxMany1 = CountMap.maxMany1
 
-union :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
-union = CountMap.union
+supportiveUnion :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
+supportiveUnion = CountMap.supportiveUnion
 
-unionMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
-unionMany1 = CountMap.unionMany1
+supportiveUnionMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
+supportiveUnionMany1 = CountMap.supportiveUnionMany1
 
-intersection :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
-intersection = CountMap.intersection
+supportiveIntersection :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
+supportiveIntersection = CountMap.supportiveIntersection
 
-intersectionMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
-intersectionMany1 = CountMap.intersectionMany1
+supportiveIntersectionMany1
+    :: Foldable1 f
+    => Ord a
+    => f (SignedBag a)
+    -> SignedBag a
+supportiveIntersectionMany1 = CountMap.supportiveIntersectionMany1
 
 difference :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
 difference = CountMap.minus

@@ -597,21 +597,21 @@ max
     => p -> p -> p
 max = unpacked2 $ MonoidMap.unionWith Prelude.max
 
-intersection
+supportiveIntersection
     :: PackedCountMap p k c
     => Ord k
     => Ord c
     => MonoidNull (Count c)
     => p -> p -> p
-intersection = unpacked2 $ MonoidMap.intersectionWith Prelude.min
+supportiveIntersection = unpacked2 $ MonoidMap.intersectionWith Prelude.min
 
-union
+supportiveUnion
     :: PackedCountMap p k c
     => Ord k
     => Ord c
     => MonoidNull (Count c)
     => p -> p -> p
-union = unpacked2 $ MonoidMap.unionWith f
+supportiveUnion = unpacked2 $ MonoidMap.unionWith f
   where
     f c1 c2
         | Null.null c1 = c2
@@ -666,16 +666,16 @@ maxMany1
     => f p -> p
 maxMany1 = Foldable1.foldl1' max
 
-intersectionMany1
+supportiveIntersectionMany1
     :: PackedCountMap p k c
     => MonoidNull (Count c)
     => Ord k
     => Ord c
     => Foldable1 f
     => f p -> p
-intersectionMany1 = Foldable1.foldl1' intersection
+supportiveIntersectionMany1 = Foldable1.foldl1' supportiveIntersection
 
-unionMany
+supportiveUnionMany
     :: PackedCountMap p k c
     => MonoidNull (Count c)
     => PositiveMonoid (Count c)
@@ -683,16 +683,16 @@ unionMany
     => Ord c
     => Foldable f
     => f p -> p
-unionMany = Foldable.foldl' union empty
+supportiveUnionMany = Foldable.foldl' supportiveUnion empty
 
-unionMany1
+supportiveUnionMany1
     :: PackedCountMap p k c
     => MonoidNull (Count c)
     => Ord k
     => Ord c
     => Foldable1 f
     => f p -> p
-unionMany1 = Foldable1.foldl1' union
+supportiveUnionMany1 = Foldable1.foldl1' supportiveUnion
 
 minus
     :: PackedCountMap p k c
