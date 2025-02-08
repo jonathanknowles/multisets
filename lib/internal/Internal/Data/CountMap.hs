@@ -46,7 +46,7 @@ import Data.Ord
     ( Down (Down)
     )
 import Data.Semiring
-    ( Semiring (one)
+    ( Semiring (one, times, plus)
     )
 import Data.Set
     ( Set
@@ -568,8 +568,18 @@ add
     => Ord k
     => Ord c
     => MonoidNull (Count c)
+    => Semiring c
     => p -> p -> p
-add = unpacked2 $ MonoidMap.unionWith (<>)
+add = unpacked2 $ MonoidMap.unionWith plus
+
+multiply
+    :: PackedCountMap p k c
+    => Ord k
+    => Ord c
+    => MonoidNull (Count c)
+    => Semiring c
+    => p -> p -> p
+multiply = unpacked2 $ MonoidMap.unionWith times
 
 min
     :: PackedCountMap p k c
@@ -611,11 +621,22 @@ union = unpacked2 $ MonoidMap.unionWith f
 addMany
     :: PackedCountMap p k c
     => MonoidNull (Count c)
+    => Semiring c
     => Ord k
     => Ord c
     => Foldable f
     => f p -> p
 addMany = Foldable.foldl' add empty
+
+multiplyMany1
+    :: PackedCountMap p k c
+    => MonoidNull (Count c)
+    => Semiring c
+    => Ord k
+    => Ord c
+    => Foldable1 f
+    => f p -> p
+multiplyMany1 = Foldable1.foldl1' multiply
 
 minMany1
     :: PackedCountMap p k c

@@ -46,6 +46,8 @@ module Data.Bag
       -- * Algebra
     , add
     , addMany
+    , multiply
+    , multiplyMany1
     , max
     , maxMany
     , min
@@ -199,6 +201,12 @@ add = CountMap.add
 
 addMany :: Foldable f => Ord a => f (Bag a) -> Bag a
 addMany = CountMap.addMany
+
+multiply :: Ord a => Bag a -> Bag a -> Bag a
+multiply = CountMap.multiply
+
+multiplyMany1 :: Foldable1 f => Ord a => f (Bag a) -> Bag a
+multiplyMany1 = CountMap.multiplyMany1
 
 min :: Ord a => Bag a -> Bag a -> Bag a
 min = CountMap.min

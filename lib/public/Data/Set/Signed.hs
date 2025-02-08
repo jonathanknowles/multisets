@@ -57,6 +57,8 @@ module Data.Set.Signed
       -- * Algebra
     , add
     , addMany
+    , multiply
+    , multiplyMany1
     , max
     , maxMany1
     , min
@@ -254,6 +256,12 @@ add = CountMap.add
 
 addMany :: Foldable f => Ord a => f (SignedSet a) -> SignedSet a
 addMany = CountMap.addMany
+
+multiply :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
+multiply = CountMap.multiply
+
+multiplyMany1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
+multiplyMany1 = CountMap.multiplyMany1
 
 min :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
 min = CountMap.min

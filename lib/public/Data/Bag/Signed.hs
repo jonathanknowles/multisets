@@ -60,6 +60,8 @@ module Data.Bag.Signed
       -- * Algebra
     , add
     , addMany
+    , multiply
+    , multiplyMany1
     , max
     , maxMany1
     , min
@@ -259,6 +261,12 @@ add = CountMap.add
 
 addMany :: Foldable f => Ord a => f (SignedBag a) -> SignedBag a
 addMany = CountMap.addMany
+
+multiply :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
+multiply = CountMap.multiply
+
+multiplyMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
+multiplyMany1 = CountMap.multiplyMany1
 
 min :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
 min = CountMap.min
