@@ -55,6 +55,12 @@ module Data.Set.Signed
     , invert
 
       -- * Algebra
+    , add
+    , addMany
+    , max
+    , maxMany1
+    , min
+    , minMany1
     , union
     , unionMany1
     , intersection
@@ -117,6 +123,8 @@ import Prelude hiding
     , foldr
     , lookup
     , map
+    , max
+    , min
     , null
     )
 
@@ -240,6 +248,24 @@ mapSigns = CountMap.mapCounts . unsafeSignToNumSign2
 
 invert :: SignedSet a -> SignedSet a
 invert = CountMap.invert
+
+add :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
+add = CountMap.add
+
+addMany :: Foldable f => Ord a => f (SignedSet a) -> SignedSet a
+addMany = CountMap.addMany
+
+min :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
+min = CountMap.min
+
+minMany1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
+minMany1 = CountMap.minMany1
+
+max :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
+max = CountMap.max
+
+maxMany1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
+maxMany1 = CountMap.maxMany1
 
 union :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
 union = CountMap.union

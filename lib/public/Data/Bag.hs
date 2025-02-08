@@ -46,6 +46,10 @@ module Data.Bag
       -- * Algebra
     , add
     , addMany
+    , max
+    , maxMany
+    , min
+    , minMany1
     , union
     , unionMany
     , intersection
@@ -94,6 +98,8 @@ import Prelude hiding
     , foldr
     , lookup
     , map
+    , max
+    , min
     , null
     , sum
     )
@@ -193,6 +199,18 @@ add = CountMap.add
 
 addMany :: Foldable f => Ord a => f (Bag a) -> Bag a
 addMany = CountMap.addMany
+
+min :: Ord a => Bag a -> Bag a -> Bag a
+min = CountMap.min
+
+minMany1 :: Foldable1 f => Ord a => f (Bag a) -> Bag a
+minMany1 = CountMap.minMany1
+
+max :: Ord a => Bag a -> Bag a -> Bag a
+max = CountMap.max
+
+maxMany :: Foldable f => Ord a => f (Bag a) -> Bag a
+maxMany = CountMap.maxMany
 
 union :: Ord a => Bag a -> Bag a -> Bag a
 union = CountMap.union

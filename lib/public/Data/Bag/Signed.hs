@@ -60,6 +60,10 @@ module Data.Bag.Signed
       -- * Algebra
     , add
     , addMany
+    , max
+    , maxMany1
+    , min
+    , minMany1
     , union
     , unionMany1
     , intersection
@@ -118,6 +122,8 @@ import Prelude hiding
     , foldr
     , lookup
     , map
+    , max
+    , min
     , null
     , sum
     )
@@ -253,6 +259,18 @@ add = CountMap.add
 
 addMany :: Foldable f => Ord a => f (SignedBag a) -> SignedBag a
 addMany = CountMap.addMany
+
+min :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
+min = CountMap.min
+
+minMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
+minMany1 = CountMap.minMany1
+
+max :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
+max = CountMap.max
+
+maxMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
+maxMany1 = CountMap.maxMany1
 
 union :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
 union = CountMap.union

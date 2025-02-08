@@ -37,6 +37,7 @@ import Data.Monoid.Null
     ( MonoidNull
     , PositiveMonoid
     )
+import Data.Monoid.Null qualified as Null
 import Data.MonoidMap
     ( MonoidMap
     )
@@ -85,9 +86,12 @@ import Prelude hiding
     , foldr
     , lookup
     , map
+    , max
+    , min
     , null
     , sum
     )
+import Prelude qualified as Prelude
 
 type CountMap a c = MonoidMap a (Count c)
 
@@ -565,7 +569,44 @@ add
     => Ord c
     => MonoidNull (Count c)
     => p -> p -> p
-add = unpacked2 (MonoidMap.unionWith (<>))
+add = unpacked2 $ MonoidMap.unionWith (<>)
+
+min
+    :: PackedCountMap p k c
+    => Ord k
+    => Ord c
+    => MonoidNull (Count c)
+    => p -> p -> p
+min = unpacked2 $ MonoidMap.unionWith Prelude.min
+
+max
+    :: PackedCountMap p k c
+    => Ord k
+    => Ord c
+    => MonoidNull (Count c)
+    => p -> p -> p
+max = unpacked2 $ MonoidMap.unionWith Prelude.max
+
+intersection
+    :: PackedCountMap p k c
+    => Ord k
+    => Ord c
+    => MonoidNull (Count c)
+    => p -> p -> p
+intersection = unpacked2 $ MonoidMap.intersectionWith Prelude.min
+
+union
+    :: PackedCountMap p k c
+    => Ord k
+    => Ord c
+    => MonoidNull (Count c)
+    => p -> p -> p
+union = unpacked2 $ MonoidMap.unionWith f
+  where
+    f c1 c2
+        | Null.null c1 = c2
+        | Null.null c2 = c1
+        | otherwise = Prelude.max c1 c2
 
 addMany
     :: PackedCountMap p k c
@@ -576,13 +617,33 @@ addMany
     => f p -> p
 addMany = Foldable.foldl' add empty
 
-intersection
+minMany1
     :: PackedCountMap p k c
+    => MonoidNull (Count c)
     => Ord k
     => Ord c
+    => Foldable1 f
+    => f p -> p
+minMany1 = Foldable1.foldl1' min
+
+maxMany
+    :: PackedCountMap p k c
     => MonoidNull (Count c)
-    => p -> p -> p
-intersection = unpacked2 (MonoidMap.unionWith min)
+    => PositiveMonoid (Count c)
+    => Ord k
+    => Ord c
+    => Foldable f
+    => f p -> p
+maxMany = Foldable.foldl' max empty
+
+maxMany1
+    :: PackedCountMap p k c
+    => MonoidNull (Count c)
+    => Ord k
+    => Ord c
+    => Foldable1 f
+    => f p -> p
+maxMany1 = Foldable1.foldl1' max
 
 intersectionMany1
     :: PackedCountMap p k c
@@ -592,14 +653,6 @@ intersectionMany1
     => Foldable1 f
     => f p -> p
 intersectionMany1 = Foldable1.foldl1' intersection
-
-union
-    :: PackedCountMap p k c
-    => Ord k
-    => Ord c
-    => MonoidNull (Count c)
-    => p -> p -> p
-union = unpacked2 (MonoidMap.unionWith max)
 
 unionMany
     :: PackedCountMap p k c
