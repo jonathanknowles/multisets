@@ -14,6 +14,8 @@ description:
 extra-doc-files:
     README.md
 
+common dependency-arithmoi
+    build-depends:arithmoi                      >= 0.13.0.0   && < 0.14
 common dependency-base
     build-depends:base                          >= 4.14.3.0   && < 4.21
 common dependency-commutative-semigroups
@@ -117,6 +119,20 @@ library internal
         Internal.Shared
     default-language:
         Haskell2010
+
+library examples
+    import:
+      , dependency-arithmoi
+      , dependency-base
+      , extensions
+    hs-source-dirs:
+        lib/examples
+    exposed-modules:
+        Examples.PrimeFactorisation
+    default-language:
+        Haskell2010
+    build-depends:
+      , multisets
 
 test-suite test
     import:
