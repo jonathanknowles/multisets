@@ -80,10 +80,10 @@ module Data.Bag.Signed
     , isLessThanOrEqualTo
     , isGreaterThan
     , isGreaterThanOrEqualTo
-    , isSubbagOf
-    , isSuperbagOf
-    , isProperSubbagOf
-    , isProperSuperbagOf
+    , isSupportiveSubbagOf
+    , isSupportiveSuperbagOf
+    , isProperSupportiveSubbagOf
+    , isProperSupportiveSuperbagOf
     , isSymmetricSubbagOf
     , isSymmetricSuperbagOf
     , isProperSymmetricSubbagOf
@@ -320,17 +320,17 @@ isGreaterThan = CountMap.isGreaterThan
 isGreaterThanOrEqualTo :: Ord a => SignedBag a -> SignedBag a -> Bool
 isGreaterThanOrEqualTo = CountMap.isGreaterThanOrEqualTo
 
-isSubbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
-isSubbagOf = CountMap.isSubmapOf
+isSupportiveSubbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
+isSupportiveSubbagOf = CountMap.isSupportiveSubmapOf
 
-isSuperbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
-isSuperbagOf = CountMap.isSupermapOf
+isSupportiveSuperbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
+isSupportiveSuperbagOf = CountMap.isSupportiveSupermapOf
 
-isProperSubbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
-isProperSubbagOf = CountMap.isProperSubmapOf
+isProperSupportiveSubbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
+isProperSupportiveSubbagOf = CountMap.isProperSupportiveSubmapOf
 
-isProperSuperbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
-isProperSuperbagOf = CountMap.isProperSupermapOf
+isProperSupportiveSuperbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
+isProperSupportiveSuperbagOf = CountMap.isProperSupportiveSupermapOf
 
 isSymmetricSubbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
 isSymmetricSubbagOf = CountMap.isSymmetricSubmapOf

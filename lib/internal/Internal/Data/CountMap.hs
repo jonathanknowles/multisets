@@ -845,40 +845,40 @@ isGreaterThanOrEqualTo
     => p -> p -> Bool
 isGreaterThanOrEqualTo s1 s2 = LT `notElem` (snd <$> compareElementsAsc s1 s2)
 
-isSubmapOf
+isSupportiveSubmapOf
     :: PackedCountMap p k c
     => Monoid (Count c)
     => Ord c
     => Ord k
     => p -> p -> Bool
-isSubmapOf m1 m2 =
+isSupportiveSubmapOf m1 m2 =
     Map.isSubmapOfBy (<=) (toMap m1) (toMap m2)
 
-isProperSubmapOf
+isProperSupportiveSubmapOf
     :: PackedCountMap p k c
     => Monoid (Count c)
     => Ord c
     => Ord k
     => p -> p -> Bool
-isProperSubmapOf m1 m2 =
+isProperSupportiveSubmapOf m1 m2 =
     Map.isProperSubmapOfBy (<=) (toMap m1) (toMap m2)
 
-isSupermapOf
+isSupportiveSupermapOf
     :: PackedCountMap p k c
     => Monoid (Count c)
     => Ord c
     => Ord k
     => p -> p -> Bool
-isSupermapOf m1 m2 =
+isSupportiveSupermapOf m1 m2 =
     Map.isSubmapOfBy (<=) (toMap m2) (toMap m1)
 
-isProperSupermapOf
+isProperSupportiveSupermapOf
     :: PackedCountMap p k c
     => Monoid (Count c)
     => Ord c
     => Ord k
     => p -> p -> Bool
-isProperSupermapOf m1 m2 =
+isProperSupportiveSupermapOf m1 m2 =
     Map.isProperSubmapOfBy (<=) (toMap m2) (toMap m1)
 
 isSymmetricSubmapOf

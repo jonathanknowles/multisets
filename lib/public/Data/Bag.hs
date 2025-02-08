@@ -65,10 +65,10 @@ module Data.Bag
     , isLessThanOrEqualTo
     , isGreaterThan
     , isGreaterThanOrEqualTo
-    , isSubbagOf
-    , isSuperbagOf
-    , isProperSubbagOf
-    , isProperSuperbagOf
+    , isSupportiveSubbagOf
+    , isSupportiveSuperbagOf
+    , isProperSupportiveSubbagOf
+    , isProperSupportiveSuperbagOf
 
       -- * Combinatorics
     , powerset
@@ -253,17 +253,17 @@ isGreaterThan = CountMap.isGreaterThan
 isGreaterThanOrEqualTo :: Ord a => Bag a -> Bag a -> Bool
 isGreaterThanOrEqualTo = CountMap.isGreaterThanOrEqualTo
 
-isSubbagOf :: Ord a => Bag a -> Bag a -> Bool
-isSubbagOf = CountMap.isSubmapOf
+isSupportiveSubbagOf :: Ord a => Bag a -> Bag a -> Bool
+isSupportiveSubbagOf = CountMap.isSupportiveSubmapOf
 
-isSuperbagOf :: Ord a => Bag a -> Bag a -> Bool
-isSuperbagOf = CountMap.isSupermapOf
+isSupportiveSuperbagOf :: Ord a => Bag a -> Bag a -> Bool
+isSupportiveSuperbagOf = CountMap.isSupportiveSupermapOf
 
-isProperSubbagOf :: Ord a => Bag a -> Bag a -> Bool
-isProperSubbagOf = CountMap.isProperSubmapOf
+isProperSupportiveSubbagOf :: Ord a => Bag a -> Bag a -> Bool
+isProperSupportiveSubbagOf = CountMap.isProperSupportiveSubmapOf
 
-isProperSuperbagOf :: Ord a => Bag a -> Bag a -> Bool
-isProperSuperbagOf = CountMap.isProperSupermapOf
+isProperSupportiveSuperbagOf :: Ord a => Bag a -> Bag a -> Bool
+isProperSupportiveSuperbagOf = CountMap.isProperSupportiveSupermapOf
 
 powerset :: Ord a => Bag a -> Set (Bag a)
 powerset = CountMap.powerset
