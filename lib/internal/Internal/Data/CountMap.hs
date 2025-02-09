@@ -888,7 +888,7 @@ isSymmetricSubmapOf
     => Ord k
     => p -> p -> Bool
 isSymmetricSubmapOf m1 m2 =
-    Map.isSubmapOfBy isBoundedBy (toMap m1) (toMap m2)
+    Map.isSubmapOfBy isSymmetricallyBoundedBy (toMap m1) (toMap m2)
 
 isProperSymmetricSubmapOf
     :: PackedCountMap p k c
@@ -897,7 +897,7 @@ isProperSymmetricSubmapOf
     => Ord k
     => p -> p -> Bool
 isProperSymmetricSubmapOf m1 m2 =
-    Map.isProperSubmapOfBy isBoundedBy (toMap m1) (toMap m2)
+    Map.isProperSubmapOfBy isSymmetricallyBoundedBy (toMap m1) (toMap m2)
 
 isSymmetricSupermapOf
     :: PackedCountMap p k c
@@ -906,7 +906,7 @@ isSymmetricSupermapOf
     => Ord k
     => p -> p -> Bool
 isSymmetricSupermapOf m1 m2 =
-    Map.isSubmapOfBy isBoundedBy (toMap m2) (toMap m1)
+    Map.isSubmapOfBy isSymmetricallyBoundedBy (toMap m2) (toMap m1)
 
 isProperSymmetricSupermapOf
     :: PackedCountMap p k c
@@ -915,7 +915,7 @@ isProperSymmetricSupermapOf
     => Ord k
     => p -> p -> Bool
 isProperSymmetricSupermapOf m1 m2 =
-    Map.isProperSubmapOfBy isBoundedBy (toMap m2) (toMap m1)
+    Map.isProperSubmapOfBy isSymmetricallyBoundedBy (toMap m2) (toMap m1)
 
 -- The set of all subsets.
 powerset
@@ -1060,8 +1060,8 @@ alignKeyValuePairs = go
     z = mempty
 {- ORMOLU_ENABLE -}
 
-isBoundedBy :: (Ord a, Monoid (Count a)) => a -> a -> Bool
-isBoundedBy v1 v2
+isSymmetricallyBoundedBy :: (Ord a, Monoid (Count a)) => a -> a -> Bool
+isSymmetricallyBoundedBy v1 v2
     | Count v1 <= mempty && Count v2 <= mempty = v1 >= v2
     | Count v1 >= mempty && Count v2 >= mempty = v1 <= v2
     | otherwise = False
