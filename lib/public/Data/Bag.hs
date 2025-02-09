@@ -65,10 +65,6 @@ module Data.Bag
     , isSuperbagOf
     , isProperSubbagOf
     , isProperSuperbagOf
-    , isSupportiveSubbagOf
-    , isSupportiveSuperbagOf
-    , isProperSupportiveSubbagOf
-    , isProperSupportiveSuperbagOf
 
       -- * Combinatorics
     , powerset
@@ -252,18 +248,6 @@ isProperSubbagOf = CountMap.isProperSubmapOf
 
 isProperSuperbagOf :: Ord a => Bag a -> Bag a -> Bool
 isProperSuperbagOf = CountMap.isProperSupermapOf
-
-isSupportiveSubbagOf :: Ord a => Bag a -> Bag a -> Bool
-isSupportiveSubbagOf = CountMap.isSupportiveSubmapOf
-
-isSupportiveSuperbagOf :: Ord a => Bag a -> Bag a -> Bool
-isSupportiveSuperbagOf = CountMap.isSupportiveSupermapOf
-
-isProperSupportiveSubbagOf :: Ord a => Bag a -> Bag a -> Bool
-isProperSupportiveSubbagOf = CountMap.isProperSupportiveSubmapOf
-
-isProperSupportiveSuperbagOf :: Ord a => Bag a -> Bag a -> Bool
-isProperSupportiveSuperbagOf = CountMap.isProperSupportiveSupermapOf
 
 powerset :: Ord a => Bag a -> Set (Bag a)
 powerset = CountMap.powerset
