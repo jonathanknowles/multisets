@@ -274,17 +274,17 @@ multiply = CountMap.multiply
 multiplyMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
 multiplyMany1 = CountMap.multiplyMany1
 
-intersection :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
-intersection = CountMap.intersection
-
-intersectionMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
-intersectionMany1 = CountMap.intersectionMany1
-
 union :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
 union = CountMap.union
 
 unionMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
 unionMany1 = CountMap.unionMany1
+
+intersection :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
+intersection = CountMap.intersection
+
+intersectionMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
+intersectionMany1 = CountMap.intersectionMany1
 
 supportiveUnion :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
 supportiveUnion = CountMap.supportiveUnion
