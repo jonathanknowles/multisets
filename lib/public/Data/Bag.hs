@@ -49,7 +49,7 @@ module Data.Bag
     , multiply
     , multiplyMany1
 
-      -- * Extrema
+      -- * Bounds
     , union
     , unionMany
     , intersection

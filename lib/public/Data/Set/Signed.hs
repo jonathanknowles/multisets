@@ -60,13 +60,13 @@ module Data.Set.Signed
     , multiply
     , multiplyMany1
 
-      -- * Extrema
+      -- * Bounds
     , union
     , unionMany1
     , intersection
     , intersectionMany1
 
-      -- * Extrema (Supportive)
+      -- * Bounds (Supportive)
     , supportiveUnion
     , supportiveUnionMany1
     , supportiveIntersection
