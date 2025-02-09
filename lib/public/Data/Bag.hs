@@ -61,6 +61,8 @@ module Data.Bag
 
       -- * Comparison
     , compareLexically
+
+      -- * Inclusion
     , isSubbagOf
     , isSuperbagOf
     , isProperSubbagOf

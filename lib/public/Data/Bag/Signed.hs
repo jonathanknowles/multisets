@@ -76,14 +76,20 @@ module Data.Bag.Signed
 
       -- * Comparison
     , compareLexically
+
+      -- * Inclusion
     , isSubbagOf
     , isSuperbagOf
     , isProperSubbagOf
     , isProperSuperbagOf
+
+      -- * Inclusion (Supportive)
     , isSupportiveSubbagOf
     , isSupportiveSuperbagOf
     , isProperSupportiveSubbagOf
     , isProperSupportiveSuperbagOf
+
+      -- * Inclusion (Symmetric)
     , isSymmetricSubbagOf
     , isSymmetricSuperbagOf
     , isProperSymmetricSubbagOf

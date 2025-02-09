@@ -70,14 +70,20 @@ module Data.Set.Signed
 
       -- * Comparison
     , compareLexically
+
+      -- * Inclusion
     , isSubsetOf
     , isSupersetOf
     , isProperSubsetOf
     , isProperSupersetOf
+
+      -- * Inclusion (Supportive)
     , isSupportiveSubsetOf
     , isSupportiveSupersetOf
     , isProperSupportiveSubsetOf
     , isProperSupportiveSupersetOf
+
+      -- * Inclusion (Symmetric)
     , isSymmetricSubsetOf
     , isSymmetricSupersetOf
     , isProperSymmetricSubsetOf
