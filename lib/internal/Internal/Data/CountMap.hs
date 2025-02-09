@@ -797,6 +797,22 @@ compareLexicallyWith align p1 p2 = go (align p1 p2)
         | c1 > c2 = GT
         | otherwise = go kcs
 
+isSubmapOf
+    :: PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord c
+    => Ord k
+    => p -> p -> Bool
+isSubmapOf m1 m2 = GT `notElem` (snd <$> compareElementsAsc m1 m2)
+
+isSupermapOf
+    :: PackedCountMap p k c
+    => Monoid (Count c)
+    => Ord c
+    => Ord k
+    => p -> p -> Bool
+isSupermapOf s1 s2 = LT `notElem` (snd <$> compareElementsAsc s1 s2)
+
 -- Note: evaluation will terminate early if (and only if) a GT is detected.
 isProperSubmapOf
     :: PackedCountMap p k c
@@ -828,22 +844,6 @@ isProperSupermapOf m1 m2 = go False (compareElementsAsc m1 m2)
     go seenGT ((_, EQ) : xs) = go seenGT xs
     go _      ((_, GT) : xs) = go True   xs
 {- ORMOLU_ENABLE -}
-
-isSubmapOf
-    :: PackedCountMap p k c
-    => Monoid (Count c)
-    => Ord c
-    => Ord k
-    => p -> p -> Bool
-isSubmapOf m1 m2 = GT `notElem` (snd <$> compareElementsAsc m1 m2)
-
-isSupermapOf
-    :: PackedCountMap p k c
-    => Monoid (Count c)
-    => Ord c
-    => Ord k
-    => p -> p -> Bool
-isSupermapOf s1 s2 = LT `notElem` (snd <$> compareElementsAsc s1 s2)
 
 isSupportiveSubmapOf
     :: PackedCountMap p k c
