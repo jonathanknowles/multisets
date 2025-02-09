@@ -941,10 +941,10 @@ powersetElements =
     fmap (pack . MonoidMap.fromListWith (<>)) . go . MonoidMap.toList . unpack
   where
     go            [] = [[]]
-    go ((a, p) : xs) = [(a, q) : ys | q <- shrinkInclusive p, ys <- go xs]
+    go ((a, p) : xs) = [(a, q) : ys | q <- shrinkInclusively p, ys <- go xs]
 
-    shrinkInclusive :: (Enum a, Monoid a) => a -> [a]
-    shrinkInclusive a = [mempty .. a]
+    shrinkInclusively :: (Enum a, Monoid a) => a -> [a]
+    shrinkInclusively a = [mempty .. a]
 {- ORMOLU_ENABLE -}
 
 powersetSize
@@ -986,10 +986,10 @@ symmetricPowersetElements =
     fmap (pack . MonoidMap.fromListWith (<>)) . go . MonoidMap.toList . unpack
   where
     go            [] = [[]]
-    go ((a, p) : xs) = [(a, q) : ys | q <- shrinkInclusive p, ys <- go xs]
+    go ((a, p) : xs) = [(a, q) : ys | q <- shrinkInclusively p, ys <- go xs]
 
-    shrinkInclusive :: (Enum a, Monoid a, Ord a) => a -> [a]
-    shrinkInclusive a
+    shrinkInclusively :: (Enum a, Monoid a, Ord a) => a -> [a]
+    shrinkInclusively a
         | a < mempty = [a .. mempty]
         | a > mempty = [mempty .. a]
         | otherwise  = [mempty]
