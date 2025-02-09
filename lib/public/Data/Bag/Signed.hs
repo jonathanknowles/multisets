@@ -54,12 +54,14 @@ module Data.Bag.Signed
     , mapWith
     , mapCounts
 
-      -- * Transformation
+      -- * Inversion
     , invert
 
-      -- * Arithmetic
+      -- * Addition
     , add
     , addMany
+
+      -- * Multiplication
     , multiply
     , multiplyMany1
 

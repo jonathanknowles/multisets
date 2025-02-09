@@ -43,9 +43,11 @@ module Data.Bag
     , mapWith
     , mapCounts
 
-      -- * Arithmetic
+      -- * Addition
     , add
     , addMany
+
+      -- * Multiplication
     , multiply
     , multiplyMany1
 

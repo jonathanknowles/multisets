@@ -51,12 +51,14 @@ module Data.Set.Signed
     , mapWith
     , mapSigns
 
-      -- * Transformation
+      -- * Inversion
     , invert
 
-      -- * Arithmetic
+      -- * Addition
     , add
     , addMany
+
+      -- * Multiplication
     , multiply
     , multiplyMany1
 
