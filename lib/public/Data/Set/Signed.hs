@@ -59,10 +59,10 @@ module Data.Set.Signed
     , addMany
     , multiply
     , multiplyMany1
-    , max
-    , maxMany1
-    , min
-    , minMany1
+    , union
+    , unionMany1
+    , intersection
+    , intersectionMany1
     , supportiveUnion
     , supportiveUnionMany1
     , supportiveIntersection
@@ -269,17 +269,17 @@ multiply = CountMap.multiply
 multiplyMany1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
 multiplyMany1 = CountMap.multiplyMany1
 
-min :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
-min = CountMap.min
+intersection :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
+intersection = CountMap.intersection
 
-minMany1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
-minMany1 = CountMap.minMany1
+intersectionMany1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
+intersectionMany1 = CountMap.intersectionMany1
 
-max :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
-max = CountMap.max
+union :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
+union = CountMap.union
 
-maxMany1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
-maxMany1 = CountMap.maxMany1
+unionMany1 :: Foldable1 f => Ord a => f (SignedSet a) -> SignedSet a
+unionMany1 = CountMap.unionMany1
 
 supportiveUnion :: Ord a => SignedSet a -> SignedSet a -> SignedSet a
 supportiveUnion = CountMap.supportiveUnion

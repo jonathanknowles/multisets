@@ -62,10 +62,10 @@ module Data.Bag.Signed
     , addMany
     , multiply
     , multiplyMany1
-    , max
-    , maxMany1
-    , min
-    , minMany1
+    , union
+    , unionMany1
+    , intersection
+    , intersectionMany1
     , supportiveUnion
     , supportiveUnionMany1
     , supportiveIntersection
@@ -274,17 +274,17 @@ multiply = CountMap.multiply
 multiplyMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
 multiplyMany1 = CountMap.multiplyMany1
 
-min :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
-min = CountMap.min
+intersection :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
+intersection = CountMap.intersection
 
-minMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
-minMany1 = CountMap.minMany1
+intersectionMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
+intersectionMany1 = CountMap.intersectionMany1
 
-max :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
-max = CountMap.max
+union :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
+union = CountMap.union
 
-maxMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
-maxMany1 = CountMap.maxMany1
+unionMany1 :: Foldable1 f => Ord a => f (SignedBag a) -> SignedBag a
+unionMany1 = CountMap.unionMany1
 
 supportiveUnion :: Ord a => SignedBag a -> SignedBag a -> SignedBag a
 supportiveUnion = CountMap.supportiveUnion

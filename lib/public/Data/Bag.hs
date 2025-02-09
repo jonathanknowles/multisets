@@ -48,10 +48,10 @@ module Data.Bag
     , addMany
     , multiply
     , multiplyMany1
-    , max
-    , maxMany
-    , min
-    , minMany1
+    , union
+    , unionMany
+    , intersection
+    , intersectionMany1
     , supportiveUnion
     , supportiveUnionMany
     , supportiveIntersection
@@ -206,17 +206,17 @@ multiply = CountMap.multiply
 multiplyMany1 :: Foldable1 f => Ord a => f (Bag a) -> Bag a
 multiplyMany1 = CountMap.multiplyMany1
 
-min :: Ord a => Bag a -> Bag a -> Bag a
-min = CountMap.min
+intersection :: Ord a => Bag a -> Bag a -> Bag a
+intersection = CountMap.intersection
 
-minMany1 :: Foldable1 f => Ord a => f (Bag a) -> Bag a
-minMany1 = CountMap.minMany1
+intersectionMany1 :: Foldable1 f => Ord a => f (Bag a) -> Bag a
+intersectionMany1 = CountMap.intersectionMany1
 
-max :: Ord a => Bag a -> Bag a -> Bag a
-max = CountMap.max
+union :: Ord a => Bag a -> Bag a -> Bag a
+union = CountMap.union
 
-maxMany :: Foldable f => Ord a => f (Bag a) -> Bag a
-maxMany = CountMap.maxMany
+unionMany :: Foldable f => Ord a => f (Bag a) -> Bag a
+unionMany = CountMap.unionMany
 
 supportiveUnion :: Ord a => Bag a -> Bag a -> Bag a
 supportiveUnion = CountMap.supportiveUnion
