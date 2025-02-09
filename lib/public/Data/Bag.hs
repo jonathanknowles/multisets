@@ -43,19 +43,19 @@ module Data.Bag
     , mapWith
     , mapCounts
 
-      -- * Algebra
+      -- * Arithmetic
     , add
     , addMany
     , multiply
     , multiplyMany1
+
+      -- * Extrema
     , union
     , unionMany
     , intersection
     , intersectionMany1
-    , supportiveUnion
-    , supportiveUnionMany
-    , supportiveIntersection
-    , supportiveIntersectionMany1
+
+      -- * Difference
     , difference
     , symmetricDifference
 
@@ -217,18 +217,6 @@ intersection = CountMap.intersection
 
 intersectionMany1 :: Foldable1 f => Ord a => f (Bag a) -> Bag a
 intersectionMany1 = CountMap.intersectionMany1
-
-supportiveUnion :: Ord a => Bag a -> Bag a -> Bag a
-supportiveUnion = CountMap.supportiveUnion
-
-supportiveUnionMany :: Foldable f => Ord a => f (Bag a) -> Bag a
-supportiveUnionMany = CountMap.supportiveUnionMany
-
-supportiveIntersection :: Ord a => Bag a -> Bag a -> Bag a
-supportiveIntersection = CountMap.supportiveIntersection
-
-supportiveIntersectionMany1 :: Foldable1 f => Ord a => f (Bag a) -> Bag a
-supportiveIntersectionMany1 = CountMap.supportiveIntersectionMany1
 
 difference :: Ord a => Bag a -> Bag a -> Bag a
 difference = CountMap.monus

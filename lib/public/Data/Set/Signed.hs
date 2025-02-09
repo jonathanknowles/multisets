@@ -54,15 +54,19 @@ module Data.Set.Signed
       -- * Transformation
     , invert
 
-      -- * Algebra
+      -- * Arithmetic
     , add
     , addMany
     , multiply
     , multiplyMany1
+
+      -- * Extrema
     , union
     , unionMany1
     , intersection
     , intersectionMany1
+
+      -- * Extrema (Supportive)
     , supportiveUnion
     , supportiveUnionMany1
     , supportiveIntersection
