@@ -61,10 +61,10 @@ module Data.Bag
 
       -- * Comparison
     , compareLexically
-    , isLessThan
-    , isLessThanOrEqualTo
-    , isGreaterThan
-    , isGreaterThanOrEqualTo
+    , isSubbagOf
+    , isSuperbagOf
+    , isProperSubbagOf
+    , isProperSuperbagOf
     , isSupportiveSubbagOf
     , isSupportiveSuperbagOf
     , isProperSupportiveSubbagOf
@@ -241,17 +241,17 @@ symmetricDifference = CountMap.symmetricDifference
 compareLexically :: Ord a => Bag a -> Bag a -> Ordering
 compareLexically = CountMap.compareLexically
 
-isLessThan :: Ord a => Bag a -> Bag a -> Bool
-isLessThan = CountMap.isLessThan
+isSubbagOf :: Ord a => Bag a -> Bag a -> Bool
+isSubbagOf = CountMap.isSubmapOf
 
-isLessThanOrEqualTo :: Ord a => Bag a -> Bag a -> Bool
-isLessThanOrEqualTo = CountMap.isLessThanOrEqualTo
+isSuperbagOf :: Ord a => Bag a -> Bag a -> Bool
+isSuperbagOf = CountMap.isSupermapOf
 
-isGreaterThan :: Ord a => Bag a -> Bag a -> Bool
-isGreaterThan = CountMap.isGreaterThan
+isProperSubbagOf :: Ord a => Bag a -> Bag a -> Bool
+isProperSubbagOf = CountMap.isProperSubmapOf
 
-isGreaterThanOrEqualTo :: Ord a => Bag a -> Bag a -> Bool
-isGreaterThanOrEqualTo = CountMap.isGreaterThanOrEqualTo
+isProperSuperbagOf :: Ord a => Bag a -> Bag a -> Bool
+isProperSuperbagOf = CountMap.isProperSupermapOf
 
 isSupportiveSubbagOf :: Ord a => Bag a -> Bag a -> Bool
 isSupportiveSubbagOf = CountMap.isSupportiveSubmapOf

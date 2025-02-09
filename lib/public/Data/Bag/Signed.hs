@@ -76,10 +76,10 @@ module Data.Bag.Signed
 
       -- * Comparison
     , compareLexically
-    , isLessThan
-    , isLessThanOrEqualTo
-    , isGreaterThan
-    , isGreaterThanOrEqualTo
+    , isSubbagOf
+    , isSuperbagOf
+    , isProperSubbagOf
+    , isProperSuperbagOf
     , isSupportiveSubbagOf
     , isSupportiveSuperbagOf
     , isProperSupportiveSubbagOf
@@ -308,17 +308,17 @@ symmetricDifferenceUnsigned = CountMap.symmetricDifferenceAbsolute
 compareLexically :: Ord a => SignedBag a -> SignedBag a -> Ordering
 compareLexically = CountMap.compareLexically
 
-isLessThan :: Ord a => SignedBag a -> SignedBag a -> Bool
-isLessThan = CountMap.isLessThan
+isSubbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
+isSubbagOf = CountMap.isSubmapOf
 
-isLessThanOrEqualTo :: Ord a => SignedBag a -> SignedBag a -> Bool
-isLessThanOrEqualTo = CountMap.isLessThanOrEqualTo
+isSuperbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
+isSuperbagOf = CountMap.isSupermapOf
 
-isGreaterThan :: Ord a => SignedBag a -> SignedBag a -> Bool
-isGreaterThan = CountMap.isGreaterThan
+isProperSubbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
+isProperSubbagOf = CountMap.isProperSubmapOf
 
-isGreaterThanOrEqualTo :: Ord a => SignedBag a -> SignedBag a -> Bool
-isGreaterThanOrEqualTo = CountMap.isGreaterThanOrEqualTo
+isProperSuperbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
+isProperSuperbagOf = CountMap.isProperSupermapOf
 
 isSupportiveSubbagOf :: Ord a => SignedBag a -> SignedBag a -> Bool
 isSupportiveSubbagOf = CountMap.isSupportiveSubmapOf

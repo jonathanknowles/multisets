@@ -70,10 +70,10 @@ module Data.Set.Signed
 
       -- * Comparison
     , compareLexically
-    , isLessThan
-    , isLessThanOrEqualTo
-    , isGreaterThan
-    , isGreaterThanOrEqualTo
+    , isSubsetOf
+    , isSupersetOf
+    , isProperSubsetOf
+    , isProperSupersetOf
     , isSupportiveSubsetOf
     , isSupportiveSupersetOf
     , isProperSupportiveSubsetOf
@@ -294,17 +294,17 @@ supportiveIntersectionMany1 = CountMap.supportiveIntersectionMany1
 compareLexically :: Ord a => SignedSet a -> SignedSet a -> Ordering
 compareLexically = CountMap.compareLexically
 
-isLessThan :: Ord a => SignedSet a -> SignedSet a -> Bool
-isLessThan = CountMap.isLessThan
+isSubsetOf :: Ord a => SignedSet a -> SignedSet a -> Bool
+isSubsetOf = CountMap.isSubmapOf
 
-isLessThanOrEqualTo :: Ord a => SignedSet a -> SignedSet a -> Bool
-isLessThanOrEqualTo = CountMap.isLessThanOrEqualTo
+isSupersetOf :: Ord a => SignedSet a -> SignedSet a -> Bool
+isSupersetOf = CountMap.isSupermapOf
 
-isGreaterThan :: Ord a => SignedSet a -> SignedSet a -> Bool
-isGreaterThan = CountMap.isGreaterThan
+isProperSubsetOf :: Ord a => SignedSet a -> SignedSet a -> Bool
+isProperSubsetOf = CountMap.isProperSubmapOf
 
-isGreaterThanOrEqualTo :: Ord a => SignedSet a -> SignedSet a -> Bool
-isGreaterThanOrEqualTo = CountMap.isGreaterThanOrEqualTo
+isProperSupersetOf :: Ord a => SignedSet a -> SignedSet a -> Bool
+isProperSupersetOf = CountMap.isProperSupermapOf
 
 isSupportiveSubsetOf :: Ord a => SignedSet a -> SignedSet a -> Bool
 isSupportiveSubsetOf = CountMap.isSupportiveSubmapOf

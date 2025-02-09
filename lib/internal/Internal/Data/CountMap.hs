@@ -798,13 +798,13 @@ compareLexicallyWith align p1 p2 = go (align p1 p2)
         | otherwise = go kcs
 
 -- Note: evaluation will terminate early if (and only if) a GT is detected.
-isLessThan
+isProperSubmapOf
     :: PackedCountMap p k c
     => Monoid (Count c)
     => Ord c
     => Ord k
     => p -> p -> Bool
-isLessThan m1 m2 = go False (compareElementsAsc m1 m2)
+isProperSubmapOf m1 m2 = go False (compareElementsAsc m1 m2)
 {- ORMOLU_DISABLE -}
   where
     go seenLT             [] = seenLT
@@ -814,13 +814,13 @@ isLessThan m1 m2 = go False (compareElementsAsc m1 m2)
 {- ORMOLU_ENABLE -}
 
 -- Note: evaluation will terminate early if (and only if) a LT is detected.
-isGreaterThan
+isProperSupermapOf
     :: PackedCountMap p k c
     => Monoid (Count c)
     => Ord c
     => Ord k
     => p -> p -> Bool
-isGreaterThan m1 m2 = go False (compareElementsAsc m1 m2)
+isProperSupermapOf m1 m2 = go False (compareElementsAsc m1 m2)
 {- ORMOLU_DISABLE -}
   where
     go seenGT             [] = seenGT
@@ -829,21 +829,21 @@ isGreaterThan m1 m2 = go False (compareElementsAsc m1 m2)
     go _      ((_, GT) : xs) = go True   xs
 {- ORMOLU_ENABLE -}
 
-isLessThanOrEqualTo
+isSubmapOf
     :: PackedCountMap p k c
     => Monoid (Count c)
     => Ord c
     => Ord k
     => p -> p -> Bool
-isLessThanOrEqualTo m1 m2 = GT `notElem` (snd <$> compareElementsAsc m1 m2)
+isSubmapOf m1 m2 = GT `notElem` (snd <$> compareElementsAsc m1 m2)
 
-isGreaterThanOrEqualTo
+isSupermapOf
     :: PackedCountMap p k c
     => Monoid (Count c)
     => Ord c
     => Ord k
     => p -> p -> Bool
-isGreaterThanOrEqualTo s1 s2 = LT `notElem` (snd <$> compareElementsAsc s1 s2)
+isSupermapOf s1 s2 = LT `notElem` (snd <$> compareElementsAsc s1 s2)
 
 isSupportiveSubmapOf
     :: PackedCountMap p k c
