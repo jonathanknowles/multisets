@@ -11,12 +11,12 @@ import Data.Group
     )
 import Data.Monoid.GCD
     ( DistributiveGCDMonoid
-    , GCDMonoid (gcd)
+    , GCDMonoid
     , LeftDistributiveGCDMonoid
-    , LeftGCDMonoid (commonPrefix)
-    , OverlappingGCDMonoid (overlap)
+    , LeftGCDMonoid
+    , OverlappingGCDMonoid
     , RightDistributiveGCDMonoid
-    , RightGCDMonoid (commonSuffix)
+    , RightGCDMonoid
     )
 import Data.Monoid.LCM
     ( DistributiveLCMMonoid
@@ -24,7 +24,6 @@ import Data.Monoid.LCM
     )
 import Data.Monoid.Monus
     ( Monus
-    , OverlappingGCDMonoid (stripOverlap)
     )
 import Data.Monoid.Null
     ( MonoidNull
@@ -109,23 +108,6 @@ newtype SignedBag a = SignedBag (CountMap a Integer)
         , RightReductive
         , Semigroup
         )
-
-instance Ord a => OverlappingGCDMonoid (SignedBag a) where
-    overlap = CountMap.intersection
-    stripOverlap b1 b2 =
-        ( b1 `CountMap.minus` b2
-        , CountMap.intersection b1 b2
-        , b2 `CountMap.minus` b1
-        )
-
-instance Ord a => LeftGCDMonoid (SignedBag a) where
-    commonPrefix = CountMap.intersection
-
-instance Ord a => RightGCDMonoid (SignedBag a) where
-    commonSuffix = CountMap.intersection
-
-instance Ord a => GCDMonoid (SignedBag a) where
-    gcd = CountMap.intersection
 
 newtype SignedSet a = SignedSet (CountMap a NumSign)
     deriving newtype (Eq, NFData)
