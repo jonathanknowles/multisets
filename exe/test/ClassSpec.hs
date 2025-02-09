@@ -6,6 +6,10 @@ import Data.Bag
     ( Bag
     )
 import Data.Bag qualified as Bag
+import Data.Bag.Signed
+    ( SignedBag
+    )
+import Data.Bag.Signed qualified as SignedBag
 import Data.Data
     ( Typeable
     , typeRep
@@ -34,6 +38,9 @@ import Test.QuickCheck.Classes
     , monoidLaws
     , semigroupLaws
     , semigroupMonoidLaws
+    )
+import Test.QuickCheck.Classes.Group
+    ( groupLaws
     )
 import Test.QuickCheck.Classes.Hspec
     ( testLawsMany
@@ -95,7 +102,6 @@ specLawsFor elementType = do
             "Class laws for element type " <> show (typeRep elementType)
 
     describe description $ do
-
         testLawsMany @(Bag a)
             [ cancellativeLaws
             , commutativeLaws
@@ -123,6 +129,23 @@ specLawsFor elementType = do
             , semigroupMonoidLaws
             ]
 
+        testLawsMany @(SignedBag a)
+            [ cancellativeLaws
+            , commutativeLaws
+            , eqLaws
+            , groupLaws
+            , isListLaws
+            , leftCancellativeLaws
+            , leftReductiveLaws
+            , monoidLaws
+            , monoidNullLaws
+            , reductiveLaws
+            , rightCancellativeLaws
+            , rightReductiveLaws
+            , semigroupLaws
+            , semigroupMonoidLaws
+            ]
+
 instance Arbitrary Natural where
     arbitrary = arbitrarySizedNatural
     shrink = shrinkIntegral
@@ -133,3 +156,10 @@ instance (Arbitrary a, Ord a) => Arbitrary (Bag a) where
             <$> scale (`mod` 16) (listOf ((,) <$> arbitrary <*> arbitrary))
     shrink =
         shrinkMapBy Bag.fromMap Bag.toMap shrink
+
+instance (Arbitrary a, Ord a) => Arbitrary (SignedBag a) where
+    arbitrary =
+        SignedBag.fromList
+            <$> scale (`mod` 16) (listOf ((,) <$> arbitrary <*> arbitrary))
+    shrink =
+        shrinkMapBy SignedBag.fromMap SignedBag.toMap shrink

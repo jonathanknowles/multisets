@@ -65,25 +65,31 @@ instance Packed (Count a) where
 -- TODO:
 -- Think of a way to avoid creating instances for `Count Bool`.
 {- ORMOLU_DISABLE -}
-deriving via Any instance Semigroup  (Count Bool)
 deriving via Any instance Monoid     (Count Bool)
 deriving via Any instance MonoidNull (Count Bool)
+deriving via Any instance Semigroup  (Count Bool)
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
-deriving via Sum NumSign instance Semigroup   (Count NumSign)
 deriving via Sum NumSign instance Commutative (Count NumSign)
+deriving via Sum NumSign instance Group       (Count NumSign)
 deriving via Sum NumSign instance Monoid      (Count NumSign)
 deriving via Sum NumSign instance MonoidNull  (Count NumSign)
-deriving via Sum NumSign instance Group       (Count NumSign)
+deriving via Sum NumSign instance Semigroup   (Count NumSign)
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
-deriving via Monoid.Sum Integer instance Semigroup            (Count Integer)
+deriving via Monoid.Sum Integer instance Cancellative         (Count Integer)
 deriving via Monoid.Sum Integer instance Commutative          (Count Integer)
+deriving via Monoid.Sum Integer instance Group                (Count Integer)
+deriving via Monoid.Sum Integer instance LeftCancellative     (Count Integer)
+deriving via Monoid.Sum Integer instance LeftReductive        (Count Integer)
 deriving via Monoid.Sum Integer instance Monoid               (Count Integer)
 deriving via Monoid.Sum Integer instance MonoidNull           (Count Integer)
-deriving via Monoid.Sum Integer instance Group                (Count Integer)
+deriving via Monoid.Sum Integer instance Reductive            (Count Integer)
+deriving via Monoid.Sum Integer instance RightCancellative    (Count Integer)
+deriving via Monoid.Sum Integer instance RightReductive       (Count Integer)
+deriving via Monoid.Sum Integer instance Semigroup            (Count Integer)
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
