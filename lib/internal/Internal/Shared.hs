@@ -9,6 +9,18 @@ import Control.DeepSeq
 import Data.Group
     ( Group
     )
+import Data.Monoid.GCD
+    ( DistributiveGCDMonoid
+    , GCDMonoid
+    , LeftDistributiveGCDMonoid
+    , LeftGCDMonoid
+    , RightDistributiveGCDMonoid
+    , RightGCDMonoid
+    )
+import Data.Monoid.LCM
+    ( DistributiveLCMMonoid
+    , LCMMonoid
+    )
 import Data.Monoid.Monus
     ( Monus
     , OverlappingGCDMonoid
@@ -54,11 +66,31 @@ import Numeric.Natural
 import Prelude
 
 newtype Bag a = Bag (CountMap a Natural)
-    deriving newtype (Eq, NFData)
-    deriving newtype (Semigroup, Monoid, MonoidNull, PositiveMonoid)
-    deriving newtype (Commutative, OverlappingGCDMonoid, Monus)
-    deriving newtype (Cancellative, LeftCancellative, RightCancellative)
-    deriving newtype (Reductive, LeftReductive, RightReductive)
+    deriving newtype
+        ( Cancellative
+        , Commutative
+        , DistributiveGCDMonoid
+        , DistributiveLCMMonoid
+        , Eq
+        , GCDMonoid
+        , LCMMonoid
+        , LeftCancellative
+        , LeftDistributiveGCDMonoid
+        , LeftGCDMonoid
+        , LeftReductive
+        , Monoid
+        , MonoidNull
+        , Monus
+        , NFData
+        , OverlappingGCDMonoid
+        , PositiveMonoid
+        , Reductive
+        , RightCancellative
+        , RightDistributiveGCDMonoid
+        , RightGCDMonoid
+        , RightReductive
+        , Semigroup
+        )
 
 newtype SignedBag a = SignedBag (CountMap a Integer)
     deriving newtype (Eq, NFData)

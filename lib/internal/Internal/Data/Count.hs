@@ -10,6 +10,14 @@ import Data.Monoid
     ( Any
     )
 import Data.Monoid qualified as Monoid
+import Data.Monoid.GCD
+    ( GCDMonoid
+    , LeftGCDMonoid
+    , RightGCDMonoid
+    )
+import Data.Monoid.LCM
+    ( LCMMonoid
+    )
 import Data.Monoid.Monus
     ( Monus
     , OverlappingGCDMonoid
@@ -79,19 +87,23 @@ deriving via Monoid.Sum Integer instance Group                (Count Integer)
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
-deriving via Monoid.Sum Natural instance Semigroup            (Count Natural)
+deriving via Monoid.Sum Natural instance Cancellative         (Count Natural)
 deriving via Monoid.Sum Natural instance Commutative          (Count Natural)
+deriving via Monoid.Sum Natural instance GCDMonoid            (Count Natural)
+deriving via Monoid.Sum Natural instance LCMMonoid            (Count Natural)
+deriving via Monoid.Sum Natural instance LeftCancellative     (Count Natural)
+deriving via Monoid.Sum Natural instance LeftGCDMonoid        (Count Natural)
+deriving via Monoid.Sum Natural instance LeftReductive        (Count Natural)
 deriving via Monoid.Sum Natural instance Monoid               (Count Natural)
 deriving via Monoid.Sum Natural instance MonoidNull           (Count Natural)
 deriving via Monoid.Sum Natural instance Monus                (Count Natural)
 deriving via Monoid.Sum Natural instance OverlappingGCDMonoid (Count Natural)
-deriving via Monoid.Sum Natural instance Reductive            (Count Natural)
-deriving via Monoid.Sum Natural instance LeftReductive        (Count Natural)
-deriving via Monoid.Sum Natural instance RightReductive       (Count Natural)
-deriving via Monoid.Sum Natural instance Cancellative         (Count Natural)
-deriving via Monoid.Sum Natural instance LeftCancellative     (Count Natural)
-deriving via Monoid.Sum Natural instance RightCancellative    (Count Natural)
 deriving via Monoid.Sum Natural instance PositiveMonoid       (Count Natural)
+deriving via Monoid.Sum Natural instance Reductive            (Count Natural)
+deriving via Monoid.Sum Natural instance RightCancellative    (Count Natural)
+deriving via Monoid.Sum Natural instance RightGCDMonoid       (Count Natural)
+deriving via Monoid.Sum Natural instance RightReductive       (Count Natural)
+deriving via Monoid.Sum Natural instance Semigroup            (Count Natural)
 {- ORMOLU_ENABLE -}
 
 class CountMagnitude c where

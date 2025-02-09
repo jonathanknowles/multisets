@@ -40,6 +40,8 @@ common dependency-quickcheck-classes
     build-depends:quickcheck-classes            >= 0.6.5.0    && < 0.7
 common dependency-quickcheck-groups
     build-depends:quickcheck-groups             >= 0.0.1.0    && < 0.1
+common dependency-quickcheck-monoid-subclasses
+    build-depends:quickcheck-monoid-subclasses  >= 0.3.0.0    && < 0.4
 common dependency-semirings
     build-depends:semirings                     >= 0.7        && < 0.8
 common dependency-tasty-bench
@@ -142,6 +144,7 @@ test-suite test
       , dependency-QuickCheck
       , dependency-quickcheck-classes
       , dependency-quickcheck-groups
+      , dependency-quickcheck-monoid-subclasses
       , extensions
     ghc-options:
         -threaded -with-rtsopts=-N
@@ -150,6 +153,7 @@ test-suite test
     hs-source-dirs:
         exe/test
     other-modules:
+        ClassSpec
         Data.SignSpec
         SpecHook
         Test.QuickCheck.Classes.Hspec
