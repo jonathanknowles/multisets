@@ -46,7 +46,7 @@ import Data.Ord
     ( Down (Down)
     )
 import Data.Semiring
-    ( Semiring (one, times, plus)
+    ( Semiring (one, plus, times)
     )
 import Data.Set
     ( Set

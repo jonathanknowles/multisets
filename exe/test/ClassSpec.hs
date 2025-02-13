@@ -18,12 +18,6 @@ import Data.Data
 import Data.Proxy
     ( Proxy (Proxy)
     )
-import Data.Set.Transformers
-    ( Intersection (..)
-    , Product (..)
-    , Sum (..)
-    , Union (..)
-    )
 import Data.Set
     ( Set
     )
@@ -31,6 +25,12 @@ import Data.Set.Signed
     ( SignedSet
     )
 import Data.Set.Signed qualified as SignedSet
+import Data.Set.Transformers
+    ( Intersection (..)
+    , Product (..)
+    , Sum (..)
+    , Union (..)
+    )
 import Data.Sign
     ( Sign
     )
