@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module ClassSpec where
@@ -17,6 +18,22 @@ import Data.Data
 import Data.Proxy
     ( Proxy (Proxy)
     )
+import Data.Semigroup.Transformers
+    ( Sum (..)
+    , Union (..)
+    , Intersection (..)
+    , Product (..)
+    )
+import Data.Set.Signed
+    ( SignedSet
+    )
+import Data.Set.Signed qualified as SignedSet
+import Data.Sign
+    ( Sign
+    )
+import Internal.Data.Sign.Num
+    ( NumSign
+    )
 import Numeric.Natural
     ( Natural
     )
@@ -26,9 +43,11 @@ import Test.Hspec
     )
 import Test.QuickCheck
     ( Arbitrary (arbitrary, shrink)
+    , arbitraryBoundedEnum
     , arbitrarySizedNatural
     , listOf
     , scale
+    , shrinkBoundedEnum
     , shrinkIntegral
     , shrinkMapBy
     )
@@ -37,7 +56,7 @@ import Test.QuickCheck.Classes
     , isListLaws
     , monoidLaws
     , semigroupLaws
-    , semigroupMonoidLaws
+    , semigroupMonoidLaws, ordLaws, showLaws
     )
 import Test.QuickCheck.Classes.Group
     ( groupLaws
@@ -74,18 +93,26 @@ import Test.QuickCheck.Classes.Semigroup.Cancellative
     , rightCancellativeLaws
     , rightReductiveLaws
     )
+import Test.QuickCheck.Quid
+    ( Latin (..)
+    , Quid
+    , Size (..)
+    )
 import Prelude
+
+newtype Element (size :: Natural) = Element (Latin Quid)
+    deriving stock (Eq, Ord)
+    deriving newtype (Read, Show)
+    deriving (Arbitrary) via Size size Quid
 
 spec :: Spec
 spec = do
     describe "Class laws" $ do
-        -- Test against a variety of element types, in ascending order of
-        -- cardinality:
-        specLawsFor (Proxy @())
-        specLawsFor (Proxy @Bool)
-        specLawsFor (Proxy @Ordering)
-        specLawsFor (Proxy @Int)
-        specLawsFor (Proxy @Integer)
+        -- Test against a variety of element sizes:
+        specLawsFor (Proxy @(Element 1))
+        specLawsFor (Proxy @(Element 2))
+        specLawsFor (Proxy @(Element 3))
+        specLawsFor (Proxy @(Element 4))
 
 specLawsFor
     :: forall a
@@ -102,15 +129,35 @@ specLawsFor elementType = do
             "Class laws for element type " <> show (typeRep elementType)
 
     describe description $ do
+
+        -- Laws for base types:
         testLawsMany @(Bag a)
+            [ eqLaws
+            , isListLaws
+            , ordLaws
+            , showLaws
+            ]
+        testLawsMany @(SignedBag a)
+            [ eqLaws
+            , isListLaws
+            , ordLaws
+            , showLaws
+            ]
+        testLawsMany @(SignedSet a)
+            [ eqLaws
+            , isListLaws
+            , ordLaws
+            , showLaws
+            ]
+
+        -- Laws for 'Sum':
+        testLawsMany @(Sum (Bag a))
             [ cancellativeLaws
             , commutativeLaws
             , distributiveGCDMonoidLaws
             , distributiveLCMMonoidLaws
-            , eqLaws
             , gcdMonoidLaws
             , lcmMonoidLaws
-            , isListLaws
             , leftCancellativeLaws
             , leftDistributiveGCDMonoidLaws
             , leftGCDMonoidLaws
@@ -128,13 +175,10 @@ specLawsFor elementType = do
             , semigroupLaws
             , semigroupMonoidLaws
             ]
-
-        testLawsMany @(SignedBag a)
+        testLawsMany @(Sum (SignedBag a))
             [ cancellativeLaws
             , commutativeLaws
-            , eqLaws
             , groupLaws
-            , isListLaws
             , leftCancellativeLaws
             , leftReductiveLaws
             , monoidLaws
@@ -145,10 +189,80 @@ specLawsFor elementType = do
             , semigroupLaws
             , semigroupMonoidLaws
             ]
+        testLawsMany @(Sum (SignedSet a))
+            [ commutativeLaws
+            , groupLaws
+            , monoidLaws
+            , monoidNullLaws
+            , semigroupLaws
+            , semigroupMonoidLaws
+            ]
+
+        -- Laws for 'Product':
+        testLawsMany @(Product (Bag a))
+            [ commutativeLaws
+            , semigroupLaws
+            ]
+        testLawsMany @(Product (SignedBag a))
+            [ commutativeLaws
+            , semigroupLaws
+            ]
+        testLawsMany @(Product (SignedSet a))
+            [ commutativeLaws
+            , semigroupLaws
+            ]
+
+        -- Laws for 'Union':
+        testLawsMany @(Union (Bag a))
+            [ commutativeLaws
+            , monoidLaws
+            , monoidNullLaws
+            , positiveMonoidLaws
+            , semigroupLaws
+            , semigroupMonoidLaws
+            ]
+        testLawsMany @(Union (SignedBag a))
+            [ commutativeLaws
+            , semigroupLaws
+            ]
+        testLawsMany @(Union (SignedSet a))
+            [ commutativeLaws
+            , semigroupLaws
+            ]
+
+        -- Laws for 'Intersection':
+        testLawsMany @(Intersection (Bag a))
+            [ commutativeLaws
+            , semigroupLaws
+            ]
+        testLawsMany @(Intersection (SignedBag a))
+            [ commutativeLaws
+            , semigroupLaws
+            ]
+        testLawsMany @(Intersection (SignedSet a))
+            [ commutativeLaws
+            , semigroupLaws
+            ]
 
 instance Arbitrary Natural where
     arbitrary = arbitrarySizedNatural
     shrink = shrinkIntegral
+
+deriving newtype instance Arbitrary a => Arbitrary (Sum a)
+
+deriving newtype instance Arbitrary a => Arbitrary (Product a)
+
+deriving newtype instance Arbitrary a => Arbitrary (Union a)
+
+deriving newtype instance Arbitrary a => Arbitrary (Intersection a)
+
+instance Arbitrary Sign where
+    arbitrary = arbitraryBoundedEnum
+    shrink = shrinkBoundedEnum
+
+instance Arbitrary NumSign where
+    arbitrary = arbitraryBoundedEnum
+    shrink = shrinkBoundedEnum
 
 instance (Arbitrary a, Ord a) => Arbitrary (Bag a) where
     arbitrary =
@@ -163,3 +277,10 @@ instance (Arbitrary a, Ord a) => Arbitrary (SignedBag a) where
             <$> scale (`mod` 16) (listOf ((,) <$> arbitrary <*> arbitrary))
     shrink =
         shrinkMapBy SignedBag.fromMap SignedBag.toMap shrink
+
+instance (Arbitrary a, Ord a) => Arbitrary (SignedSet a) where
+    arbitrary =
+        SignedSet.fromListWith const
+            <$> scale (`mod` 16) (listOf ((,) <$> arbitrary <*> arbitrary))
+    shrink =
+        shrinkMapBy SignedSet.fromMap SignedSet.toMap shrink
