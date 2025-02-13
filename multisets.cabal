@@ -142,6 +142,7 @@ library examples
 test-suite test
     import:
       , dependency-base
+      , dependency-containers
       , dependency-hspec
       , dependency-pretty-show
       , dependency-QuickCheck

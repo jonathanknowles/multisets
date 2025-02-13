@@ -19,10 +19,13 @@ import Data.Proxy
     ( Proxy (Proxy)
     )
 import Data.Semigroup.Transformers
-    ( Sum (..)
-    , Union (..)
-    , Intersection (..)
+    ( Intersection (..)
     , Product (..)
+    , Sum (..)
+    , Union (..)
+    )
+import Data.Set
+    ( Set
     )
 import Data.Set.Signed
     ( SignedSet
@@ -55,8 +58,10 @@ import Test.QuickCheck.Classes
     ( eqLaws
     , isListLaws
     , monoidLaws
+    , ordLaws
     , semigroupLaws
-    , semigroupMonoidLaws, ordLaws, showLaws
+    , semigroupMonoidLaws
+    , showLaws
     )
 import Test.QuickCheck.Classes.Group
     ( groupLaws
@@ -109,10 +114,9 @@ spec :: Spec
 spec = do
     describe "Class laws" $ do
         -- Test against a variety of element sizes:
-        specLawsFor (Proxy @(Element 1))
         specLawsFor (Proxy @(Element 2))
-        specLawsFor (Proxy @(Element 3))
         specLawsFor (Proxy @(Element 4))
+        specLawsFor (Proxy @(Element 8))
 
 specLawsFor
     :: forall a
@@ -129,7 +133,6 @@ specLawsFor elementType = do
             "Class laws for element type " <> show (typeRep elementType)
 
     describe description $ do
-
         -- Laws for base types:
         testLawsMany @(Bag a)
             [ eqLaws
@@ -218,6 +221,27 @@ specLawsFor elementType = do
             , monoidLaws
             , monoidNullLaws
             , positiveMonoidLaws
+            , semigroupLaws
+            , semigroupMonoidLaws
+            ]
+        testLawsMany @(Union (Set a))
+            [ commutativeLaws
+            , distributiveGCDMonoidLaws
+            , distributiveLCMMonoidLaws
+            , gcdMonoidLaws
+            , lcmMonoidLaws
+            , leftDistributiveGCDMonoidLaws
+            , leftGCDMonoidLaws
+            , leftReductiveLaws
+            , monoidLaws
+            , monoidNullLaws
+            , monusLaws
+            , overlappingGCDMonoidLaws
+            , positiveMonoidLaws
+            , reductiveLaws
+            , rightDistributiveGCDMonoidLaws
+            , rightGCDMonoidLaws
+            , rightReductiveLaws
             , semigroupLaws
             , semigroupMonoidLaws
             ]
