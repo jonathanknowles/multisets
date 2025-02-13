@@ -18,7 +18,7 @@ import Data.Data
 import Data.Proxy
     ( Proxy (Proxy)
     )
-import Data.Semigroup.Transformers
+import Data.Set.Transformers
     ( Intersection (..)
     , Product (..)
     , Sum (..)

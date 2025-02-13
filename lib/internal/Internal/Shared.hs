@@ -67,7 +67,7 @@ import Internal.Data.CountMap qualified as CountMap
 import Internal.Data.Packed
     ( Packed (Unpacked, pack, unpack)
     )
-import Internal.Data.Semigroup.Transformers
+import Internal.Data.Set.Transformers
     ( Intersection (..)
     , Product (..)
     , Sum (..)

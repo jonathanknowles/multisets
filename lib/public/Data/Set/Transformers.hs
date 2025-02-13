@@ -1,4 +1,4 @@
-module Data.Semigroup.Transformers
+module Data.Set.Transformers
     ( Sum (..)
     , Product (..)
     , Union (..)
@@ -6,7 +6,7 @@ module Data.Semigroup.Transformers
     )
 where
 
-import Internal.Data.Semigroup.Transformers
+import Internal.Data.Set.Transformers
     ( Intersection (..)
     , Product (..)
     , Sum (..)

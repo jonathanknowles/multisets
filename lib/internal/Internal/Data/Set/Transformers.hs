@@ -1,4 +1,4 @@
-module Internal.Data.Semigroup.Transformers
+module Internal.Data.Set.Transformers
     ( Sum (..)
     , Product (..)
     , Union (..)
