@@ -147,7 +147,7 @@ singleton = CountMap.singleton
 
 fromListWith :: Ord a => (Sign -> Sign -> Sign) -> [(a, Sign)] -> SignedSet a
 fromListWith f =
-    CountMap.fromListWith (unsafeSignToSignOrZero3 f)
+    CountMap.fromListWith (unsafeMapNonZeroSign2 f)
         . fmap (fmap Sign.forgetNonZero)
 
 fromMap :: Map a Sign -> SignedSet a
@@ -229,22 +229,22 @@ maybePositive :: Ord a => SignedSet a -> Maybe (Set a)
 maybePositive = CountMap.maybePositive
 
 foldl :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
-foldl f = CountMap.foldl (\r a -> f r a . unsafeSignOrZeroToSign)
+foldl f = CountMap.foldl (\r a -> f r a . unsafeAssertNonZeroSign)
 
 foldl' :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
-foldl' f = CountMap.foldl' (\r a -> f r a . unsafeSignOrZeroToSign)
+foldl' f = CountMap.foldl' (\r a -> f r a . unsafeAssertNonZeroSign)
 
 foldr :: (a -> Sign -> r -> r) -> r -> SignedSet a -> r
-foldr f = CountMap.foldr (\a -> f a . unsafeSignOrZeroToSign)
+foldr f = CountMap.foldr (\a -> f a . unsafeAssertNonZeroSign)
 
 foldr' :: (a -> Sign -> r -> r) -> r -> SignedSet a -> r
-foldr' f = CountMap.foldr' (\a -> f a . unsafeSignOrZeroToSign)
+foldr' f = CountMap.foldr' (\a -> f a . unsafeAssertNonZeroSign)
 
 foldMap :: Monoid m => (a -> Sign -> m) -> SignedSet a -> m
-foldMap f = CountMap.foldMap (\a -> f a . unsafeSignOrZeroToSign)
+foldMap f = CountMap.foldMap (\a -> f a . unsafeAssertNonZeroSign)
 
 foldMap' :: Monoid m => (a -> Sign -> m) -> SignedSet a -> m
-foldMap' f = CountMap.foldMap' (\a -> f a . unsafeSignOrZeroToSign)
+foldMap' f = CountMap.foldMap' (\a -> f a . unsafeAssertNonZeroSign)
 
 mapWith
     :: Ord b
@@ -252,10 +252,10 @@ mapWith
     -> (a -> b)
     -> SignedSet a
     -> SignedSet b
-mapWith = CountMap.mapWith . unsafeSignToSignOrZero3
+mapWith = CountMap.mapWith . unsafeMapNonZeroSign2
 
 mapSigns :: (Sign -> Sign) -> SignedSet a -> SignedSet a
-mapSigns = CountMap.mapCounts . unsafeSignToSignOrZero2
+mapSigns = CountMap.mapCounts . unsafeMapNonZeroSign
 
 invert :: SignedSet a -> SignedSet a
 invert = CountMap.invert
@@ -352,21 +352,21 @@ symmetricPowersetSize = CountMap.symmetricPowersetSize
 -- Utilities
 --------------------------------------------------------------------------------
 
-unsafeSignOrZeroToSign :: SignOrZero -> Sign
-unsafeSignOrZeroToSign ms = case Sign.assertNonZero ms of
-    Nothing -> error "unsafeSignOrZeroToSign"
+unsafeAssertNonZeroSign :: SignOrZero -> Sign
+unsafeAssertNonZeroSign ms = case Sign.assertNonZero ms of
+    Nothing -> error "unsafeAssertNonZeroSign"
     Just s -> s
 
-unsafeSignToSignOrZero2
+unsafeMapNonZeroSign
     :: (Sign -> Sign) -> (SignOrZero -> SignOrZero)
-unsafeSignToSignOrZero2 f ns =
+unsafeMapNonZeroSign f ns =
     Sign.forgetNonZero $
-        f (unsafeSignOrZeroToSign ns)
+        f (unsafeAssertNonZeroSign ns)
 
-unsafeSignToSignOrZero3
+unsafeMapNonZeroSign2
     :: (Sign -> Sign -> Sign) -> (SignOrZero -> SignOrZero -> SignOrZero)
-unsafeSignToSignOrZero3 f ns1 ns2 =
+unsafeMapNonZeroSign2 f ns1 ns2 =
     Sign.forgetNonZero $
         f
-            (unsafeSignOrZeroToSign ns1)
-            (unsafeSignOrZeroToSign ns2)
+            (unsafeAssertNonZeroSign ns1)
+            (unsafeAssertNonZeroSign ns2)
