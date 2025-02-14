@@ -980,7 +980,7 @@ symmetricPowerset
 symmetricPowerset =
     Set.fromDistinctAscList . coerce . symmetricPowersetElements
 
--- Generates all symmetric subsets in lexicograhic order.
+-- Generates all symmetric subsets in lexicographic order.
 symmetricPowersetElements
     :: PackedCountMap p k c
     => MonoidNull (Count c)
