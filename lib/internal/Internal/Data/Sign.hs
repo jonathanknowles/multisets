@@ -63,15 +63,17 @@ instance Bounded SignOrZero where
     minBound = Sign Negative
     maxBound = Sign Positive
 
+{- ORMOLU_DISABLE -}
 instance Ord SignOrZero where
     compare s1 s2 = case (s1, s2) of
         (Sign Negative, Sign Negative) -> EQ
-        (Sign Negative, _) -> LT
+        (Sign Negative, _            ) -> LT
         (Sign Positive, Sign Positive) -> EQ
-        (Sign Positive, _) -> GT
-        (Zero, Sign Negative) -> GT
-        (Zero, Sign Positive) -> LT
-        (Zero, Zero) -> EQ
+        (Sign Positive, _            ) -> GT
+        (Zero         , Sign Negative) -> GT
+        (Zero         , Sign Positive) -> LT
+        (Zero         , Zero         ) -> EQ
+{- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
 instance Semiring SignOrZero where
