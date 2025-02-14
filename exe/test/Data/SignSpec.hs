@@ -2,12 +2,15 @@
 
 module Data.SignSpec where
 
-import Internal.Data.Monoid
+import Data.Semigroup
     ( Max (..)
     , Min (..)
-    , Product (..)
-    , Sum (..)
     )
+import Data.Set.Transformers
+    ( Product
+    , Sum
+    )
+import Generators ()
 import Internal.Data.Sign
     ( SignOrZero
     )
@@ -15,20 +18,8 @@ import Test.Hspec
     ( Spec
     , describe
     )
-import Test.QuickCheck
-    ( Arbitrary
-        ( arbitrary
-        , shrink
-        )
-    , Property
-    , arbitraryBoundedEnum
-    , shrinkBoundedEnum
-    )
 import Test.QuickCheck.Classes
-    ( Laws (Laws)
-    , boundedEnumLaws
-    , enumLaws
-    , eqLaws
+    ( eqLaws
     , monoidLaws
     , ordLaws
     , ringLaws
@@ -41,10 +32,6 @@ import Test.QuickCheck.Classes.Group
 import Test.QuickCheck.Classes.Hspec
     ( testLawsMany
     )
-import Test.QuickCheck.Property
-    ( Result (..)
-    , mapTotalResult
-    )
 import Prelude
 
 spec :: Spec
@@ -52,8 +39,6 @@ spec = describe "Class laws" $ do
     testLawsMany @SignOrZero
         [ eqLaws
         , ordLaws
-        , enumLaws
-        , boundedEnumLaws
         , semiringLaws
         , ringLaws
         ]
@@ -74,34 +59,3 @@ spec = describe "Class laws" $ do
         [ semigroupLaws
         , monoidLaws
         ]
-
-instance Arbitrary SignOrZero where
-    arbitrary = arbitraryBoundedEnum
-    shrink = shrinkBoundedEnum
-
-deriving newtype instance Arbitrary (Min SignOrZero)
-
-deriving newtype instance Arbitrary (Max SignOrZero)
-
-deriving newtype instance Arbitrary (Sum SignOrZero)
-
-deriving newtype instance Arbitrary (Product SignOrZero)
-
---------------------------------------------------------------------------------
--- Coverage checks
---------------------------------------------------------------------------------
-
-class HasCoverageCheck p where
-    disableCoverageCheck :: p -> p
-
-instance HasCoverageCheck Laws where
-    disableCoverageCheck (Laws title laws) =
-        Laws title $ fmap disableCoverageCheck <$> laws
-
-instance HasCoverageCheck Property where
-    disableCoverageCheck =
-        mapTotalResult (\r -> r {maybeCheckCoverage = Nothing})
-
-instance (Functor f, HasCoverageCheck p) => HasCoverageCheck (f p) where
-    disableCoverageCheck =
-        fmap disableCoverageCheck

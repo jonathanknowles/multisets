@@ -6,11 +6,9 @@ module ClassSpec where
 import Data.Bag
     ( Bag
     )
-import Data.Bag qualified as Bag
 import Data.Bag.Signed
     ( SignedBag
     )
-import Data.Bag.Signed qualified as SignedBag
 import Data.Data
     ( Typeable
     , typeRep
@@ -24,19 +22,13 @@ import Data.Set
 import Data.Set.Signed
     ( SignedSet
     )
-import Data.Set.Signed qualified as SignedSet
 import Data.Set.Transformers
     ( Intersection (..)
     , Product (..)
     , Sum (..)
     , Union (..)
     )
-import Data.Sign
-    ( Sign (Negative, Positive)
-    )
-import Internal.Data.Sign
-    ( SignOrZero (Sign, Zero)
-    )
+import Generators ()
 import Numeric.Natural
     ( Natural
     )
@@ -45,13 +37,7 @@ import Test.Hspec
     , describe
     )
 import Test.QuickCheck
-    ( Arbitrary (arbitrary, shrink)
-    , arbitrarySizedNatural
-    , elements
-    , listOf
-    , scale
-    , shrinkIntegral
-    , shrinkMapBy
+    ( Arbitrary
     )
 import Test.QuickCheck.Classes
     ( eqLaws
@@ -132,7 +118,6 @@ specLawsFor elementType = do
             "Class laws for element type " <> show (typeRep elementType)
 
     describe description $ do
-
         -- Laws for base types:
         testLawsMany @(Bag a)
             [ eqLaws
@@ -267,50 +252,3 @@ specLawsFor elementType = do
             [ commutativeLaws
             , semigroupLaws
             ]
-
-instance Arbitrary Natural where
-    arbitrary = arbitrarySizedNatural
-    shrink = shrinkIntegral
-
-instance Arbitrary SignOrZero where
-    arbitrary =
-        elements
-            [ Zero
-            , Sign Negative
-            , Sign Positive
-            ]
-
-deriving newtype instance Arbitrary a => Arbitrary (Sum a)
-
-deriving newtype instance Arbitrary a => Arbitrary (Product a)
-
-deriving newtype instance Arbitrary a => Arbitrary (Union a)
-
-deriving newtype instance Arbitrary a => Arbitrary (Intersection a)
-
-instance Arbitrary Sign where
-    arbitrary = elements [Negative, Positive]
-    shrink = \case
-        Negative -> [Positive]
-        Positive -> []
-
-instance (Arbitrary a, Ord a) => Arbitrary (Bag a) where
-    arbitrary =
-        Bag.fromList
-            <$> scale (`mod` 16) (listOf ((,) <$> arbitrary <*> arbitrary))
-    shrink =
-        shrinkMapBy Bag.fromMap Bag.toMap shrink
-
-instance (Arbitrary a, Ord a) => Arbitrary (SignedBag a) where
-    arbitrary =
-        SignedBag.fromList
-            <$> scale (`mod` 16) (listOf ((,) <$> arbitrary <*> arbitrary))
-    shrink =
-        shrinkMapBy SignedBag.fromMap SignedBag.toMap shrink
-
-instance (Arbitrary a, Ord a) => Arbitrary (SignedSet a) where
-    arbitrary =
-        SignedSet.fromListWith const
-            <$> scale (`mod` 16) (listOf ((,) <$> arbitrary <*> arbitrary))
-    shrink =
-        shrinkMapBy SignedSet.fromMap SignedSet.toMap shrink

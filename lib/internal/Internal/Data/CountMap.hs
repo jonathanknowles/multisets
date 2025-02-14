@@ -19,6 +19,9 @@ import Data.Foldable1
     ( Foldable1
     )
 import Data.Foldable1 qualified as Foldable1
+import Data.Function
+    ( (&)
+    )
 import Data.Group
     ( Group
     )
@@ -46,8 +49,11 @@ import Data.Ord
     ( Down (Down)
     )
 import Data.Semiring
-    ( Semiring (one, plus, times)
+    ( Ring
+    , Semiring
     )
+import Data.Semiring qualified as Ring
+import Data.Semiring qualified as Semiring
 import Data.Set
     ( Set
     )
@@ -121,7 +127,7 @@ singleton
     => MonoidNull (Count c)
     => Semiring (Count c)
     => k -> p
-singleton k = pack $ MonoidMap.singleton k one
+singleton k = pack $ MonoidMap.singleton k Semiring.one
 
 fromList
     :: forall p k c
@@ -246,7 +252,7 @@ isSimple = isJust . maybeSimple
 isSingleton
     :: PackedCountMap p k c
     => Monoid (Count c)
-    => Enum c
+    => Semiring c
     => Eq c
     => p -> Bool
 isSingleton = isJust . maybeSingleton
@@ -254,7 +260,7 @@ isSingleton = isJust . maybeSingleton
 isSingletonSigned
     :: PackedCountMap p k c
     => Monoid (Count c)
-    => Enum c
+    => Ring (Count c)
     => Eq c
     => p -> Bool
 isSingletonSigned = isJust . maybeSingletonSigned
@@ -348,13 +354,13 @@ maybeSingleton
      . ()
     => PackedCountMap p k c
     => Monoid (Count c)
-    => Enum c
+    => Semiring (Count c)
     => Eq c
     => p
     -> Maybe k
 maybeSingleton p =
     case MonoidMap.toList (unpack p) of
-        [(k, c)] | c == succ mempty -> Just k
+        [(k, c)] | c == Semiring.one -> Just k
         _ -> Nothing
 
 maybeSingletonSigned
@@ -362,15 +368,18 @@ maybeSingletonSigned
      . ()
     => PackedCountMap p k c
     => Monoid (Count c)
-    => Enum c
+    => Ring (Count c)
     => Eq c
     => p
     -> Maybe (Sign, k)
 maybeSingletonSigned p =
     case MonoidMap.toList (unpack p) of
-        [(k, c)] | c == succ mempty -> Just (Positive, k)
-        [(k, c)] | c == pred mempty -> Just (Negative, k)
+        [(k, c)] | c == positiveOne -> Just (Positive, k)
+        [(k, c)] | c == negativeOne -> Just (Negative, k)
         _ -> Nothing
+  where
+    positiveOne = Semiring.one
+    negativeOne = Semiring.one & Ring.negate
 
 maybeUnipolar
     :: forall p1 p2 k c1 c2
@@ -572,7 +581,7 @@ add
     => MonoidNull (Count c)
     => Semiring c
     => p -> p -> p
-add = unpacked2 $ MonoidMap.unionWith plus
+add = unpacked2 $ MonoidMap.unionWith Semiring.plus
 
 multiply
     :: PackedCountMap p k c
@@ -581,7 +590,7 @@ multiply
     => MonoidNull (Count c)
     => Semiring c
     => p -> p -> p
-multiply = unpacked2 $ MonoidMap.unionWith times
+multiply = unpacked2 $ MonoidMap.unionWith Semiring.times
 
 intersection
     :: PackedCountMap p k c
@@ -924,9 +933,9 @@ powerset
     :: PackedCountMap p k c
     => MonoidNull (Count c)
     => PositiveMonoid (Count c)
-    => Ord p
+    => Semiring (Count c)
+    => Ord c
     => Ord k
-    => Enum (Count c)
     => p -> Set p
 powerset = Set.fromDistinctAscList . coerce . powersetElements
 
@@ -935,18 +944,16 @@ powersetElements
     :: PackedCountMap p k c
     => MonoidNull (Count c)
     => PositiveMonoid (Count c)
+    => Semiring (Count c)
+    => Ord c
     => Ord k
-    => Enum (Count c)
     => p -> [p]
 {- ORMOLU_DISABLE -}
 powersetElements =
     fmap (pack . MonoidMap.fromListWith (<>)) . go . MonoidMap.toList . unpack
   where
     go            [] = [[]]
-    go ((a, p) : xs) = [(a, q) : ys | q <- shrinkInclusively p, ys <- go xs]
-
-    shrinkInclusively :: (Enum a, Monoid a) => a -> [a]
-    shrinkInclusively a = [mempty .. a]
+    go ((a, p) : xs) = [(a, q) : ys | q <- semiringIntervalZero p, ys <- go xs]
 {- ORMOLU_ENABLE -}
 
 powersetSize
@@ -966,10 +973,9 @@ symmetricPowerset
     :: PackedCountMap p k c
     => MonoidNull (Count c)
     => Group (Count c)
-    => Ord p
-    => Ord k
+    => Semiring (Count c)
     => Ord c
-    => Enum (Count c)
+    => Ord k
     => p -> Set p
 symmetricPowerset =
     Set.fromDistinctAscList . coerce . symmetricPowersetElements
@@ -979,22 +985,16 @@ symmetricPowersetElements
     :: PackedCountMap p k c
     => MonoidNull (Count c)
     => Group (Count c)
-    => Ord k
+    => Semiring (Count c)
     => Ord c
-    => Enum (Count c)
+    => Ord k
     => p -> [p]
 {- ORMOLU_DISABLE -}
 symmetricPowersetElements =
     fmap (pack . MonoidMap.fromListWith (<>)) . go . MonoidMap.toList . unpack
   where
     go            [] = [[]]
-    go ((a, p) : xs) = [(a, q) : ys | q <- shrinkInclusively p, ys <- go xs]
-
-    shrinkInclusively :: (Enum a, Monoid a, Ord a) => a -> [a]
-    shrinkInclusively a
-        | a < mempty = [a .. mempty]
-        | a > mempty = [mempty .. a]
-        | otherwise  = [mempty]
+    go ((a, p) : xs) = [(a, q) : ys | q <- semiringIntervalZero p, ys <- go xs]
 {- ORMOLU_ENABLE -}
 
 symmetricPowersetSize
@@ -1067,3 +1067,20 @@ isSymmetricallyBoundedBy v1 v2
     | Count v1 <= mempty && Count v2 <= mempty = v1 >= v2
     | Count v1 >= mempty && Count v2 >= mempty = v1 <= v2
     | otherwise = False
+
+semiringIntervalZero :: Ord a => Semiring a => a -> [a]
+semiringIntervalZero = semiringInterval Semiring.zero
+
+semiringInterval :: Ord a => Semiring a => a -> a -> [a]
+semiringInterval a b = from lo
+  where
+    lo = Prelude.min a b
+    hi = Prelude.max a b
+
+    from n
+        | n == hi = [n]
+        | n < hi = n : from (semiringSucc n)
+        | otherwise = error "semiringAscendingRange"
+
+semiringSucc :: Semiring a => a -> a
+semiringSucc = Semiring.plus Semiring.one

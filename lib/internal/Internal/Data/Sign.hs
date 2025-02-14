@@ -31,7 +31,7 @@ import Data.Semiring
 import GHC.Generics
     ( Generic
     )
-import Internal.Data.Monoid
+import Internal.Data.Set.Transformers
     ( Product (Product)
     , Sum (Sum)
     )
@@ -63,19 +63,6 @@ instance Bounded SignOrZero where
     minBound = Sign Negative
     maxBound = Sign Positive
 
--- TODO:
--- Eliminate this instance. There's no way to create a safe, idiomatic instance.
-instance Enum SignOrZero where
-    toEnum i = case i `moduloInclusiveRange` (-1, 1) of
-        -1 -> Sign Negative
-        01 -> Sign Positive
-        00 -> Zero
-        __ -> errorInvalidEnumSignOrZero
-    fromEnum = \case
-        Sign Negative -> -1
-        Sign Positive -> 01
-        Zero -> 0
-
 instance Ord SignOrZero where
     compare s1 s2 = case (s1, s2) of
         (Sign Negative, Sign Negative) -> EQ
@@ -85,12 +72,6 @@ instance Ord SignOrZero where
         (Zero, Sign Negative) -> GT
         (Zero, Sign Positive) -> LT
         (Zero, Zero) -> EQ
-
-moduloInclusiveRange :: Integral i => i -> (i, i) -> i
-moduloInclusiveRange i (lo, hi) = ((i - lo) `mod` (hi - lo + 1)) + lo
-
-errorInvalidEnumSignOrZero :: a
-errorInvalidEnumSignOrZero = error "Invalid Enum value for SignOrzero"
 
 {- ORMOLU_DISABLE -}
 instance Semiring SignOrZero where

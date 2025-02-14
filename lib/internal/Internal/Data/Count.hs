@@ -38,13 +38,14 @@ import Data.Semigroup.Commutative
     ( Commutative
     )
 import Data.Semiring
-    ( Semiring
-    )
-import Internal.Data.Monoid
-    ( Sum (Sum)
+    ( Ring
+    , Semiring
     )
 import Internal.Data.Packed
     ( Packed (Unpacked)
+    )
+import Internal.Data.Set.Transformers
+    ( Sum (Sum)
     )
 import Internal.Data.Sign
     ( Sign (Negative, Positive)
@@ -58,7 +59,7 @@ import Prelude
 newtype Count a = Count a
     deriving stock (Eq, Ord, Functor)
     deriving newtype
-        (Bounded, Enum, NFData, Semiring, Show)
+        (Bounded, NFData, Ring, Semiring, Show)
 
 instance Packed (Count a) where
     type Unpacked (Count a) = a

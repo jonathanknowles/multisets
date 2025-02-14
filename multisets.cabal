@@ -115,7 +115,6 @@ library internal
         Internal.Data.Count
         Internal.Data.CountMap
         Internal.Data.Magnitude
-        Internal.Data.Monoid
         Internal.Data.Packed
         Internal.Data.Set.Transformers
         Internal.Data.Sign
@@ -156,6 +155,7 @@ test-suite test
     hs-source-dirs:
         exe/test
     other-modules:
+        Generators
         ClassSpec
         Data.SignSpec
         SpecHook
