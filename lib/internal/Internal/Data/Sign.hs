@@ -51,7 +51,7 @@ data Sign
 --------------------------------------------------------------------------------
 
 data SignOrZero
-    = Sign Sign
+    = Sign !Sign
     | Zero
     deriving stock (Eq, Generic, Ord, Read, Show)
     deriving anyclass (NFData)
