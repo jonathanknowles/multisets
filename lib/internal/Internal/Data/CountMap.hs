@@ -1076,11 +1076,9 @@ semiringInterval a b = from lo
   where
     lo = Prelude.min a b
     hi = Prelude.max a b
-
     from n
         | n == hi = [n]
-        | n < hi = n : from (semiringSucc n)
-        | otherwise = error "semiringInterval"
+        | otherwise = n : from (semiringSucc n)
 
 semiringSucc :: Semiring a => a -> a
 semiringSucc = Semiring.plus Semiring.one
