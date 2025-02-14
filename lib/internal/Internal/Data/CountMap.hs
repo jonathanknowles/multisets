@@ -367,8 +367,8 @@ maybeSingletonSigned
     -> Maybe (Sign, k)
 maybeSingletonSigned p =
     case MonoidMap.toList (unpack p) of
-        [(k, c)] | c == succ mempty -> Just (Sign.P, k)
-        [(k, c)] | c == pred mempty -> Just (Sign.N, k)
+        [(k, c)] | c == succ mempty -> Just (Sign.Positive, k)
+        [(k, c)] | c == pred mempty -> Just (Sign.Negative, k)
         _ -> Nothing
 
 maybeUnipolar

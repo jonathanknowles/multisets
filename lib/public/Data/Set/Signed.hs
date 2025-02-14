@@ -357,8 +357,8 @@ symmetricPowersetSize = CountMap.symmetricPowersetSize
 
 unsafeNumSignToSign :: NumSign -> Sign
 unsafeNumSignToSign = \case
-    NumSign.N -> Sign.N
-    NumSign.P -> Sign.P
+    NumSign.N -> Sign.Negative
+    NumSign.P -> Sign.Positive
     NumSign.Z -> error "unsafeNumSignToSign"
 
 unsafeSignToNumSign2

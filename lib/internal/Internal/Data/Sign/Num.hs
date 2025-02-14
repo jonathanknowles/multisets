@@ -116,14 +116,14 @@ instance Monoid (Product NumSign) where
 
 toSign :: NumSign -> Maybe Sign
 toSign = \case
-    N -> Just Sign.N
-    P -> Just Sign.P
+    N -> Just Sign.Negative
+    P -> Just Sign.Positive
     Z -> Nothing
 
 fromSign :: Sign -> NumSign
 fromSign = \case
-    Sign.N -> N
-    Sign.P -> P
+    Sign.Negative -> N
+    Sign.Positive -> P
 
 --------------------------------------------------------------------------------
 -- Functions

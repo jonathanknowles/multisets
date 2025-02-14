@@ -13,12 +13,12 @@ import Prelude
 
 data Sign
     = -- | Negative
-      N
+      Negative
     | -- | Positive
-      P
+      Positive
     deriving stock (Bounded, Enum, Eq, Generic, Ord, Read, Show)
     deriving anyclass (NFData)
 
 invert :: Sign -> Sign
-invert N = P
-invert P = N
+invert Negative = Positive
+invert Positive = Negative

@@ -1,8 +1,8 @@
 module Data.Sign
-    ( Sign (N, P)
+    ( Sign (Negative, Positive)
     )
     where
 
 import Internal.Data.Sign
-    ( Sign (N, P)
+    ( Sign (Negative, Positive)
     )
