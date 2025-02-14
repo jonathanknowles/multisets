@@ -73,8 +73,8 @@ import Internal.Data.Set.Transformers
     , Sum (..)
     , Union (..)
     )
-import Internal.Data.Sign.Num
-    ( NumSign
+import Internal.Data.Sign
+    ( SignOrZero
     )
 import Numeric.Natural
     ( Natural
@@ -91,7 +91,7 @@ newtype Bag a = Bag (CountMap a Natural)
 newtype SignedBag a = SignedBag (CountMap a Integer)
     deriving newtype (Eq, NFData)
 
-newtype SignedSet a = SignedSet (CountMap a NumSign)
+newtype SignedSet a = SignedSet (CountMap a SignOrZero)
     deriving newtype (Eq, NFData)
 
 --------------------------------------------------------------------------------
@@ -268,7 +268,7 @@ instance Packed (SignedBag a) where
     type Unpacked (SignedBag a) = CountMap a Integer
 
 instance Packed (SignedSet a) where
-    type Unpacked (SignedSet a) = CountMap a NumSign
+    type Unpacked (SignedSet a) = CountMap a SignOrZero
 
 type UBag a = Unpacked (Bag a)
 
@@ -304,7 +304,7 @@ instance Ord a => IsList (SignedBag a) where
     toList = CountMap.toList
 
 instance Ord a => IsList (SignedSet a) where
-    type Item (SignedSet a) = (a, NumSign)
+    type Item (SignedSet a) = (a, SignOrZero)
     fromList = CountMap.fromList
     toList = CountMap.toList
 

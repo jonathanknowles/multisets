@@ -70,14 +70,11 @@ import Internal.Data.Packed
     , unpacked2
     )
 import Internal.Data.Sign
-    ( Sign
+    ( Sign (Negative, Positive)
+    , SignOrZero
+    , Signed (SignOf, signOf)
     )
 import Internal.Data.Sign qualified as Sign
-import Internal.Data.Sign.Num
-    ( NumSign
-    , SignNum (signNum)
-    )
-import Internal.Data.Sign.Num qualified as NumSign
 import Numeric.Natural
     ( Natural
     )
@@ -188,12 +185,13 @@ toSet p = MonoidMap.nonNullKeys (unpack p)
 
 toSetSigned
     :: PackedCountMap p1 k c1
-    => PackedCountMap p2 k NumSign
-    => SignNum c1
+    => PackedCountMap p2 k SignOrZero
+    => Signed c1
+    => SignOf c1 ~ SignOrZero
     => Num c1
     => Ord c1
     => p1 -> p2
-toSetSigned = fromMap . Map.map signNum . toMap
+toSetSigned = fromMap . Map.map signOf . toMap
 
 fromSet
     :: PackedCountMap p k c
@@ -221,11 +219,12 @@ member k = MonoidMap.nonNullKey k . unpack
 
 signs
     :: PackedCountMap p k c
-    => SignNum c
+    => Signed c
+    => SignOf c ~ SignOrZero
     => p -> Set Sign
 signs =
     Set.fromList
-        . mapMaybe (NumSign.toSign . signNum . snd)
+        . mapMaybe (Sign.assertNonZero . signOf . snd)
         . toList
 
 isRegular
@@ -264,7 +263,8 @@ isBipolar
     :: forall p k c
      . ()
     => PackedCountMap p k c
-    => SignNum c
+    => Signed c
+    => SignOf c ~ SignOrZero
     => p -> Bool
 isBipolar p = Set.size (signs p) == 2
 
@@ -272,7 +272,8 @@ isUnipolar
     :: forall p k c
      . ()
     => PackedCountMap p k c
-    => SignNum c
+    => Signed c
+    => SignOf c ~ SignOrZero
     => p -> Bool
 isUnipolar p = Set.size (signs p) == 1
 
@@ -367,8 +368,8 @@ maybeSingletonSigned
     -> Maybe (Sign, k)
 maybeSingletonSigned p =
     case MonoidMap.toList (unpack p) of
-        [(k, c)] | c == succ mempty -> Just (Sign.Positive, k)
-        [(k, c)] | c == pred mempty -> Just (Sign.Negative, k)
+        [(k, c)] | c == succ mempty -> Just (Positive, k)
+        [(k, c)] | c == pred mempty -> Just (Negative, k)
         _ -> Nothing
 
 maybeUnipolar
@@ -377,7 +378,8 @@ maybeUnipolar
     => PackedCountMap p1 k c1
     => PackedCountMap p2 k c2
     => HasMagnitude c1
-    => SignNum c1
+    => Signed c1
+    => SignOf c1 ~ SignOrZero
     => Magnitude c1 ~ c2
     => MonoidNull (Count c1)
     => MonoidNull (Count c2)

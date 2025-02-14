@@ -59,9 +59,7 @@ import Test.QuickCheck
     , shrinkMapBy
     )
 import Test.QuickCheck.Classes
-    ( boundedEnumLaws
-    , enumLaws
-    , eqLaws
+    ( eqLaws
     , isListLaws
     , monoidLaws
     , ordLaws

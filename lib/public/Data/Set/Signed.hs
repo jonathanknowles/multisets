@@ -118,12 +118,9 @@ import Data.Set
 import Internal.Data.CountMap qualified as CountMap
 import Internal.Data.Sign
     ( Sign
+    , SignOrZero
     )
 import Internal.Data.Sign qualified as Sign
-import Internal.Data.Sign.Num
-    ( NumSign
-    )
-import Internal.Data.Sign.Num qualified as NumSign
 import Internal.Shared
     ( SignedSet
     )
@@ -150,20 +147,20 @@ singleton = CountMap.singleton
 
 fromListWith :: Ord a => (Sign -> Sign -> Sign) -> [(a, Sign)] -> SignedSet a
 fromListWith f =
-    CountMap.fromListWith (unsafeSignToNumSign3 f)
-        . fmap (fmap NumSign.fromSign)
+    CountMap.fromListWith (unsafeSignToSignOrZero3 f)
+        . fmap (fmap Sign.forgetNonZero)
 
 fromMap :: Map a Sign -> SignedSet a
-fromMap = CountMap.fromMap . Map.map NumSign.fromSign
+fromMap = CountMap.fromMap . Map.map Sign.forgetNonZero
 
 fromSet :: (a -> Sign) -> Set a -> SignedSet a
-fromSet = CountMap.fromSet . fmap NumSign.fromSign
+fromSet = CountMap.fromSet . fmap Sign.forgetNonZero
 
 toList :: SignedSet a -> [(a, Sign)]
-toList = mapMaybe (traverse NumSign.toSign) . CountMap.toList
+toList = mapMaybe (traverse Sign.assertNonZero) . CountMap.toList
 
 toMap :: SignedSet a -> Map a Sign
-toMap = Map.mapMaybe NumSign.toSign . CountMap.toMap
+toMap = Map.mapMaybe Sign.assertNonZero . CountMap.toMap
 
 toSet :: SignedSet a -> Set a
 toSet = CountMap.toSet
@@ -172,7 +169,7 @@ null :: SignedSet a -> Bool
 null = CountMap.null
 
 lookup :: Ord a => a -> SignedSet a -> Maybe Sign
-lookup a = NumSign.toSign . CountMap.lookup a
+lookup a = Sign.assertNonZero . CountMap.lookup a
 
 member :: Ord a => a -> SignedSet a -> Bool
 member = CountMap.member
@@ -207,13 +204,13 @@ isPositive = CountMap.isPositive
 maybeRegular :: Ord a => SignedSet a -> Maybe (Sign, Set a)
 maybeRegular s = do
     (numSign, regularSet) <- CountMap.maybeRegular s
-    sign <- NumSign.toSign numSign
+    sign <- Sign.assertNonZero numSign
     pure (sign, regularSet)
 
 maybeSimple :: Ord a => SignedSet a -> Maybe (Sign, a)
 maybeSimple s = do
     (numSign, a) <- CountMap.maybeSimple s
-    sign <- NumSign.toSign numSign
+    sign <- Sign.assertNonZero numSign
     pure (sign, a)
 
 maybeSingleton :: Ord a => SignedSet a -> Maybe a
@@ -232,22 +229,22 @@ maybePositive :: Ord a => SignedSet a -> Maybe (Set a)
 maybePositive = CountMap.maybePositive
 
 foldl :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
-foldl f = CountMap.foldl (\r a -> f r a . unsafeNumSignToSign)
+foldl f = CountMap.foldl (\r a -> f r a . unsafeSignOrZeroToSign)
 
 foldl' :: (r -> a -> Sign -> r) -> r -> SignedSet a -> r
-foldl' f = CountMap.foldl' (\r a -> f r a . unsafeNumSignToSign)
+foldl' f = CountMap.foldl' (\r a -> f r a . unsafeSignOrZeroToSign)
 
 foldr :: (a -> Sign -> r -> r) -> r -> SignedSet a -> r
-foldr f = CountMap.foldr (\a -> f a . unsafeNumSignToSign)
+foldr f = CountMap.foldr (\a -> f a . unsafeSignOrZeroToSign)
 
 foldr' :: (a -> Sign -> r -> r) -> r -> SignedSet a -> r
-foldr' f = CountMap.foldr' (\a -> f a . unsafeNumSignToSign)
+foldr' f = CountMap.foldr' (\a -> f a . unsafeSignOrZeroToSign)
 
 foldMap :: Monoid m => (a -> Sign -> m) -> SignedSet a -> m
-foldMap f = CountMap.foldMap (\a -> f a . unsafeNumSignToSign)
+foldMap f = CountMap.foldMap (\a -> f a . unsafeSignOrZeroToSign)
 
 foldMap' :: Monoid m => (a -> Sign -> m) -> SignedSet a -> m
-foldMap' f = CountMap.foldMap' (\a -> f a . unsafeNumSignToSign)
+foldMap' f = CountMap.foldMap' (\a -> f a . unsafeSignOrZeroToSign)
 
 mapWith
     :: Ord b
@@ -255,10 +252,10 @@ mapWith
     -> (a -> b)
     -> SignedSet a
     -> SignedSet b
-mapWith = CountMap.mapWith . unsafeSignToNumSign3
+mapWith = CountMap.mapWith . unsafeSignToSignOrZero3
 
 mapSigns :: (Sign -> Sign) -> SignedSet a -> SignedSet a
-mapSigns = CountMap.mapCounts . unsafeSignToNumSign2
+mapSigns = CountMap.mapCounts . unsafeSignToSignOrZero2
 
 invert :: SignedSet a -> SignedSet a
 invert = CountMap.invert
@@ -355,22 +352,21 @@ symmetricPowersetSize = CountMap.symmetricPowersetSize
 -- Utilities
 --------------------------------------------------------------------------------
 
-unsafeNumSignToSign :: NumSign -> Sign
-unsafeNumSignToSign = \case
-    NumSign.N -> Sign.Negative
-    NumSign.P -> Sign.Positive
-    NumSign.Z -> error "unsafeNumSignToSign"
+unsafeSignOrZeroToSign :: SignOrZero -> Sign
+unsafeSignOrZeroToSign ms = case Sign.assertNonZero ms of
+    Nothing -> error "unsafeSignOrZeroToSign"
+    Just s -> s
 
-unsafeSignToNumSign2
-    :: (Sign -> Sign) -> (NumSign -> NumSign)
-unsafeSignToNumSign2 f ns =
-    NumSign.fromSign $
-        f (unsafeNumSignToSign ns)
+unsafeSignToSignOrZero2
+    :: (Sign -> Sign) -> (SignOrZero -> SignOrZero)
+unsafeSignToSignOrZero2 f ns =
+    Sign.forgetNonZero $
+        f (unsafeSignOrZeroToSign ns)
 
-unsafeSignToNumSign3
-    :: (Sign -> Sign -> Sign) -> (NumSign -> NumSign -> NumSign)
-unsafeSignToNumSign3 f ns1 ns2 =
-    NumSign.fromSign $
+unsafeSignToSignOrZero3
+    :: (Sign -> Sign -> Sign) -> (SignOrZero -> SignOrZero -> SignOrZero)
+unsafeSignToSignOrZero3 f ns1 ns2 =
+    Sign.forgetNonZero $
         f
-            (unsafeNumSignToSign ns1)
-            (unsafeNumSignToSign ns2)
+            (unsafeSignOrZeroToSign ns1)
+            (unsafeSignOrZeroToSign ns2)

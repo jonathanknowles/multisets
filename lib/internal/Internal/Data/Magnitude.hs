@@ -12,8 +12,9 @@ import Data.Word
     , Word64
     , Word8
     )
-import Internal.Data.Sign.Num
-    ( NumSign (..)
+import Internal.Data.Sign
+    ( Sign (Negative, Positive)
+    , SignOrZero (Sign, Zero)
     )
 import Numeric.Natural
     ( Natural
@@ -24,12 +25,12 @@ class HasMagnitude i where
     type Magnitude i
     magnitude :: i -> Magnitude i
 
-instance HasMagnitude NumSign where
-    type Magnitude NumSign = Bool
+instance HasMagnitude SignOrZero where
+    type Magnitude SignOrZero = Bool
     magnitude = \case
-        N -> True
-        Z -> False
-        P -> True
+        Sign Negative -> True
+        Zero -> False
+        Sign Positive -> True
 
 instance HasMagnitude Integer where
     type Magnitude Integer = Natural

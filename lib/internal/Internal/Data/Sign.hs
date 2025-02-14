@@ -60,6 +60,28 @@ instance Bounded SignOrZero where
     minBound = Sign Negative
     maxBound = Sign Positive
 
+instance Enum SignOrZero where
+    toEnum = \case
+        -1 -> Sign Negative
+        01 -> Sign Positive
+        00 -> Zero
+        __ -> errorInvalidEnumSignOrZero
+    fromEnum = \case
+        Sign Negative -> -1
+        Sign Positive -> 01
+        Zero -> 0
+    succ = \case
+        Sign Negative -> Zero
+        Sign Positive -> errorInvalidEnumSignOrZero
+        Zero -> Sign Positive
+    pred = \case
+        Sign Negative -> errorInvalidEnumSignOrZero
+        Sign Positive -> Zero
+        Zero -> Sign Negative
+
+errorInvalidEnumSignOrZero :: a
+errorInvalidEnumSignOrZero = error "Invalid Enum value for SignOrzero"
+
 {- ORMOLU_DISABLE -}
 instance Semiring SignOrZero where
     zero = Zero

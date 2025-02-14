@@ -46,10 +46,10 @@ import Internal.Data.Monoid
 import Internal.Data.Packed
     ( Packed (Unpacked)
     )
-import Internal.Data.Sign.Num
-    ( NumSign
+import Internal.Data.Sign
+    ( Sign (Negative, Positive)
+    , SignOrZero (Sign, Zero)
     )
-import Internal.Data.Sign.Num qualified as NumSign
 import Numeric.Natural
     ( Natural
     )
@@ -57,7 +57,8 @@ import Prelude
 
 newtype Count a = Count a
     deriving stock (Eq, Ord, Functor)
-    deriving newtype (Bounded, Enum, NFData, Semiring, Show)
+    deriving newtype
+        (Bounded, Enum, NFData, Semiring, Show)
 
 instance Packed (Count a) where
     type Unpacked (Count a) = a
@@ -71,11 +72,11 @@ deriving via Any instance Semigroup  (Count Bool)
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
-deriving via Sum NumSign instance Commutative (Count NumSign)
-deriving via Sum NumSign instance Group       (Count NumSign)
-deriving via Sum NumSign instance Monoid      (Count NumSign)
-deriving via Sum NumSign instance MonoidNull  (Count NumSign)
-deriving via Sum NumSign instance Semigroup   (Count NumSign)
+deriving via Sum SignOrZero instance Commutative (Count SignOrZero)
+deriving via Sum SignOrZero instance Group       (Count SignOrZero)
+deriving via Sum SignOrZero instance Monoid      (Count SignOrZero)
+deriving via Sum SignOrZero instance MonoidNull  (Count SignOrZero)
+deriving via Sum SignOrZero instance Semigroup   (Count SignOrZero)
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
@@ -129,15 +130,15 @@ instance CountMagnitude Natural where
 {- ORMOLU_ENABLE -}
 
 {- ORMOLU_DISABLE -}
-instance CountMagnitude NumSign where
+instance CountMagnitude SignOrZero where
     countToInteger (Count s) = case s of
-        NumSign.N -> -1
-        NumSign.Z ->  0
-        NumSign.P ->  1
+        Sign Negative -> -1
+        Zero          ->  0
+        Sign Positive ->  1
     countToNatural (Count s) = case s of
-        NumSign.N ->  1
-        NumSign.Z ->  0
-        NumSign.P ->  1
+        Sign Negative -> 1
+        Zero          -> 0
+        Sign Positive -> 1
 {- ORMOLU_ENABLE -}
 
 class CountSymmetricDifference c where
