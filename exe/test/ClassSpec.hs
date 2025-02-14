@@ -32,7 +32,10 @@ import Data.Set.Transformers
     , Union (..)
     )
 import Data.Sign
-    ( Sign
+    ( Sign (Negative, Positive)
+    )
+import Internal.Data.Sign
+    ( SignOrZero (Sign, Zero)
     )
 import Internal.Data.Sign.Num
     ( NumSign
@@ -48,6 +51,7 @@ import Test.QuickCheck
     ( Arbitrary (arbitrary, shrink)
     , arbitraryBoundedEnum
     , arbitrarySizedNatural
+    , elements
     , listOf
     , scale
     , shrinkBoundedEnum
@@ -55,7 +59,9 @@ import Test.QuickCheck
     , shrinkMapBy
     )
 import Test.QuickCheck.Classes
-    ( eqLaws
+    ( boundedEnumLaws
+    , enumLaws
+    , eqLaws
     , isListLaws
     , monoidLaws
     , ordLaws
@@ -133,6 +139,10 @@ specLawsFor elementType = do
             "Class laws for element type " <> show (typeRep elementType)
 
     describe description $ do
+        testLawsMany @SignOrZero
+            [ eqLaws
+            ]
+
         -- Laws for base types:
         testLawsMany @(Bag a)
             [ eqLaws
@@ -272,6 +282,14 @@ instance Arbitrary Natural where
     arbitrary = arbitrarySizedNatural
     shrink = shrinkIntegral
 
+instance Arbitrary SignOrZero where
+    arbitrary =
+        elements
+            [ Zero
+            , Sign Negative
+            , Sign Positive
+            ]
+
 deriving newtype instance Arbitrary a => Arbitrary (Sum a)
 
 deriving newtype instance Arbitrary a => Arbitrary (Product a)
@@ -281,8 +299,10 @@ deriving newtype instance Arbitrary a => Arbitrary (Union a)
 deriving newtype instance Arbitrary a => Arbitrary (Intersection a)
 
 instance Arbitrary Sign where
-    arbitrary = arbitraryBoundedEnum
-    shrink = shrinkBoundedEnum
+    arbitrary = elements [Negative, Positive]
+    shrink = \case
+        Negative -> [Positive]
+        Positive -> []
 
 instance Arbitrary NumSign where
     arbitrary = arbitraryBoundedEnum
