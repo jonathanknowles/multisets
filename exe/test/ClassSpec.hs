@@ -59,7 +59,9 @@ import Test.QuickCheck
     , shrinkMapBy
     )
 import Test.QuickCheck.Classes
-    ( eqLaws
+    ( boundedEnumLaws
+    , enumLaws
+    , eqLaws
     , isListLaws
     , monoidLaws
     , ordLaws
@@ -139,6 +141,9 @@ specLawsFor elementType = do
     describe description $ do
         testLawsMany @SignOrZero
             [ eqLaws
+            , ordLaws
+            , enumLaws
+            , boundedEnumLaws
             ]
 
         -- Laws for base types:

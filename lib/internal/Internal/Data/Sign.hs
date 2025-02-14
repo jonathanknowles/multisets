@@ -53,15 +53,17 @@ data Sign
 data SignOrZero
     = Sign !Sign
     | Zero
-    deriving stock (Eq, Generic, Ord, Read, Show)
+    deriving stock (Eq, Generic, Read, Show)
     deriving anyclass (NFData)
 
 instance Bounded SignOrZero where
     minBound = Sign Negative
     maxBound = Sign Positive
 
+-- TODO:
+-- Eliminate this instance. There's no way to create a safe, idiomatic instance.
 instance Enum SignOrZero where
-    toEnum = \case
+    toEnum i = case i `moduloInclusiveRange` (-1, 1) of
         -1 -> Sign Negative
         01 -> Sign Positive
         00 -> Zero
@@ -70,14 +72,19 @@ instance Enum SignOrZero where
         Sign Negative -> -1
         Sign Positive -> 01
         Zero -> 0
-    succ = \case
-        Sign Negative -> Zero
-        Sign Positive -> errorInvalidEnumSignOrZero
-        Zero -> Sign Positive
-    pred = \case
-        Sign Negative -> errorInvalidEnumSignOrZero
-        Sign Positive -> Zero
-        Zero -> Sign Negative
+
+instance Ord SignOrZero where
+    compare s1 s2 = case (s1, s2) of
+        (Sign Negative, Sign Negative) -> EQ
+        (Sign Negative, _            ) -> LT
+        (Sign Positive, Sign Positive) -> EQ
+        (Sign Positive, _            ) -> GT
+        (Zero         , Sign Negative) -> GT
+        (Zero         , Sign Positive) -> LT
+        (Zero         , Zero         ) -> EQ
+
+moduloInclusiveRange :: Integral i => i -> (i, i) -> i
+moduloInclusiveRange i (lo, hi) = ((i - lo) `mod` (hi - lo + 1)) + lo
 
 errorInvalidEnumSignOrZero :: a
 errorInvalidEnumSignOrZero = error "Invalid Enum value for SignOrzero"
