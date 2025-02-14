@@ -119,8 +119,6 @@ library internal
         Internal.Data.Packed
         Internal.Data.Set.Transformers
         Internal.Data.Sign
-        Internal.Data.Sign.Num
-        Internal.Data.Sign.Num.Model
         Internal.Shared
     default-language:
         Haskell2010

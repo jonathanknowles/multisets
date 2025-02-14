@@ -37,9 +37,6 @@ import Data.Sign
 import Internal.Data.Sign
     ( SignOrZero (Sign, Zero)
     )
-import Internal.Data.Sign.Num
-    ( NumSign
-    )
 import Numeric.Natural
     ( Natural
     )
@@ -49,19 +46,15 @@ import Test.Hspec
     )
 import Test.QuickCheck
     ( Arbitrary (arbitrary, shrink)
-    , arbitraryBoundedEnum
     , arbitrarySizedNatural
     , elements
     , listOf
     , scale
-    , shrinkBoundedEnum
     , shrinkIntegral
     , shrinkMapBy
     )
 import Test.QuickCheck.Classes
-    ( boundedEnumLaws
-    , enumLaws
-    , eqLaws
+    ( eqLaws
     , isListLaws
     , monoidLaws
     , ordLaws
@@ -139,12 +132,6 @@ specLawsFor elementType = do
             "Class laws for element type " <> show (typeRep elementType)
 
     describe description $ do
-        testLawsMany @SignOrZero
-            [ eqLaws
-            , ordLaws
-            , enumLaws
-            , boundedEnumLaws
-            ]
 
         -- Laws for base types:
         testLawsMany @(Bag a)
@@ -306,10 +293,6 @@ instance Arbitrary Sign where
     shrink = \case
         Negative -> [Positive]
         Positive -> []
-
-instance Arbitrary NumSign where
-    arbitrary = arbitraryBoundedEnum
-    shrink = shrinkBoundedEnum
 
 instance (Arbitrary a, Ord a) => Arbitrary (Bag a) where
     arbitrary =

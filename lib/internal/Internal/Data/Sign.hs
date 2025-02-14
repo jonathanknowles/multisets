@@ -25,7 +25,8 @@ import Data.Monoid.Null
     ( MonoidNull (null)
     )
 import Data.Semiring
-    ( Semiring (one, plus, times, zero)
+    ( Ring (negate)
+    , Semiring (one, plus, times, zero)
     )
 import GHC.Generics
     ( Generic
@@ -34,7 +35,9 @@ import Internal.Data.Monoid
     ( Product (Product)
     , Sum (Sum)
     )
-import Prelude
+import Prelude hiding
+    ( negate
+    )
 
 --------------------------------------------------------------------------------
 -- Sign
@@ -76,12 +79,12 @@ instance Enum SignOrZero where
 instance Ord SignOrZero where
     compare s1 s2 = case (s1, s2) of
         (Sign Negative, Sign Negative) -> EQ
-        (Sign Negative, _            ) -> LT
+        (Sign Negative, _) -> LT
         (Sign Positive, Sign Positive) -> EQ
-        (Sign Positive, _            ) -> GT
-        (Zero         , Sign Negative) -> GT
-        (Zero         , Sign Positive) -> LT
-        (Zero         , Zero         ) -> EQ
+        (Sign Positive, _) -> GT
+        (Zero, Sign Negative) -> GT
+        (Zero, Sign Positive) -> LT
+        (Zero, Zero) -> EQ
 
 moduloInclusiveRange :: Integral i => i -> (i, i) -> i
 moduloInclusiveRange i (lo, hi) = ((i - lo) `mod` (hi - lo + 1)) + lo
@@ -108,6 +111,12 @@ instance Semiring SignOrZero where
         (Sign Negative, Sign Negative) -> Sign Positive
 {- ORMOLU_ENABLE -}
 
+instance Ring SignOrZero where
+    negate = \case
+        Sign Negative -> Sign Positive
+        Sign Positive -> Sign Negative
+        Zero -> Zero
+
 --------------------------------------------------------------------------------
 -- SignOrZero: Sum
 --------------------------------------------------------------------------------
@@ -122,10 +131,7 @@ instance MonoidNull (Sum SignOrZero) where
     null (Sum s) = s == Zero
 
 instance Group (Sum SignOrZero) where
-    invert (Sum s) = Sum $ case s of
-        Sign Negative -> Sign Positive
-        Sign Positive -> Sign Negative
-        Zero -> Zero
+    invert = coerce (negate @SignOrZero)
 
 instance Abelian (Sum SignOrZero)
 

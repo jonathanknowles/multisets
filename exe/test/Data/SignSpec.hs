@@ -2,14 +2,14 @@
 
 module Data.SignSpec where
 
-import Internal.Data.Sign.Num
-    ( NumSign
-    )
 import Internal.Data.Monoid
     ( Max (..)
     , Min (..)
     , Product (..)
     , Sum (..)
+    )
+import Internal.Data.Sign
+    ( SignOrZero
     )
 import Test.Hspec
     ( Spec
@@ -26,8 +26,14 @@ import Test.QuickCheck
     )
 import Test.QuickCheck.Classes
     ( Laws (Laws)
+    , boundedEnumLaws
+    , enumLaws
+    , eqLaws
     , monoidLaws
-    , semigroupLaws, semiringLaws, ringLaws
+    , ordLaws
+    , ringLaws
+    , semigroupLaws
+    , semiringLaws
     )
 import Test.QuickCheck.Classes.Group
     ( groupLaws
@@ -43,39 +49,43 @@ import Prelude
 
 spec :: Spec
 spec = describe "Class laws" $ do
-    testLawsMany @NumSign
-        [ semiringLaws
+    testLawsMany @SignOrZero
+        [ eqLaws
+        , ordLaws
+        , enumLaws
+        , boundedEnumLaws
+        , semiringLaws
         , ringLaws
         ]
-    testLawsMany @(Min NumSign)
+    testLawsMany @(Min SignOrZero)
         [ semigroupLaws
         , monoidLaws
         ]
-    testLawsMany @(Max NumSign)
+    testLawsMany @(Max SignOrZero)
         [ semigroupLaws
         , monoidLaws
         ]
-    testLawsMany @(Sum NumSign)
+    testLawsMany @(Sum SignOrZero)
         [ semigroupLaws
         , monoidLaws
         , groupLaws
         ]
-    testLawsMany @(Product NumSign)
+    testLawsMany @(Product SignOrZero)
         [ semigroupLaws
         , monoidLaws
         ]
 
-instance Arbitrary NumSign where
+instance Arbitrary SignOrZero where
     arbitrary = arbitraryBoundedEnum
     shrink = shrinkBoundedEnum
 
-deriving newtype instance Arbitrary (Min NumSign)
+deriving newtype instance Arbitrary (Min SignOrZero)
 
-deriving newtype instance Arbitrary (Max NumSign)
+deriving newtype instance Arbitrary (Max SignOrZero)
 
-deriving newtype instance Arbitrary (Sum NumSign)
+deriving newtype instance Arbitrary (Sum SignOrZero)
 
-deriving newtype instance Arbitrary (Product NumSign)
+deriving newtype instance Arbitrary (Product SignOrZero)
 
 --------------------------------------------------------------------------------
 -- Coverage checks
