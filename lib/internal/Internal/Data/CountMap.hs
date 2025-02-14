@@ -1080,7 +1080,7 @@ semiringInterval a b = from lo
     from n
         | n == hi = [n]
         | n < hi = n : from (semiringSucc n)
-        | otherwise = error "semiringAscendingRange"
+        | otherwise = error "semiringInterval"
 
 semiringSucc :: Semiring a => a -> a
 semiringSucc = Semiring.plus Semiring.one
