@@ -1,8 +1,10 @@
 module Data.Map.SeqMap where
 
 import Data.Monoid.GCD
-    ( LeftGCDMonoid
+    ( LeftDistributiveGCDMonoid
+    , LeftGCDMonoid
     , OverlappingGCDMonoid
+    , RightDistributiveGCDMonoid
     , RightGCDMonoid
     )
 import Data.Monoid.Null
@@ -19,9 +21,7 @@ import Data.Semigroup.Cancellative
     , RightCancellative
     , RightReductive
     )
-import Data.Semigroup.Commutative
-    ( Commutative
-    )
+import Data.Semigroup.Cancellative qualified as C
 import Data.Sequence
     ( Seq
     )
@@ -29,13 +29,12 @@ import Internal.Data.Packed
     ( Packed (Unpacked)
     )
 import Prelude
-import qualified Data.Semigroup.Cancellative as C
 
 newtype SeqMap k v = SeqMap (MonoidMap k (Seq v))
     deriving newtype
-        ( Commutative
-        , Eq
+        ( Eq
         , LeftCancellative
+        , LeftDistributiveGCDMonoid
         , LeftGCDMonoid
         , LeftReductive
         , Monoid
@@ -43,6 +42,7 @@ newtype SeqMap k v = SeqMap (MonoidMap k (Seq v))
         , OverlappingGCDMonoid
         , PositiveMonoid
         , RightCancellative
+        , RightDistributiveGCDMonoid
         , RightGCDMonoid
         , RightReductive
         , Semigroup

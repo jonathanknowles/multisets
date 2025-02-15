@@ -268,3 +268,22 @@ specLawsFor elementType = do
             , functorLaws
             , traversableLaws
             ]
+
+        testLawsMany @(SeqMap a Int)
+            [ eqLaws
+            , leftCancellativeLaws
+            , leftDistributiveGCDMonoidLaws
+            , leftGCDMonoidLaws
+            , leftReductiveLaws
+            , monoidLaws
+            , monoidNullLaws
+            , overlappingGCDMonoidLaws
+            , positiveMonoidLaws
+            , rightCancellativeLaws
+            , rightDistributiveGCDMonoidLaws
+            , rightGCDMonoidLaws
+            , rightReductiveLaws
+            , semigroupLaws
+            , semigroupMonoidLaws
+            , showLaws
+            ]
