@@ -79,6 +79,12 @@ keySet (SeqMap m) = MonoidMap.nonNullKeys m
 keyBag :: Ord k => SeqMap k v -> Bag k
 keyBag (SeqMap m) = Bag (MonoidMap.map (Count . fromIntegral . Seq.length) m)
 
+valueSet :: Ord v => SeqMap k v -> Set v
+valueSet = undefined
+
+valueBag :: SeqMap k v -> Bag v
+valueBag = undefined
+
 isPrefixOf :: (Ord k, Eq v) => SeqMap k v -> SeqMap k v -> Bool
 isPrefixOf = C.isPrefixOf
 
