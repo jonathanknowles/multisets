@@ -95,6 +95,86 @@ newtype SignedSet a = SignedSet (CountMap a SignOrZero)
     deriving newtype (Eq, NFData)
 
 --------------------------------------------------------------------------------
+-- Instances of 'Ord'
+--------------------------------------------------------------------------------
+
+-- | See 'Data.Bag.compareLexically'.
+instance Ord a => Ord (Bag a) where
+    compare = CountMap.compareLexically
+
+-- | See 'Data.Bag.Signed.compareLexically'.
+instance Ord a => Ord (SignedBag a) where
+    compare = CountMap.compareLexically
+
+-- | See 'Data.Set.Signed.compareLexically'.
+instance Ord a => Ord (SignedSet a) where
+    compare = CountMap.compareLexically
+
+--------------------------------------------------------------------------------
+-- Instances of 'Packed'
+--------------------------------------------------------------------------------
+
+instance Packed (Bag a) where
+    type Unpacked (Bag a) = CountMap a Natural
+
+instance Packed (SignedBag a) where
+    type Unpacked (SignedBag a) = CountMap a Integer
+
+instance Packed (SignedSet a) where
+    type Unpacked (SignedSet a) = CountMap a SignOrZero
+
+type UBag a = Unpacked (Bag a)
+
+type USBag a = Unpacked (SignedBag a)
+
+type USSet a = Unpacked (SignedSet a)
+
+-- TODO:
+--
+-- This instance allows us to treat a @Set a@ object as if it were a packed
+-- 'CountMap a Bool' object. However, packing and unpacking both have cost
+-- that increases (superlinearly) with the size of the set.
+
+-- We should think of a way to avoid defining this instance.
+--
+instance Packed (Set a) where
+    type Unpacked (Set a) = CountMap a Bool
+    unpack = MonoidMap.fromSet (const (Count True))
+    pack = MonoidMap.nonNullKeys
+
+--------------------------------------------------------------------------------
+-- Instances of 'IsList'
+--------------------------------------------------------------------------------
+
+instance Ord a => IsList (Bag a) where
+    type Item (Bag a) = (a, Natural)
+    fromList = CountMap.fromList
+    toList = CountMap.toList
+
+instance Ord a => IsList (SignedBag a) where
+    type Item (SignedBag a) = (a, Integer)
+    fromList = CountMap.fromList
+    toList = CountMap.toList
+
+instance Ord a => IsList (SignedSet a) where
+    type Item (SignedSet a) = (a, SignOrZero)
+    fromList = CountMap.fromList
+    toList = CountMap.toList
+
+--------------------------------------------------------------------------------
+-- Instances of 'Show'
+--------------------------------------------------------------------------------
+
+instance Show a => Show (Bag a) where
+    show = CountMap.showFromList "Bag"
+
+instance Show a => Show (SignedBag a) where
+    show = CountMap.showFromList "SignedBag"
+
+instance Show a => Show (SignedSet a) where
+    show = CountMap.showFromListWith "SignedSet" "Sign.add"
+
+--------------------------------------------------------------------------------
 -- Instances for 'Sum' of 'Bag'
 --------------------------------------------------------------------------------
 
@@ -240,83 +320,3 @@ instance Ord a => Commutative (Intersection (SignedSet a))
 
 instance Ord a => Semigroup (Intersection (SignedSet a)) where
     (<>) = coerce (CountMap.intersection @(SignedSet a))
-
---------------------------------------------------------------------------------
--- Instances of 'Ord'
---------------------------------------------------------------------------------
-
--- | See 'Data.Bag.compareLexically'.
-instance Ord a => Ord (Bag a) where
-    compare = CountMap.compareLexically
-
--- | See 'Data.Bag.Signed.compareLexically'.
-instance Ord a => Ord (SignedBag a) where
-    compare = CountMap.compareLexically
-
--- | See 'Data.Set.Signed.compareLexically'.
-instance Ord a => Ord (SignedSet a) where
-    compare = CountMap.compareLexically
-
---------------------------------------------------------------------------------
--- Instances of 'Packed'
---------------------------------------------------------------------------------
-
-instance Packed (Bag a) where
-    type Unpacked (Bag a) = CountMap a Natural
-
-instance Packed (SignedBag a) where
-    type Unpacked (SignedBag a) = CountMap a Integer
-
-instance Packed (SignedSet a) where
-    type Unpacked (SignedSet a) = CountMap a SignOrZero
-
-type UBag a = Unpacked (Bag a)
-
-type USBag a = Unpacked (SignedBag a)
-
-type USSet a = Unpacked (SignedSet a)
-
--- TODO:
---
--- This instance allows us to treat a @Set a@ object as if it were a packed
--- 'CountMap a Bool' object. However, packing and unpacking both have cost
--- that increases (superlinearly) with the size of the set.
-
--- We should think of a way to avoid defining this instance.
---
-instance Packed (Set a) where
-    type Unpacked (Set a) = CountMap a Bool
-    unpack = MonoidMap.fromSet (const (Count True))
-    pack = MonoidMap.nonNullKeys
-
---------------------------------------------------------------------------------
--- Instances of 'IsList'
---------------------------------------------------------------------------------
-
-instance Ord a => IsList (Bag a) where
-    type Item (Bag a) = (a, Natural)
-    fromList = CountMap.fromList
-    toList = CountMap.toList
-
-instance Ord a => IsList (SignedBag a) where
-    type Item (SignedBag a) = (a, Integer)
-    fromList = CountMap.fromList
-    toList = CountMap.toList
-
-instance Ord a => IsList (SignedSet a) where
-    type Item (SignedSet a) = (a, SignOrZero)
-    fromList = CountMap.fromList
-    toList = CountMap.toList
-
---------------------------------------------------------------------------------
--- Instances of 'Show'
---------------------------------------------------------------------------------
-
-instance Show a => Show (Bag a) where
-    show = CountMap.showFromList "Bag"
-
-instance Show a => Show (SignedBag a) where
-    show = CountMap.showFromList "SignedBag"
-
-instance Show a => Show (SignedSet a) where
-    show = CountMap.showFromListWith "SignedSet" "Sign.add"
