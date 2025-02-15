@@ -250,6 +250,10 @@ specLawsFor elementType = do
             [ commutativeLaws
             , semigroupLaws
             ]
+        testLawsMany @(Intersection (Set a))
+            [ commutativeLaws
+            , semigroupLaws
+            ]
         testLawsMany @(Intersection (SignedBag a))
             [ commutativeLaws
             , semigroupLaws

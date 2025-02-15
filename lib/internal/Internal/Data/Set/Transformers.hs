@@ -38,6 +38,8 @@ import Data.Set
     ( Set
     )
 import Prelude
+import qualified Data.Set as Set
+import Data.Coerce (coerce)
 
 newtype Sum a = Sum {getSum :: a}
     deriving stock (Eq, Show)
@@ -75,3 +77,12 @@ deriving newtype instance Ord a => RightGCDMonoid (Union (Set a))
 deriving newtype instance Ord a => RightReductive (Union (Set a))
 deriving newtype instance Ord a => Semigroup (Union (Set a))
 {- ORMOLU_ENABLE -}
+
+--------------------------------------------------------------------------------
+-- Instances for 'Intersection' of 'Set'
+--------------------------------------------------------------------------------
+
+deriving newtype instance Ord a => Commutative (Intersection (Set a))
+
+instance Ord a => Semigroup (Intersection (Set a)) where
+    (<>) = coerce Set.intersection

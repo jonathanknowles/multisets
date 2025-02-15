@@ -14,13 +14,13 @@ import Data.Monoid.GCD
     ( GCDMonoid
     , LeftGCDMonoid
     , RightGCDMonoid
+    , OverlappingGCDMonoid
     )
 import Data.Monoid.LCM
     ( LCMMonoid
     )
 import Data.Monoid.Monus
     ( Monus
-    , OverlappingGCDMonoid
     )
 import Data.Monoid.Null
     ( MonoidNull

@@ -80,8 +80,10 @@ source-repository head
 library
     import:
       , dependency-base
+      , dependency-commutative-semigroups
       , dependency-containers
       , dependency-monoidmap
+      , dependency-monoid-subclasses
       , extensions
     hs-source-dirs:
         lib/public
