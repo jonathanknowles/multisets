@@ -1,3 +1,4 @@
+{-# LANGUAGE InstanceSigs #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module Generators where
@@ -10,6 +11,14 @@ import Data.Bag.Signed
     ( SignedBag
     )
 import Data.Bag.Signed qualified as SignedBag
+import Data.Map.SeqMap
+    ( SeqMap
+    )
+import Data.Map.SeqMap qualified as SeqMap
+import Data.Semigroup
+    ( Max (Max)
+    , Min (Min)
+    )
 import Data.Set.Signed
     ( SignedSet
     )
@@ -36,12 +45,11 @@ import Test.QuickCheck
     , listOf
     , oneof
     , scale
+    , shrink
     , shrinkIntegral
     , shrinkMapBy
     )
-import Test.QuickCheck.Arbitrary (shrink)
 import Prelude
-import Data.Semigroup (Min (Min), Max (Max) )
 
 instance Arbitrary Natural where
     arbitrary = arbitrarySizedNatural
@@ -91,3 +99,10 @@ instance (Arbitrary a, Ord a) => Arbitrary (SignedSet a) where
             <$> scale (`mod` 16) (listOf ((,) <$> arbitrary <*> arbitrary))
     shrink =
         shrinkMapBy SignedSet.fromMap SignedSet.toMap shrink
+
+instance (Arbitrary k, Ord k, Arbitrary v) => Arbitrary (SeqMap k v) where
+    arbitrary =
+        SeqMap.fromList
+            <$> scale (`mod` 16) (listOf ((,) <$> arbitrary <*> arbitrary))
+    shrink =
+        shrinkMapBy SeqMap.fromList SeqMap.toList shrink

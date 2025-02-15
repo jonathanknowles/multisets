@@ -13,9 +13,25 @@ import Internal.Data.Packed
 import Prelude
 
 newtype SeqMap k v = SeqMap (MonoidMap k (Seq v))
+    deriving (Eq, Show)
 
 instance Packed (SeqMap k v) where
     type Unpacked (SeqMap k v) = MonoidMap k (Seq v)
+
+instance Foldable (SeqMap k) where
+    foldMap f (SeqMap m) = foldMap (foldMap f) m
+
+instance Functor (SeqMap k) where
+    fmap f (SeqMap m) = SeqMap $ MonoidMap.map (fmap f) m
+
+instance Traversable (SeqMap k) where
+    traverse f (SeqMap m) = SeqMap <$> MonoidMap.traverse (traverse f) m
+
+fromList :: Ord k => [(k, Seq v)] -> SeqMap k v
+fromList = SeqMap . MonoidMap.fromList
+
+toList :: SeqMap k v -> [(k, Seq v)]
+toList (SeqMap m) = MonoidMap.toList m
 
 isPrefixOf :: (Ord k, Eq v) => SeqMap k v -> SeqMap k v -> Bool
 isPrefixOf m1 m2 = unpack m1 `MonoidMap.isPrefixOf` unpack m2

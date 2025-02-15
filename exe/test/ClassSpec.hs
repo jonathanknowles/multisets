@@ -13,6 +13,9 @@ import Data.Data
     ( Typeable
     , typeRep
     )
+import Data.Map.SeqMap
+    ( SeqMap
+    )
 import Data.Proxy
     ( Proxy (Proxy)
     )
@@ -41,12 +44,15 @@ import Test.QuickCheck
     )
 import Test.QuickCheck.Classes
     ( eqLaws
+    , foldableLaws
+    , functorLaws
     , isListLaws
     , monoidLaws
     , ordLaws
     , semigroupLaws
     , semigroupMonoidLaws
     , showLaws
+    , traversableLaws
     )
 import Test.QuickCheck.Classes.Group
     ( groupLaws
@@ -251,4 +257,10 @@ specLawsFor elementType = do
         testLawsMany @(Intersection (SignedSet a))
             [ commutativeLaws
             , semigroupLaws
+            ]
+
+        testLawsMany @(SeqMap a)
+            [ foldableLaws
+            , functorLaws
+            , traversableLaws
             ]
