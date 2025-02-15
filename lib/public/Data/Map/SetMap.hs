@@ -19,14 +19,14 @@ import Prelude
 
 newtype SetMap k v = SetMap (MonoidMap k (Set v))
 
-keysSet :: SetMap k v -> Set k
-keysSet (SetMap m) = MonoidMap.nonNullKeys m
+keySet :: SetMap k v -> Set k
+keySet (SetMap m) = MonoidMap.nonNullKeys m
 
-keysBag :: SetMap k v -> Bag k
-keysBag (SetMap m) = Bag (MonoidMap.map (Count . fromIntegral . Set.size) m)
+keyBag :: SetMap k v -> Bag k
+keyBag (SetMap m) = Bag (MonoidMap.map (Count . fromIntegral . Set.size) m)
 
-valuesSet :: Ord v => SetMap k v -> Set v
-valuesSet (SetMap m) = F.fold m
+valueSet :: Ord v => SetMap k v -> Set v
+valueSet (SetMap m) = F.fold m
 
-valuesBag :: SetMap k v -> Bag v
-valuesBag = undefined
+valueBag :: SetMap k v -> Bag v
+valueBag = undefined
