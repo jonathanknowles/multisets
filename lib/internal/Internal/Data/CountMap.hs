@@ -11,6 +11,9 @@ module Internal.Data.CountMap where
 -- restrictKeys?
 -- withoutKeys?
 
+import Control.Monad
+    ( guard
+    )
 import Data.Coerce
     ( coerce
     )
@@ -239,7 +242,10 @@ isRegular
     => Ord c
     => Ord k
     => p -> Bool
-isRegular = isJust . maybeRegular
+isRegular (toMap -> m) =
+    case Map.lookupMin m of
+        Just (_key, count) -> Foldable.all (== count) m
+        Nothing -> False
 
 isSimple
     :: PackedCountMap p k c
@@ -309,24 +315,10 @@ maybeRegular
     => Ord c
     => p
     -> Maybe (c, Set k)
-{- ORMOLU_DISABLE -}
-maybeRegular p =
-    -- TODO:
-    -- Optimise this function, so that instead of constructing the entire set
-    -- of unique counts and then testing its size, we terminate as soon as we
-    -- detect more than one unique count.
-    case Set.toList uniqueCounts of
-        -- TODO: Consider whether or not to return 'Nothing' here:
-        [ ] -> Just (z, Set.empty)
-        [c] -> Just (c,   toSet p)
-        (_) -> Nothing
-  where
-    z :: c
-    z = coerce (mempty :: Count c)
-
-    uniqueCounts :: Set c
-    uniqueCounts = Set.fromList $ fmap snd $ toList p
-{- ORMOLU_ENABLE -}
+maybeRegular (toMap -> m) = do
+    (_key, count) <- Map.lookupMin m
+    guard $ Foldable.all (== count) m
+    pure (count, Map.keysSet m)
 
 maybeSimple
     :: forall p k c
