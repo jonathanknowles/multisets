@@ -11,9 +11,6 @@ module Internal.Data.CountMap where
 -- restrictKeys?
 -- withoutKeys?
 
-import Control.Monad
-    ( guard
-    )
 import Data.Coerce
     ( coerce
     )
@@ -62,7 +59,7 @@ import Data.Set
     )
 import Data.Set qualified as Set
 import Internal.Data.Count
-    ( Count (Count)
+    ( Count (Count, getCount)
     , CountMagnitude (countToNatural)
     , CountSymmetricDifference
         ( CountSymmetricDifferenceAbsolute
@@ -236,6 +233,8 @@ signs =
         . mapMaybe (Sign.assertNonZero . signOf . snd)
         . toList
 
+-- Indicates whether or not all non-zero multiplicities are the same.
+--
 isRegular
     :: PackedCountMap p k c
     => Monoid (Count c)
@@ -244,16 +243,18 @@ isRegular
     => p -> Bool
 isRegular (toMap -> m) =
     case Map.lookupMin m of
+        Nothing -> True
         Just (_key, count) -> Foldable.all (== count) m
-        Nothing -> False
 
+-- Returns true if and only if there is exactly one unique element.
+--
 isSimple
     :: PackedCountMap p k c
     => Monoid (Count c)
     => Ord c
     => Ord k
     => p -> Bool
-isSimple = isJust . maybeSimple
+isSimple (toMap -> m) = Map.size m == 1
 
 isSingleton
     :: PackedCountMap p k c
@@ -307,6 +308,12 @@ isPositive
     => p -> Bool
 isPositive p = Foldable.all (>= mempty) (unpack p)
 
+-- Asserts that all non-zero multiplicities are the same.
+--
+-- @
+-- maybe True (\(c, s) -> fromSet (const c) s == m) (maybeRegular m)
+-- @
+--
 maybeRegular
     :: forall p k c
      . PackedCountMap p k c
@@ -315,10 +322,15 @@ maybeRegular
     => Ord c
     => p
     -> Maybe (c, Set k)
-maybeRegular (toMap -> m) = do
-    (_key, count) <- Map.lookupMin m
-    guard $ Foldable.all (== count) m
-    pure (count, Map.keysSet m)
+maybeRegular (toMap -> m) =
+    case Map.lookupMin m of
+        Nothing ->
+            Just (getCount mempty, mempty)
+        Just (_key, count)
+            | Foldable.all (== count) m ->
+                Just (count, Map.keysSet m)
+            | otherwise ->
+                Nothing
 
 maybeSimple
     :: forall p k c
@@ -329,17 +341,11 @@ maybeSimple
     => Ord c
     => p
     -> Maybe (c, k)
-maybeSimple p =
-    -- TODO:
-    -- Optimise this function, so that instead of constructing the entire set
-    -- of unique keys and then testing its size, we terminate as soon as we
-    -- detect more than one unique key.
-    case Set.toList uniqueKeys of
-        [k] -> Just (lookup k p, k)
-        (_) -> Nothing
-  where
-    uniqueKeys :: Set k
-    uniqueKeys = toSet p
+maybeSimple (toMap -> m) = do
+    (key, count) <- Map.lookupMin m
+    if Map.size m == 1
+    then Just (count, key)
+    else Nothing
 
 maybeSingleton
     :: forall p k c

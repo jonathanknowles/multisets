@@ -56,7 +56,7 @@ import Numeric.Natural
     )
 import Prelude
 
-newtype Count a = Count a
+newtype Count a = Count {getCount :: a}
     deriving stock (Eq, Ord, Functor)
     deriving newtype
         (Bounded, NFData, Ring, Semiring, Show)
