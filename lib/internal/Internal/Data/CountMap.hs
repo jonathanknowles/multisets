@@ -95,6 +95,7 @@ import Prelude hiding
     , sum
     )
 import Prelude qualified as Prelude
+import Control.Monad (guard)
 
 type CountMap a c = MonoidMap a (Count c)
 
@@ -322,15 +323,10 @@ maybeRegular
     => Ord c
     => p
     -> Maybe (c, Set k)
-maybeRegular (toMap -> m) =
-    case Map.lookupMin m of
-        Nothing ->
-            Just (getCount mempty, mempty)
-        Just (_key, count)
-            | Foldable.all (== count) m ->
-                Just (count, Map.keysSet m)
-            | otherwise ->
-                Nothing
+maybeRegular (toMap -> m) = do
+    (_key, count) <- Map.lookupMin m
+    guard $ Foldable.all (== count) m
+    pure (count, Map.keysSet m)
 
 maybeSimple
     :: forall p k c
